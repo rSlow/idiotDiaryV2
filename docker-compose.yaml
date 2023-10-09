@@ -1,0 +1,49 @@
+version: "3"
+
+services:
+  aiogram:
+    build: ./telegram_bot
+    env_file:
+      - ./env/aiogram.env
+      - ./env/postgres.env
+      - ./env/redis.env
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+
+  postgres:
+    image: postgres
+    restart: always
+    env_file:
+      - ./env/postgres.env
+    ports:
+      - '6432:5432'
+    volumes:
+      - pg_idv2:/var/lib/postgresql/data/pgdata/idiotDiaryV2
+    environment:
+      PGDATA: /var/lib/postgresql/data/pgdata/idiotDiaryV2
+
+  redis:
+    image: redis
+    restart: always
+    ports:
+      - '6379:6379'
+    command:
+      - 'redis-server'
+      - '--loglevel ${REDIS_LOGLEVEL:-warning}'
+      - '--databases 2'
+      - '--save 900 1'
+      - '--save 300 10'
+      - '--save 60 10000'
+      - '--maxmemory ${REDIS_MAXMEM:-50mb}'
+      - '--maxmemory-policy ${REDIS_POLICY:-noeviction}'
+      - '--requirepass ${REDIS_PASS}'
+    volumes:
+      - redis:/data
+    env_file:
+      - ./env/redis.env
+
+volumes:
+  redis:
+  pg_idv2:
