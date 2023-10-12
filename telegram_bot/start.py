@@ -15,6 +15,7 @@ async def main():
     await memory_storage.set_all_states()
 
     await set_ui_commands(bot)
+
     await dp.start_polling(bot)
 
 

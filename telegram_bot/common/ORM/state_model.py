@@ -1,16 +1,16 @@
-from sqlalchemy import select
+from sqlalchemy import select, BigInteger
 from sqlalchemy.orm import Mapped, mapped_column
 
-from config.database import Base, Session
+from .database import Base, Session
 
 
 class State(Base):
     __tablename__ = "states"
 
-    user_id: Mapped[int] = mapped_column(primary_key=True)
-    chat_id: Mapped[int]
-    bot_id: Mapped[int]
-    state: Mapped[str]
+    user_id = mapped_column(BigInteger, primary_key=True)
+    chat_id = mapped_column(BigInteger)
+    bot_id = mapped_column(BigInteger)
+    state: Mapped[str] = mapped_column(nullable=True)
 
     @classmethod
     async def add_user(cls,

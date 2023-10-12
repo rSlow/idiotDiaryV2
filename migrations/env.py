@@ -24,14 +24,14 @@ sys.path.append(BASE_DIR)
 # add your model's MetaData object here
 # for 'autogenerate' support
 try:
-    from telegram_bot.config.database import Engine, Base
+    from telegram_bot.common.ORM.database import Engine, Base
 
     target_metadata = Base.metadata
 except ImportError as ex:
     raise ex
 
 try:
-    ...
+    from telegram_bot.common.ORM.state_model import State
 except ImportError:
     raise
 

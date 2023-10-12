@@ -1,4 +1,4 @@
-from config.base_keyboard import BaseKeyboardBuilder
+from common.base_keyboard import BaseKeyboardBuilder
 
 
 class PackKeyboard(BaseKeyboardBuilder):
@@ -10,7 +10,7 @@ class PackKeyboard(BaseKeyboardBuilder):
     ]
 
 
-class PackAgainKeyboard(BaseKeyboardBuilder):
+class PackFinishKeyboard(BaseKeyboardBuilder):
     class Buttons:
         again = "Еще один архив"
 

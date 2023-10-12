@@ -1,4 +1,4 @@
-from config.base_keyboard import BaseKeyboardBuilder
+from common.base_keyboard import BaseKeyboardBuilder
 
 
 class ConvertVideoKeyboard(BaseKeyboardBuilder):

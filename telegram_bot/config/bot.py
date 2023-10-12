@@ -1,7 +1,6 @@
 from aiogram import Bot, Dispatcher
-from aiogram.filters import Command
 
-from common.handlers import start, delete
+from common.handlers import router as common_router
 from common.storage import memory_storage
 from .router import root_router
 from .settings import ENV
@@ -16,12 +15,6 @@ dp = Dispatcher(
     storage=memory_storage
 )
 
-# ----- HANDLERS ----- #
-dp.message.register(
-    start,
-    Command("start")
-)
-
+# ----- ROUTERS ----- #
 dp.include_routers(root_router)
-
-dp.message.register(delete)
+dp.include_routers(common_router)

@@ -1,4 +1,4 @@
-from config.base_keyboard import BaseKeyboardBuilder
+from .base_keyboard import BaseKeyboardBuilder
 
 
 class StartKeyboard(BaseKeyboardBuilder):

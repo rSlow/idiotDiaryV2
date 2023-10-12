@@ -34,8 +34,7 @@ async def download_photo(file_id: str, bot: Bot):
     return photo_io
 
 
-async def get_zip(file_id_list: list[str], bot):
-    print(file_id_list)
+async def get_zip_file(file_id_list: list[str], bot: Bot):
     tasks = []
     for i, file_id in enumerate(file_id_list, 1):
         tasks.append(download_photo(file_id=file_id, bot=bot))
@@ -49,7 +48,6 @@ async def get_zip(file_id_list: list[str], bot):
                 zinfo_or_arcname=f"{i}.jpg",
                 data=photo_io.read()
             )
-
     zip_io.seek(0)
     zip_file = BufferedInputFile(
         file=zip_io.read(),

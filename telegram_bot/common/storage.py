@@ -1,7 +1,8 @@
 from aiogram.fsm.storage.base import StorageKey, StateType
 from aiogram.fsm.storage.memory import MemoryStorage
 
-from common.state_model import State
+from common.ORM.state_model import State
+from aiogram.fsm.state import State as TState
 
 
 class ModifiedMemoryStorage(MemoryStorage):
@@ -18,7 +19,7 @@ class ModifiedMemoryStorage(MemoryStorage):
             chat_id=key.chat_id,
             user_id=key.user_id,
             bot_id=key.bot_id,
-            state=state.state
+            state=state.state if isinstance(state, TState) else state
         )
 
     async def set_all_states(self):
