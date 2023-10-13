@@ -1,3 +1,5 @@
+import logging
+
 from aiogram import types, Router, F
 from aiogram.filters import Command, ExceptionTypeFilter
 from aiogram.fsm.context import FSMContext
@@ -23,13 +25,25 @@ async def delete(message: types.Message):
     await message.delete()
 
 
-# @first_router.error(ExceptionTypeFilter(KeyError), F.update.message.as_("message"))
+@first_router.error(F.update.message.as_("message"))
 async def key_error_pass(event: types.ErrorEvent, message: types.Message, state: FSMContext):
     data = await state.get_data()
-    if not data:
+    if isinstance(event.exception, KeyError) and not data:  # check if empty FSM data and KeyError exception
+        await start(
+            message=message,
+            state=state,
+            text=f"Бот был перезагружен, и промежуточные данные были утеряны. "
+                 f"Попробуйте воспользоваться функцией еще раз."
+        )
+    else:
         await start(
             message=message,
             state=state,
             text=f"Извините, во время работы бота произошла ошибка. Мы вынуждены вернуть вас на главный экран. "
                  f"Попробуйте воспользоваться функцией еще раз."
         )
+
+    logging.exception(
+        msg="",
+        exc_info=event.exception
+    )
