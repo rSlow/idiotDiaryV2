@@ -1,23 +1,10 @@
-import asyncio
+from aiogram.webhook.aiohttp_server import setup_application
+from aiohttp import web
 
-from common.middlewares import DbSessionMiddleware
-from common.storage import memory_storage
 from config.bot import dp, bot
-from common.ORM.database import Session
-from config.logger import init_logging
-from config.ui_config import set_ui_commands
+from config.settings import WEB_SERVER_HOST, WEB_SERVER_PORT
+from http_server.app import app
 
-
-async def main():
-    dp.startup.register(init_logging)
-    dp.update.middleware(DbSessionMiddleware(session_pool=Session))
-
-    await memory_storage.set_all_states()
-
-    await set_ui_commands(bot)
-
-    await dp.start_polling(bot)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())
+if __name__ == '__main__':
+    setup_application(app, dp, bot=bot)
+    web.run_app(app, host=WEB_SERVER_HOST, port=WEB_SERVER_PORT)

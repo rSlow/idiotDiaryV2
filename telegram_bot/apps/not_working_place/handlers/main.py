@@ -1,14 +1,15 @@
-from aiogram import types, F
+from aiogram import types, F, Router
 from aiogram.fsm.context import FSMContext
 
 from common.FSM import CommonState
 from common.keyboards import StartKeyboard
-from . import router
 from ..FSM.start import Start
 from ..keyboards.main import NotWorkingPlaceKeyboard
 
+main_nwp_router = Router()
 
-@router.message(
+
+@main_nwp_router.message(
     F.text == StartKeyboard.Buttons.not_working_place,
     CommonState.start
 )

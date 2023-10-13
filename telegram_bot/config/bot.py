@@ -1,9 +1,10 @@
 from aiogram import Bot, Dispatcher
 
-from common.handlers import router as common_router
+from common.handlers import first_router, last_router
 from common.storage import memory_storage
-from .router import root_router
+from .router import apps_router
 from .settings import ENV
+from .startup_shutdown import on_startup, on_shutdown
 
 token = ENV.str("BOT_TOKEN")
 
@@ -14,7 +15,12 @@ bot = Bot(
 dp = Dispatcher(
     storage=memory_storage
 )
+dp.startup.register(on_startup)
+dp.shutdown.register(on_shutdown)
 
 # ----- ROUTERS ----- #
-dp.include_routers(root_router)
-dp.include_routers(common_router)
+dp.include_routers(
+    first_router,
+    apps_router,
+    last_router
+)

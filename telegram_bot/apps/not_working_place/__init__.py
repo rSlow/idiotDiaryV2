@@ -1,1 +1,1 @@
-from .handlers import router
+from .handlers import nwp_router

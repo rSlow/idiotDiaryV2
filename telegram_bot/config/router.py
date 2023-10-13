@@ -1,8 +1,9 @@
 from aiogram import Router
 from apps import not_working_place
 
-root_router = Router(name="root")
+apps_router = Router(name="apps")
 
-root_router.include_routers(
-    not_working_place.router,
+apps_router.include_routers(
+    not_working_place.nwp_router,
+    # free_shaurma.fsh_router
 )

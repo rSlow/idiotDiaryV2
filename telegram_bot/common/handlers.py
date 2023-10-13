@@ -1,22 +1,35 @@
 from aiogram import types, Router, F
-from aiogram.filters import Command
+from aiogram.filters import Command, ExceptionTypeFilter
 from aiogram.fsm.context import FSMContext
 
 from .FSM import CommonState
 from .keyboards import StartKeyboard
 
-router = Router()
+first_router = Router()
+last_router = Router()
 
 
-@router.message(Command("start"))
-async def start(message: types.Message, state: FSMContext):
+@first_router.message(Command("start"))
+async def start(message: types.Message, state: FSMContext, text: str | None = None):
     await state.set_state(CommonState.start)
     await message.answer(
-        text="Куда надо?",
+        text=text or "Куда надо?",
         reply_markup=StartKeyboard.build()
     )
 
 
-@router.message(F.text)
+@last_router.message(F.text)
 async def delete(message: types.Message):
     await message.delete()
+
+
+# @first_router.error(ExceptionTypeFilter(KeyError), F.update.message.as_("message"))
+async def key_error_pass(event: types.ErrorEvent, message: types.Message, state: FSMContext):
+    data = await state.get_data()
+    if not data:
+        await start(
+            message=message,
+            state=state,
+            text=f"Извините, во время работы бота произошла ошибка. Мы вынуждены вернуть вас на главный экран. "
+                 f"Попробуйте воспользоваться функцией еще раз."
+        )

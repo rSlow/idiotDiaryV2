@@ -1,4 +1,4 @@
-from aiogram import types, F
+from aiogram import types, F, Router
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
 
@@ -7,10 +7,11 @@ from ..FSM.images_zip import ImagesZip
 from ..keyboards.main import NotWorkingPlaceKeyboard
 from ..keyboards.pack import PackKeyboard, PackFinishKeyboard
 from ..utils import photos
-from . import router
+
+pack_photos_router = Router(name="pack_photos")
 
 
-@router.message(
+@pack_photos_router.message(
     F.text == NotWorkingPlaceKeyboard.Buttons.pack,
     Start.main
 )
@@ -25,7 +26,7 @@ async def wait_photos(message: types.Message, state: FSMContext):
     )
 
 
-@router.message(
+@pack_photos_router.message(
     F.photo,
     StateFilter(ImagesZip.waiting, ImagesZip.start)
 )
@@ -37,7 +38,7 @@ async def append_photo(message: types.Message, state: FSMContext):
     await message.delete()
 
 
-@router.message(
+@pack_photos_router.message(
     F.text == PackKeyboard.Buttons.accept,
     ImagesZip.waiting
 )
@@ -70,7 +71,7 @@ async def return_zip(message: types.Message, state: FSMContext):
         await temp_message.delete()
 
 
-@router.message(
+@pack_photos_router.message(
     F.text == PackFinishKeyboard.Buttons.again,
     ImagesZip.finish
 )

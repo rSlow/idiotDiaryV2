@@ -1,7 +1,7 @@
 from asyncio import sleep
 from datetime import datetime
 
-from aiogram import F
+from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, BufferedInputFile
 from ..FSM.start import Start
@@ -9,14 +9,14 @@ from ..FSM.convert_voice import ConvertVoice
 from ..keyboards.main import NotWorkingPlaceKeyboard
 from ..keyboards.voice_convert import ConvertVideoKeyboard, ConvertAgainVideoKeyboard
 
-from . import router
+voice_convert_router = Router()
 
 
-@router.message(
+@voice_convert_router.message(
     F.text == ConvertAgainVideoKeyboard.Buttons.again,
     ConvertVoice.convert
 )
-@router.message(
+@voice_convert_router.message(
     F.text == NotWorkingPlaceKeyboard.Buttons.convert_voice,
     Start.main
 )
@@ -31,7 +31,7 @@ async def convert_voice_message_start(message: Message, state: FSMContext):
     )
 
 
-@router.message(
+@voice_convert_router.message(
     F.text,
     ConvertVoice.start,
 )
@@ -45,7 +45,7 @@ async def set_voice_file_text(message: Message, state: FSMContext):
     await inf_msg.delete()
 
 
-@router.message(
+@voice_convert_router.message(
     F.voice,
     ConvertVoice.start,
 )

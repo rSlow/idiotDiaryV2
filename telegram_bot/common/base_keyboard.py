@@ -1,9 +1,11 @@
+from enum import Enum, EnumType
+
 from aiogram.types import KeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
 
 class TypeInterface:
-    button_type = str | KeyboardButton
+    button_type = str | KeyboardButton | EnumType
     iterable = list[button_type] | tuple[button_type]
     double_iterable = list[iterable] | tuple[iterable]
     buttons_list_type = iterable | double_iterable
@@ -44,20 +46,23 @@ class BaseKeyboardBuilder(ReplyKeyboardBuilder):
         )
 
     @classmethod
-    def build(cls):
-        return cls().as_markup()
+    def build(cls, *args, **kwargs):
+        return cls(*args, **kwargs).as_markup()
 
     def _process_buttons_list(self, buttons_list: TypeInterface.buttons_list_type):
 
         def _prepare_row(buttons_row: TypeInterface.iterable):
             prepared_row: list[KeyboardButton] = []
             for button in buttons_row:
-                if type(button) == str:
+                b = type(button)
+                if isinstance(button, str):
                     prepared_button = KeyboardButton(text=button)
-                elif type(button) == KeyboardButton:
+                elif isinstance(button, Enum):
+                    prepared_button = KeyboardButton(text=button.value)
+                elif isinstance(button, KeyboardButton):
                     prepared_button = button
                 else:
-                    raise TypeError(f"button {button} is not matches to 'str' or 'KeyboardButton'")
+                    raise TypeError(f"button {button} is not matches to 'str', 'Enum' or 'KeyboardButton'")
 
                 prepared_row.append(prepared_button)
             return prepared_row
@@ -65,6 +70,10 @@ class BaseKeyboardBuilder(ReplyKeyboardBuilder):
         for row in buttons_list:
             if type(row) == TypeInterface.iterable:
                 self.row(*_prepare_row(row))
-            elif type(row) in [str, KeyboardButton]:
+            elif isinstance(row, (str, KeyboardButton, Enum)):
                 self.add(*_prepare_row(buttons_list))
                 return
+
+
+class CancelKeyboard(BaseKeyboardBuilder):
+    pass
