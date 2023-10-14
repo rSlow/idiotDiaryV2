@@ -46,7 +46,8 @@ services:
     image: nginx
     restart: always
     ports:
-      - "${OUTER_PORT}:443"
+      - "443:443"
+      - "80:80"
     volumes:
       - ~/certs-data/certs/:/data/certs/:ro
       - ./nginx/default.conf:/etc/nginx/templates/default.conf.template/:rw
