@@ -45,8 +45,6 @@ services:
   nginx:
     image: nginx
     restart: always
-    links:
-      - aiogram
     ports:
       - "443:443"
       - "80:80"
