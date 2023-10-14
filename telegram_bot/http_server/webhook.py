@@ -10,7 +10,7 @@ webhook_router = APIRouter()
 
 async def init_webhook(dp: Dispatcher, bot: Bot):
     await bot.set_webhook(
-        url=f"{settings.BASE_WEBHOOK_URL}{settings.WEBHOOK_PATH}",
+        url=f"{settings.BASE_WEBHOOK_URL}:{settings.OUTER_PORT}{settings.WEBHOOK_PATH}",
         secret_token=settings.WEBHOOK_SECRET
     )
 

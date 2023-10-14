@@ -4,8 +4,6 @@ services:
   aiogram:
     build: ./telegram_bot
     restart: always
-    ports:
-      - "${WEB_SERVER_PORT}:${WEB_SERVER_PORT}"
     volumes:
       - ./.env/:/app/.env/:ro
     depends_on:
@@ -45,12 +43,10 @@ services:
       - ./.env
 
   nginx:
-    image: nginx
+    build: ./nginx
     restart: always
     ports:
-      - "443:443"
-      - "80:80"
-      - "${WEB_SERVER_PORT}:${WEB_SERVER_PORT}"
+      - "${OUTER_PORT}:443"
     volumes:
       - ~/certs-data/certs/:/data/certs/:ro
       - ./nginx/default.conf:/etc/nginx/templates/default.conf.template/:rw
