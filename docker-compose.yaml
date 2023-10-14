@@ -3,10 +3,8 @@ version: "3"
 services:
   aiogram:
     build: ./telegram_bot
-    env_file:
-      - ./env/aiogram.env
-      - ./env/postgres.env
-      - ./env/redis.env
+    volumes:
+      - ./.env/:/app/.env/:ro
     restart: always
     depends_on:
       - postgres
@@ -16,7 +14,7 @@ services:
     image: postgres
     restart: always
     env_file:
-      - ./env/postgres.env
+      - ./.env
     ports:
       - '6432:5432'
     volumes:
@@ -38,11 +36,26 @@ services:
       - '--save 60 10000'
       - '--maxmemory ${REDIS_MAXMEM:-50mb}'
       - '--maxmemory-policy ${REDIS_POLICY:-noeviction}'
-      - '--requirepass ${REDIS_PASS}'
+      - '--requirepass ${REDIS_PASS:-spa1Nmax}'
     volumes:
       - redis:/data
     env_file:
-      - ./env/redis.env
+      - ./.env
+
+  nginx:
+    image: nginx
+    restart: always
+    ports:
+      - "443:443"
+      - "80:80"
+    volumes:
+      - /home/rslow/shadowsocks_config/certs-data/certs/:/data/certs/:ro
+      - ./nginx/default.conf:/etc/nginx/templates/default.conf.template/:rw
+    env_file:
+      - ./.env
+    depends_on:
+      - aiogram
+
 
 volumes:
   redis:

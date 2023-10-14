@@ -7,7 +7,7 @@ from sqlalchemy.engine import Connection
 from sqlalchemy.ext.asyncio import async_engine_from_config
 
 from alembic import context
-from telegram_bot.config.settings import BASE_DIR, ENV
+from config.settings import ENV, BASE_DIR
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
@@ -24,14 +24,15 @@ sys.path.append(BASE_DIR)
 # add your model's MetaData object here
 # for 'autogenerate' support
 try:
-    from telegram_bot.common.ORM.database import Engine, Base
+    from common.ORM.database import Engine, Base
 
     target_metadata = Base.metadata
 except ImportError as ex:
     raise ex
 
 try:
-    from telegram_bot.common.ORM.state_model import State
+    from common.ORM.state_model import State
+    from apps.not_working_place.ORM.birthdays import Birthday
 except ImportError:
     raise
 

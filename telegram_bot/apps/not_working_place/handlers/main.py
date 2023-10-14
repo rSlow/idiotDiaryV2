@@ -6,10 +6,10 @@ from common.keyboards import StartKeyboard
 from ..FSM.start import Start
 from ..keyboards.main import NotWorkingPlaceKeyboard
 
-main_nwp_router = Router()
+start_nwp_router = Router()
 
 
-@main_nwp_router.message(
+@start_nwp_router.message(
     F.text == StartKeyboard.Buttons.not_working_place,
     CommonState.start
 )
