@@ -1,3 +1,4 @@
+import logging
 from typing import Any
 
 from aiogram import Bot, Dispatcher, types
@@ -9,22 +10,12 @@ webhook_router = APIRouter()
 
 
 async def init_webhook(dp: Dispatcher, bot: Bot):
+    webhook_url = f"{settings.BASE_WEBHOOK_URL}{settings.WEBHOOK_PATH}"
     await bot.set_webhook(
-        url=f"{settings.BASE_WEBHOOK_URL}{settings.WEBHOOK_PATH}",
+        url=webhook_url,
         secret_token=settings.WEBHOOK_SECRET
     )
-
-    @webhook_router.post(settings.WEBHOOK_PATH)
-    async def bot_webhook(update: dict,
-                          secret_token: str = Header(alias=settings.SECRET_HEADER)):
-        if secret_token != settings.WEBHOOK_SECRET:
-            raise HTTPException(
-                status_code=status.HTTP_401_UNAUTHORIZED,
-                detail="Incorrect secret token",
-            )
-
-        telegram_update = types.Update(**update)
-        await dp.feed_update(bot=bot, update=telegram_update)
+    logging.info("SET WEBHOOK")
 
 
 def fastapi_setup(fastapi_app: FastAPI, dispatcher: Dispatcher, /, **kwargs: Any) -> None:
