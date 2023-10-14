@@ -6,6 +6,7 @@ services:
     restart: always
     volumes:
       - ./.env/:/app/.env/:ro
+    network_mode: host
     depends_on:
       - postgres
       - redis
@@ -15,6 +16,7 @@ services:
     restart: always
     env_file:
       - ./.env
+    network_mode: host
     ports:
       - '6432:5432'
     volumes:
@@ -25,6 +27,7 @@ services:
   redis:
     image: redis
     restart: always
+    network_mode: host
     ports:
       - '6379:6379'
     command:
@@ -45,6 +48,7 @@ services:
   nginx:
     image: nginx
     restart: always
+    network_mode: host
     ports:
       - "443:443"
       - "80:80"
