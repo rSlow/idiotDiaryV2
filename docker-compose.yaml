@@ -3,9 +3,9 @@ version: "3"
 services:
   aiogram:
     build: ./telegram_bot
+    restart: always
     volumes:
       - ./.env/:/app/.env/:ro
-    restart: always
     depends_on:
       - postgres
       - redis
