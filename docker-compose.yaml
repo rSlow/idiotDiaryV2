@@ -49,7 +49,7 @@ services:
       - "443:443"
       - "80:80"
     volumes:
-      - ~/shadowsocks_config/certs-data/certs/:/data/certs/:ro
+      - ~/certs-data/certs/:/data/certs/:ro
       - ./nginx/default.conf:/etc/nginx/templates/default.conf.template/:rw
     env_file:
       - ./.env
