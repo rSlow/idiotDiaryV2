@@ -3,8 +3,6 @@ version: "3"
 services:
   aiogram:
     build: ./telegram_bot
-    ports:
-      - "${WEB_SERVER_PORT}:${WEB_SERVER_PORT}"
     restart: always
     volumes:
       - ./.env/:/app/.env/:ro
@@ -47,6 +45,8 @@ services:
   nginx:
     image: nginx
     restart: always
+    links:
+      - aiogram
     ports:
       - "443:443"
       - "80:80"
