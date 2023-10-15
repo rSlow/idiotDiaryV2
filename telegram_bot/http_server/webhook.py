@@ -1,12 +1,10 @@
 import logging
 from typing import Any
 
-from aiogram import Bot, Dispatcher, types
-from fastapi import FastAPI, Header, HTTPException, status, APIRouter
+from aiogram import Bot, Dispatcher
+from fastapi import FastAPI
 
 from config import settings
-
-webhook_router = APIRouter()
 
 
 async def init_webhook(dp: Dispatcher, bot: Bot):

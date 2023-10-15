@@ -2,7 +2,6 @@ import logging
 
 from aiogram import Bot, Dispatcher
 
-from apps.not_working_place.schedules import send_birthdays
 from common.middlewares import DbSessionMiddleware, PreviousHandlerMiddleware, ContextMiddleware
 from common.storage import memory_storage
 from common.ORM.database import Session
@@ -27,7 +26,6 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot):
     scheduler.start()
     init_schedules(bot)
 
-    await send_birthdays(bot=bot)
     await init_webhook(dispatcher, bot)
 
 

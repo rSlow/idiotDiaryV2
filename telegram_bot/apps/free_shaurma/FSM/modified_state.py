@@ -1,31 +1,45 @@
-from typing import Optional
+from typing import Type, Optional, Any, Callable
 
 from aiogram.fsm.state import StatesGroup, State
 
-from common.base_keyboard import BaseKeyboardBuilder
-
-
-class StateValidator:
-    ...
+from apps.free_shaurma.validators import BaseStateValidator
+from common.base_keyboard import BaseKeyboardBuilder, CancelKeyboard
 
 
 class BankState(State):
     def __init__(self,
                  start_text: str,
-                 start_keyboard: BaseKeyboardBuilder | None = None,
-                 error_text: str | None = None,
-                 error_keyboard: BaseKeyboardBuilder | None = None,
-
-                 validators: list[StateValidator] | None = None,
+                 keyboard: Type[BaseKeyboardBuilder] = CancelKeyboard,
+                 validator: BaseStateValidator | Callable[[Any], Any] | None = None,
                  state: str | None = None,
                  group_name: str | None = None):
         super().__init__(state=state, group_name=group_name)
 
         self.start_text = start_text
-        self.start_keyboard = start_keyboard
-        self.error_text = error_text
-        self.error_keyboard = error_keyboard
-        self.validators = validators
+        self.keyboard = keyboard
+        self.validator = validator
+
+    def next(self) -> Optional["BankState"]:
+        group = self.group
+        for i, state in enumerate(group.__all_states__):
+            if self.state == state.state:
+                if i + 1 == len(group.__all_states__):
+                    return None
+                else:
+                    return group.__all_states__[i + 1]
+        else:
+            raise RuntimeError(f"can't find next state for state {self.state}")
+
+    def validate(self, value: Any) -> Any:
+        if self.validator is None:
+            return value
+        else:
+            if isinstance(self.validator, BaseStateValidator):
+                return self.validator.validate(value)
+            elif callable(self.validator):
+                return self.validator(value)
+            else:
+                raise RuntimeError("unknown validator type")
 
 
 class BankStatesGroup(StatesGroup):
@@ -34,17 +48,9 @@ class BankStatesGroup(StatesGroup):
         return cls.__all_states__[0]
 
     @classmethod
-    def next(cls, state_obj: BankState | str | None = None) -> BankState | bool:
-        if state_obj is None:
-            return cls.first()
-
-        state_str: str = state_obj.state if isinstance(state_obj, BankState) else state_obj
-
-        for i, state in enumerate(cls.__all_states__):
-            if state_str == state.state:
-                if i + 1 == len(cls.__all_states__):
-                    return False
-                else:
-                    return state
+    def get_by_raw(cls, raw_state: str) -> BankState:
+        for state in cls.__all_states__:
+            if raw_state == state.state:
+                return state
         else:
-            raise AttributeError
+            raise KeyError

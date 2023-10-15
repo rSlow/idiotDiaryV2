@@ -5,11 +5,9 @@ from fastapi import status
 from apps.not_working_place.http_app.routers import nwp_router
 from config import settings
 from config.bot import dp, bot
-from http_server.webhook import webhook_router
 
 app = FastAPI()
 
-app.include_router(webhook_router)
 app.include_router(nwp_router)
 
 

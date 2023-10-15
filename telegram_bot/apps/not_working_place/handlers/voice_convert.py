@@ -4,6 +4,8 @@ from datetime import datetime
 from aiogram import F, Router
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, BufferedInputFile
+
+from config import settings
 from ..FSM.start import Start
 from ..FSM.convert_voice import ConvertVoice
 from ..keyboards.main import NotWorkingPlaceKeyboard
@@ -53,9 +55,9 @@ async def convert_voice_message(message: Message, state: FSMContext):
     await state.set_state(ConvertVoice.convert)
 
     data = await state.get_data()
-    filename = data["VOICE_NAME"]
+    filename = data.get("VOICE_NAME")
     if filename is None:
-        filename = datetime.now().isoformat()
+        filename = datetime.now().astimezone(settings.TIMEZONE).isoformat()
 
     voice_file_io = await message.bot.download(
         file=message.voice.file_id
