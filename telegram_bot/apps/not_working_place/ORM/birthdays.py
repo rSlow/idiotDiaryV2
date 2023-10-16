@@ -12,7 +12,7 @@ class Birthday(Base):
     __tablename__ = "birthdays"
 
     id: Mapped[int] = mapped_column(primary_key=True)
-    fio: Mapped[str]
+    fio: Mapped[str] = mapped_column(primary_key=True)
     date: Mapped[date]
     post: Mapped[str]
     rank: Mapped[str] = mapped_column(nullable=True)
@@ -21,14 +21,13 @@ class Birthday(Base):
     async def update_data(cls, data: list[SBirthday]):
         async with Session() as session:
             async with session.begin():
-                q = delete(cls)
+                q = delete(cls).filter(
+                    cls.fio.in_([birthday.fio for birthday in data])
+                )
                 await session.execute(q)
 
                 session.add_all([
-                    cls(fio=birthday.fio,
-                        date=birthday.date,
-                        post=birthday.post,
-                        rank=birthday.rank)
+                    cls(**birthday.model_dump())
                     for birthday in data
                 ])
 

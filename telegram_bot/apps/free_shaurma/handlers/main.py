@@ -6,9 +6,10 @@ from common.keyboards import StartKeyboard
 from common.FSM import CommonState
 from .. import settings
 from ..FSM.modified_state import BankStatesGroup
+from ..schemas import enums
 from ..utils import send_files, main
 from ..keyboards.bank_prepare import FromBanksKeyboard, ToBanksKeyboard, DeviceKeyboard
-from ..FSM.bank import ChooseBankParams
+from ..FSM.bank_forms import ChooseBankParams
 
 start_fsh_router = Router(name="start_fsh")
 
@@ -27,11 +28,11 @@ async def choose_device(message: types.Message, state: FSMContext):
 
 
 @start_fsh_router.message(
-    F.text[F.in_(settings.DeviceNames.as_value_list())].as_("device_value"),
+    F.text[F.in_(enums.DeviceNames.as_value_list())].as_("device_value"),
     ChooseBankParams.device,
 )
 async def choose_from_bank(message: types.Message, state: FSMContext, device_value: str):
-    device_enum = settings.DeviceNames.find_from_value(device_value)
+    device_enum = enums.DeviceNames.find_from_value(device_value)
     await state.update_data(device=device_enum.name)
 
     await state.set_state(ChooseBankParams.from_bank)
@@ -45,14 +46,14 @@ async def choose_from_bank(message: types.Message, state: FSMContext, device_val
 
 
 @start_fsh_router.message(
-    F.text[F.in_(settings.BankNames.as_value_list())].as_("from_bank_value"),
+    F.text[F.in_(enums.BankNames.as_value_list())].as_("from_bank_value"),
     ChooseBankParams.from_bank
 )
 async def choose_to_bank(message: types.Message, state: FSMContext, from_bank_value: str):
     storage_data = await state.get_data()
     device = storage_data["device"]
 
-    from_bank_name = settings.BankNames.find_from_value(from_bank_value).name
+    from_bank_name = enums.BankNames.find_from_value(from_bank_value).name
 
     await state.update_data(from_bank=from_bank_name)
 
@@ -68,14 +69,14 @@ async def choose_to_bank(message: types.Message, state: FSMContext, from_bank_va
 
 
 @start_fsh_router.message(
-    F.text[F.in_(settings.BankNames.as_value_list())].as_("to_bank_value"),
+    F.text[F.in_(enums.BankNames.as_value_list())].as_("to_bank_value"),
 )
 async def start_bank_cycle(message: types.Message, state: FSMContext, to_bank_value: str):
     storage_data = await state.get_data()
 
     device_name: str = storage_data["device"]
     from_bank_name: str = storage_data["from_bank"]
-    to_bank_name: str = settings.BankNames.find_from_value(to_bank_value).name
+    to_bank_name: str = enums.BankNames.find_from_value(to_bank_value).name
     await state.update_data(to_bank=to_bank_name)
 
     bank_state_group: BankStatesGroup = settings.FSSettings[device_name].value.find_bank(from_bank_name).state_group
