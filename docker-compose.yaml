@@ -6,6 +6,7 @@ services:
     restart: always
     volumes:
       - ./.env/:/app/.env/:ro
+      - ./telegram_bot/logs/:/app/logs/:rw
     depends_on:
       - postgres
       - redis
