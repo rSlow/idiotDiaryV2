@@ -10,7 +10,7 @@ async def send_birthdays(bot: Bot):
     tomorrow_birthdays = await Birthday.get_tomorrow_list()
     if today_birthdays or tomorrow_birthdays:
         message_text = render_template(
-            template_name="send_birthdays.jinja2",
+            template_name="send_schedule_birthdays.jinja2",
             data={
                 "today_birthdays": today_birthdays,
                 "tomorrow_birthdays": tomorrow_birthdays

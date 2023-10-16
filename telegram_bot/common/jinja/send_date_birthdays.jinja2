@@ -1,0 +1,20 @@
+{% if dates %}
+    {% for date, birthdays in dates.items() %}
+        {% if birthdays %}
+            <u><b>{{ date.strftime('%d.%m.%Y') }} г. день рождения:</b></u> <br>
+            {% for birthday in birthdays %}
+                - {{ birthday.post }}
+
+                {% if birthday.rank %}
+                    {{ birthday.rank }}
+                {% endif %}
+
+                {{ birthday.fio }} <br>
+            {% endfor %}
+        {% endif %}
+        <br>
+    {% endfor %}
+{% else %}
+    Ни у кого в ближайшее время нет дня рождения.
+{% endif %}
+
