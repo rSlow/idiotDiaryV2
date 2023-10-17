@@ -1,9 +1,15 @@
-font_android = "data/resources/fonts/Roboto-Medium.ttf"
-font_iphone_bold = "data/resources/fonts/sfuidisplay_bold.ttf"
-font_iphone_thin = "data/resources/fonts/sfuidisplay_thin.ttf"
+from config.settings import BASE_DIR
 
-template_sberbank_android = "data/templates/android/sberbank/sberbank.png"
-template_sberbank_iphone = "data/templates/iphone/sberbank/sberbank.png"
+DATA_DIR = BASE_DIR / "apps" / "free_shaurma" / "data"
 
-template_tinkoff_phone_android = "data/templates/android/tinkoff/tinkoff_phone.png"
-template_tinkoff_phone_iphone = "data/templates/iphone/tinkoff/tinkoff_phone.png"
+font_android = str(DATA_DIR / "resources" / "fonts" / "Roboto-Medium.ttf")
+font_iphone_bold = str(DATA_DIR / "resources" / "fonts" / "sfuidisplay_bold.ttf")
+font_iphone_thin = str(DATA_DIR / "resources" / "fonts" / "sfuidisplay_thin.ttf")
+
+template_sberbank_android = DATA_DIR / "templates" / "android" / "sberbank" / "sberbank.png"
+template_sberbank_iphone = DATA_DIR / "templates" / "iphone" / "sberbank" / "sberbank.png"
+
+template_tinkoff_phone_android = DATA_DIR / "templates" / "android" / "tinkoff" / "tinkoff_phone.png"
+template_tinkoff_phone_iphone = DATA_DIR / "templates" / "iphone" / "tinkoff" / "tinkoff_phone.png"
+
+tinkoff_arrow = DATA_DIR / "resources" / "layouts" / "arrow.png"

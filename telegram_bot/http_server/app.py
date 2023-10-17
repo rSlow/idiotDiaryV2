@@ -1,9 +1,11 @@
 from aiogram import types
-from fastapi import FastAPI, HTTPException, Header
+from fastapi import FastAPI, HTTPException, Header, Request
 from fastapi import status
+from starlette.routing import Match
 
 from apps.not_working_place.http_app.routers import nwp_router
 from config import settings
+from config.logger import logger
 from config.bot import dp, bot
 
 app = FastAPI()
@@ -22,3 +24,21 @@ async def bot_webhook(update: dict,
 
     telegram_update = types.Update(**update)
     await dp.feed_update(bot=bot, update=telegram_update)
+
+
+# @app.middleware("http")
+async def log_middle(request: Request, call_next):
+    logger.debug(f"{request.method} {request.url}")
+    routes = request.app.router.routes
+    logger.debug("Params:")
+    for route in routes:
+        match, scope = route.matches(request)
+        if match == Match.FULL:
+            for name, value in scope["path_params"].items():
+                logger.debug(f"\t{name}: {value}")
+    logger.debug("Headers:")
+    for name, value in request.headers.items():
+        logger.debug(f"\t{name}: {value}")
+
+    response = await call_next(request)
+    return response

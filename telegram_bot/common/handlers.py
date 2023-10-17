@@ -4,6 +4,7 @@ from aiogram import types, Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
+from config.logger import logger
 from .FSM import CommonState
 from .keyboards.start import StartKeyboard
 
@@ -39,11 +40,11 @@ async def key_error_pass(event: types.ErrorEvent, message: types.Message, state:
             text=f"Извините, во время работы бота произошла ошибка. Мы вынуждены вернуть вас на главный экран. "
                  f"Попробуйте воспользоваться функцией еще раз."
         )
-
-    logging.exception(
-        msg="",
-        exc_info=event.exception
-    )
+    logger.exception(event.exception)
+    # logging.exception(
+    #     msg="",
+    #     exc_info=event.exception
+    # )
 
 
 @last_router.message(F.text)

@@ -4,6 +4,7 @@ from aiogram.fsm.context import FSMContext
 from ..FSM.bank_forms import TinkoffForm, SberbankForm, BankStatesGroup
 from ..exceptions import ValidationError
 from ..settings import FSSettings
+from ..utils.send_files import send_file
 
 bank_router = Router(name="bank_router")
 
@@ -33,15 +34,24 @@ async def bank_cycle(message: types.Message, state: FSMContext, raw_state: str, 
         await state.set_data(data)
 
         next_state = current_bank_state.next()
-        if next_state is None:
-            ...
-        else:
+        if next_state is not None:
             await state.set_state(next_state)
             await message.answer(
                 text=next_state.start_text,
                 reply_markup=next_state.keyboard.build()
             )
-    except ValidationError as ex:
+        else:
+            bank_kwargs = (await state.get_data())["bank_values"]
+            render_func = FSSettings[device_name].value.find_bank(from_bank_name).find_bank(to_bank_name).render_func
+            image_io = render_func(**bank_kwargs)
+            await send_file(
+                message=message,
+                image_io=image_io,
+                from_bank=from_bank_name,
+                to_bank=to_bank_name,
+                device=device_name
+            )
+    except ValidationError:
         await message.answer(
             text=current_bank_state.validator.error_text,
             reply_markup=current_bank_state.keyboard.build(),

@@ -1,5 +1,6 @@
 from abc import ABC
 from dataclasses import field, dataclass
+from io import BytesIO
 from typing import Callable, Iterable
 
 from ..FSM.modified_state import BankStatesGroup
@@ -31,7 +32,7 @@ class FromBank(ABC):
 
     def find_bank(self, bank_name: str):
         for bank_obj in self.to_banks:
-            if bank_obj.name_enum.value == bank_name:
+            if bank_obj.name_enum.name == bank_name:
                 return bank_obj
         else:
             raise KeyError

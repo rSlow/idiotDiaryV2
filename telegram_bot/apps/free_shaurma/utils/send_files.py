@@ -11,8 +11,8 @@ from common.keyboards.base import CancelKeyboard
 
 async def send_file(message: types.Message,
                     image_io: BytesIO,
-                    bank,
-                    on_bank,
+                    from_bank,
+                    to_bank,
                     device):
     photo = BufferedInputFile(
         file=image_io.read(),
@@ -24,4 +24,4 @@ async def send_file(message: types.Message,
         reply_markup=CancelKeyboard.build()
     )
 
-    logging.info(f"[SCREEN] |{message.from_user.id}| {bank}->{on_bank}/{device}")
+    logging.info(f"[SCREEN] |{message.from_user.id}| {from_bank}->{to_bank}/{device}")

@@ -6,7 +6,7 @@ from .. import settings
 from ...main import grade, get_now
 
 
-async def sberbank_sberbank_phone_android(
+def sberbank_sberbank_phone_android(
         name,
         transfer_sum,
 ):

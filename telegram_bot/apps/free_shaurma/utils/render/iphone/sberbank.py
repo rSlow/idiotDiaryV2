@@ -9,7 +9,7 @@ x = 1170
 y = 2532
 
 
-async def sberbank_sberbank_phone_iphone(
+def sberbank_sberbank_phone_iphone(
         name,
         transfer_sum,
 ):

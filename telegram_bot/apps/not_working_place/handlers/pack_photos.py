@@ -44,6 +44,7 @@ async def append_photo(message: types.Message, state: FSMContext):
 )
 async def return_zip(message: types.Message, state: FSMContext):
     file_id_list = await photos.get_file_id_list(state)
+    await photos.clear_file_id_list(state)
 
     if not file_id_list:
         await message.answer(

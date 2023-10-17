@@ -1,6 +1,6 @@
-from .. import settings
+import pytz
+
 from datetime import datetime
-# import pytz
 
 
 def grade(number: str):
@@ -30,11 +30,6 @@ def strike(text):
     return stroked
 
 
-def get_render_func(bank, on_bank, device):
-    return settings.BANKS[bank]["on_banks"][on_bank][device]
-
-
 def get_now():
-    # tz = pytz.timezone("Asia/Vladivostok")
-    # return datetime.now().astimezone(tz=tz)
-    return datetime.now()
+    tz = pytz.timezone("Asia/Vladivostok")
+    return datetime.now().astimezone(tz=tz)

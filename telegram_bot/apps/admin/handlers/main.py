@@ -1,12 +1,11 @@
 from aiogram import types, Router, F
 from aiogram.fsm.context import FSMContext
 
+from common.filters import OwnerFilter
 from ..FSM.admin import AdminStates
-from ..filters import UserIDFilter
 from ..keyboards.admin import AdminKeyboard
 from common.keyboards.start import StartKeyboard
 from common.FSM import CommonState
-from config import settings
 from ...not_working_place.ORM.birthdays import Birthday
 
 admin_router = Router(name="admin")
@@ -14,7 +13,7 @@ admin_router = Router(name="admin")
 
 @admin_router.message(
     F.text == StartKeyboard.Buttons.admin,
-    UserIDFilter(users_id=settings.OWNER_ID),
+    OwnerFilter(),
     CommonState.start
 )
 async def start_admin(message: types.Message, state: FSMContext):

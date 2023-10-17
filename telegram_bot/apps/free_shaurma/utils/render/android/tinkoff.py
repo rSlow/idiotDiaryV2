@@ -2,28 +2,27 @@ from io import BytesIO
 
 from PIL import Image, ImageDraw, ImageFont
 
-from apps.free_shaurma.utils.main import grade, get_now
-
 from .. import settings
+from ...main import get_now
+from ...prepare_data import prepare_tinkoff_sums
 
 
-async def tinkoff_tinkoff_phone_android(
+def tinkoff_tinkoff_phone_android(
         name,
         phone_num,
         start_sum,
         transfer_sum,
 ):
-    str_start_sum = grade(f"{start_sum:.2f}".replace(".", ",")) + " ₽"
-    str_transfer_sum = grade(f"{transfer_sum}".replace(".", ",")) + " ₽"
-    str_end_sum = grade(f"{round(start_sum - transfer_sum, 2):.2f}".replace(".", ",")) + " ₽"
-
-    changing_string = f"{str_start_sum}         {str_end_sum}"
+    str_start_sum, str_transfer_sum, str_end_sum, changing_string = prepare_tinkoff_sums(
+        start_sum=start_sum,
+        transfer_sum=transfer_sum
+    )
     stroked_font = ImageFont.truetype(
         font=settings.font_android,
         size=40
     )
-    length_line, _ = stroked_font.getsize(str_start_sum)
-    length_full, height_full = stroked_font.getsize(changing_string)
+    length_line = stroked_font.getlength(str_start_sum)
+    length_full = stroked_font.getlength(changing_string)
     start_changing_string = 1080 / 2 - length_full / 2
 
     image_io = BytesIO()
@@ -87,7 +86,7 @@ async def tinkoff_tinkoff_phone_android(
     )
 
     # Стрелка
-    arrow = Image.open("data/resources/layouts/arrow.png")
+    arrow = Image.open(settings.tinkoff_arrow)
     image.paste(
         im=arrow,
         box=(529, 631),

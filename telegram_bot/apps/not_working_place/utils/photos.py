@@ -28,6 +28,12 @@ async def get_file_id_list(state: FSMContext) -> list[str]:
     return data[PHOTOS]
 
 
+async def clear_file_id_list(state: FSMContext) -> None:
+    data = await state.get_data()
+    del data["photos"]
+    await state.set_data(data)
+
+
 async def download_photo(file_id: str, bot: Bot):
     file = await bot.get_file(file_id)
     photo_io: BinaryIO = await bot.download_file(file_path=file.file_path)

@@ -2,12 +2,14 @@ from aiogram import types, Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
+from common.filters import OwnerFilter
 from common.keyboards.start import StartKeyboard
 from common.FSM import CommonState
 from .. import settings
 from ..FSM.modified_state import BankStatesGroup
 from ..schemas import enums
-from ..utils import send_files, main
+from ..settings import FSSettings
+from ..utils import send_files
 from ..keyboards.bank_prepare import FromBanksKeyboard, ToBanksKeyboard, DeviceKeyboard
 from ..FSM.bank_forms import ChooseBankParams
 
@@ -95,20 +97,17 @@ async def start_bank_cycle(message: types.Message, state: FSMContext, to_bank_va
 
 @start_fsh_router.message(
     Command("test"),
+    OwnerFilter(),
     ChooseBankParams.device
 )
 async def test(message: types.Message):
-    bank = "Тинькофф"
-    on_bank = "На Тинькофф"
-    device = "iPhone"
+    from_bank_name = "tinkoff"
+    to_bank_name = "tinkoff"
+    device_name = "iphone"
 
-    render_func = main.get_render_func(
-        bank=bank,
-        on_bank=on_bank,
-        device=device
-    )
+    render_func = FSSettings[device_name].value.find_bank(from_bank_name).find_bank(to_bank_name).render_func
 
-    image_io = await render_func(
+    image_io = render_func(
         name="Евгений П.",
         phone_num="+7 (914) 665-64-93",
         start_sum=25434.56,
@@ -118,7 +117,7 @@ async def test(message: types.Message):
     await send_files.send_file(
         image_io=image_io,
         message=message,
-        bank=bank,
-        on_bank=on_bank,
-        device=device
+        from_bank=from_bank_name,
+        to_bank=to_bank_name,
+        device=device_name
     )
