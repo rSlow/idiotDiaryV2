@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 from ..FSM.admin import AdminStates
 from ..filters import UserIDFilter
 from ..keyboards.admin import AdminKeyboard
-from common.keyboards import StartKeyboard
+from common.keyboards.start import StartKeyboard
 from common.FSM import CommonState
 from config import settings
 from ...not_working_place.ORM.birthdays import Birthday

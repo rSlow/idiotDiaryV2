@@ -2,7 +2,7 @@ from aiogram import Router, F, types
 from aiogram.fsm.context import FSMContext
 from aiohttp import ClientSession
 
-from common.base_keyboard import CancelKeyboard
+from common.keyboards.base import CancelKeyboard
 from config import settings, types as t
 from ..FSM.morph import MorphFIO
 from ..FSM.start import Start

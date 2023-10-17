@@ -1,5 +1,5 @@
-from config import settings
-from .base_keyboard import BaseKeyboardBuilder
+from .base import BaseKeyboardBuilder
+from .base_validators import ButtonWithValidator, IsOwnerValidator
 
 
 class StartKeyboard(BaseKeyboardBuilder):
@@ -13,10 +13,8 @@ class StartKeyboard(BaseKeyboardBuilder):
     buttons_list = [
         Buttons.not_working_place,
         Buttons.free_shaurma,
+        ButtonWithValidator(
+            text=Buttons.admin,
+            validator=IsOwnerValidator()
+        )
     ]
-
-    def __init__(self, user_id: int | str):
-        super().__init__()
-        if str(user_id) == settings.OWNER_ID:
-            self.buttons_list = self.buttons_list.copy()
-            self.buttons_list.append(self.Buttons.admin)

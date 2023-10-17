@@ -2,7 +2,7 @@ from aiogram import types, F, Router
 from aiogram.fsm.context import FSMContext
 
 from common.FSM import CommonState
-from common.keyboards import StartKeyboard
+from common.keyboards.start import StartKeyboard
 from ..FSM.start import Start
 from ..keyboards.main import NotWorkingPlaceKeyboard
 
@@ -34,5 +34,7 @@ async def main(message: types.Message, text: str, state: FSMContext):
 
     await message.answer(
         text=text,
-        reply_markup=NotWorkingPlaceKeyboard.build()
+        reply_markup=NotWorkingPlaceKeyboard.build(
+            validator_args={"user_id": message.from_user.id}
+        )
     )

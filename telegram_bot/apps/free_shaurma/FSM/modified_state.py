@@ -3,7 +3,7 @@ from typing import Type, Optional, Any, Callable
 from aiogram.fsm.state import StatesGroup, State
 
 from apps.free_shaurma.validators import BaseStateValidator
-from common.base_keyboard import BaseKeyboardBuilder, CancelKeyboard
+from common.keyboards.base import BaseKeyboardBuilder, CancelKeyboard
 
 
 class BankState(State):

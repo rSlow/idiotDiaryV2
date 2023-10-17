@@ -5,7 +5,7 @@ from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
 from .FSM import CommonState
-from .keyboards import StartKeyboard
+from .keyboards.start import StartKeyboard
 
 first_router = Router()
 last_router = Router()
@@ -16,7 +16,9 @@ async def start(message: types.Message, state: FSMContext, text: str | None = No
     await state.set_state(CommonState.start)
     await message.answer(
         text=text or "Куда надо?",
-        reply_markup=StartKeyboard.build(user_id=message.from_user.id)
+        reply_markup=StartKeyboard.build(
+            validator_args={"user_id": message.from_user.id}
+        )
     )
 
 

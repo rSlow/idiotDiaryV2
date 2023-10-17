@@ -6,7 +6,7 @@ from io import BytesIO
 from aiogram.types import BufferedInputFile
 
 from ..utils.main import get_now
-from common.base_keyboard import CancelKeyboard
+from common.keyboards.base import CancelKeyboard
 
 
 async def send_file(message: types.Message,

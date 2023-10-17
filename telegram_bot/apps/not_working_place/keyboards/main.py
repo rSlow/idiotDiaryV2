@@ -1,4 +1,5 @@
-from common.base_keyboard import BaseKeyboardBuilder
+from common.keyboards.base import BaseKeyboardBuilder
+from common.keyboards.base_validators import ButtonWithValidator, IsOwnerValidator
 
 
 class NotWorkingPlaceKeyboard(BaseKeyboardBuilder):
@@ -14,5 +15,8 @@ class NotWorkingPlaceKeyboard(BaseKeyboardBuilder):
         Buttons.morph,
         Buttons.download_video_note,
         Buttons.convert_voice,
-        Buttons.check_birthdays,
+        ButtonWithValidator(
+            text=Buttons.check_birthdays,
+            validator=IsOwnerValidator()
+        )
     ]

@@ -1,6 +1,6 @@
 from random import randint
 
-from common.base_keyboard import BaseKeyboardBuilder
+from common.keyboards.base import BaseKeyboardBuilder
 
 
 class RandomSumKeyboard(BaseKeyboardBuilder):

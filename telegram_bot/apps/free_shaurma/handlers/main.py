@@ -2,7 +2,7 @@ from aiogram import types, Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
-from common.keyboards import StartKeyboard
+from common.keyboards.start import StartKeyboard
 from common.FSM import CommonState
 from .. import settings
 from ..FSM.modified_state import BankStatesGroup

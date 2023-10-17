@@ -1,11 +1,14 @@
 from enum import Enum, EnumType
+from typing import Any, Optional
 
 from aiogram.types import KeyboardButton
 from aiogram.utils.keyboard import ReplyKeyboardBuilder
 
+from .base_validators import ButtonWithValidator
+
 
 class TypeInterface:
-    button_type = str | KeyboardButton | EnumType
+    button_type = str | KeyboardButton | EnumType | ButtonWithValidator
     iterable = list[button_type] | tuple[button_type]
     double_iterable = list[iterable] | tuple[iterable]
     buttons_list_type = iterable | double_iterable
@@ -24,6 +27,7 @@ class BaseKeyboardBuilder(ReplyKeyboardBuilder):
     on_main_button_text: str = "На главную ◀"
 
     buttons_list: TypeInterface.buttons_list_type = []
+    validator_args: dict[str, Any] | None = None
 
     def _add_from_text(self, text: str):
         self.add(KeyboardButton(text=text))
@@ -49,8 +53,13 @@ class BaseKeyboardBuilder(ReplyKeyboardBuilder):
         )
 
     @classmethod
-    def build(cls, *args, **kwargs):
-        return cls(*args, **kwargs).as_markup()
+    def build(cls,
+              validator_args: Optional[dict[str, Any]] = None,
+              *args, **kwargs):
+        keyboard = cls(*args, **kwargs)
+        if validator_args:
+            keyboard.validator_args = validator_args
+        return keyboard.as_markup()
 
     def _process_buttons_list(self, buttons_list: TypeInterface.buttons_list_type):
 
@@ -58,15 +67,22 @@ class BaseKeyboardBuilder(ReplyKeyboardBuilder):
             prepared_row: list[KeyboardButton] = []
             for button in buttons_row:
                 if isinstance(button, str):
-                    prepared_button = KeyboardButton(text=button)
+                    prepared_row.append(KeyboardButton(text=button))
+
                 elif isinstance(button, Enum):
-                    prepared_button = KeyboardButton(text=button.value)
+                    prepared_row.append(KeyboardButton(text=button.value))
+
+                elif isinstance(button, ButtonWithValidator):
+                    validator = button.validator
+                    matching_value = self.validator_args[validator.arg_name]
+                    if validator.validate(matching_value):
+                        prepared_row.append(KeyboardButton(text=button.text))
+
                 elif isinstance(button, KeyboardButton):
-                    prepared_button = button
+                    prepared_row.append(button)
+
                 else:
                     raise TypeError(f"button {button} is not matches to 'str', 'Enum' or 'KeyboardButton'")
-
-                prepared_row.append(prepared_button)
             return prepared_row
 
         for row in buttons_list:
