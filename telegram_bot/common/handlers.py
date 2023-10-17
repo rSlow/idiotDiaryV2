@@ -1,11 +1,10 @@
-import logging
-
 from aiogram import types, Router, F
 from aiogram.filters import Command
 from aiogram.fsm.context import FSMContext
 
 from config.logger import logger
 from .FSM import CommonState
+from .keyboards.base import BaseKeyboardBuilder
 from .keyboards.start import StartKeyboard
 
 first_router = Router()
@@ -13,6 +12,7 @@ last_router = Router()
 
 
 @first_router.message(Command("start", "cancel"))
+@first_router.message(F.text == BaseKeyboardBuilder.on_main_button_text)
 async def start(message: types.Message, state: FSMContext, text: str | None = None):
     await state.set_state(CommonState.start)
     await message.answer(
@@ -41,10 +41,6 @@ async def key_error_pass(event: types.ErrorEvent, message: types.Message, state:
                  f"Попробуйте воспользоваться функцией еще раз."
         )
     logger.exception(event.exception)
-    # logging.exception(
-    #     msg="",
-    #     exc_info=event.exception
-    # )
 
 
 @last_router.message(F.text)

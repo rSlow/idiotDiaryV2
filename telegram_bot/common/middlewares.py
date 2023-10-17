@@ -36,20 +36,3 @@ class ContextMiddleware(BaseMiddleware):
     ) -> Any:
         data.update(self.context)
         return await handler(event, data)
-
-
-class PreviousHandlerMiddleware(BaseMiddleware):
-    def __init__(self):
-        self.prev_handler: types.HANDLER_TYPE | None = None
-
-    async def __call__(
-            self,
-            handler: types.HANDLER_TYPE,
-            event: TelegramObject,
-            data: dict[str, Any],
-    ) -> Any:
-        prev_handler: types.HANDLER_TYPE | None = data.get("prev_handler", None)
-        if prev_handler != handler:
-            data["prev_handler"] = handler
-
-        return await handler(event, data)
