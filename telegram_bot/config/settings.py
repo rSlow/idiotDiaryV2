@@ -28,4 +28,4 @@ MORPH_CASE_ALIASES = {
 }
 
 TIMEZONE = pytz.timezone(ENV.str("TIMEZONE"))
-OWNER_ID = ENV.int("OWNER_ID")
+OWNER_ID = ENV.str("OWNER_ID")

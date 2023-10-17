@@ -25,6 +25,9 @@ class BaseKeyboardBuilder(ReplyKeyboardBuilder):
 
     buttons_list: TypeInterface.buttons_list_type = []
 
+    def _add_from_text(self, text: str):
+        self.add(KeyboardButton(text=text))
+
     def as_markup(self):
         if self.buttons_list is None and not self.add_on_main_button:
             raise RuntimeError("buttons_list is not specified")
@@ -32,7 +35,7 @@ class BaseKeyboardBuilder(ReplyKeyboardBuilder):
             self._process_buttons_list(self.buttons_list)
 
         if self.add_on_main_button:
-            self.add(KeyboardButton(text=self.on_main_button_text))
+            self._add_from_text(self.on_main_button_text)
 
         if self.row_width is not None:
             self.adjust(self.row_width)
@@ -54,7 +57,6 @@ class BaseKeyboardBuilder(ReplyKeyboardBuilder):
         def _prepare_row(buttons_row: TypeInterface.iterable):
             prepared_row: list[KeyboardButton] = []
             for button in buttons_row:
-                b = type(button)
                 if isinstance(button, str):
                     prepared_button = KeyboardButton(text=button)
                 elif isinstance(button, Enum):
@@ -68,7 +70,7 @@ class BaseKeyboardBuilder(ReplyKeyboardBuilder):
             return prepared_row
 
         for row in buttons_list:
-            if type(row) == TypeInterface.iterable:
+            if isinstance(row, (list, tuple)):
                 self.row(*_prepare_row(row))
             elif isinstance(row, (str, KeyboardButton, Enum)):
                 self.add(*_prepare_row(buttons_list))

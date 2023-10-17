@@ -16,7 +16,7 @@ async def start(message: types.Message, state: FSMContext, text: str | None = No
     await state.set_state(CommonState.start)
     await message.answer(
         text=text or "Куда надо?",
-        reply_markup=StartKeyboard.build()
+        reply_markup=StartKeyboard.build(user_id=message.from_user.id)
     )
 
 

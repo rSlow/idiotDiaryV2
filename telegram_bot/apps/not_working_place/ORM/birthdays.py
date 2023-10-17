@@ -26,10 +26,12 @@ class Birthday(Base):
                 )
                 await session.execute(q)
 
-                session.add_all([
-                    cls(**birthday.model_dump())
-                    for birthday in data
-                ])
+    @classmethod
+    async def delete_data(cls):
+        async with Session() as session:
+            async with session.begin():
+                q = delete(cls)
+                await session.execute(q)
 
     @classmethod
     async def get_date_list(cls, d: date):
