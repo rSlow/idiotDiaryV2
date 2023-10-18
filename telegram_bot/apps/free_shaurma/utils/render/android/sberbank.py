@@ -2,8 +2,9 @@ from io import BytesIO
 
 from PIL import Image, ImageDraw, ImageFont
 
+from common.utils.functions import get_now
 from .. import settings
-from ...main import grade, get_now
+from ...main import grade
 
 
 def sberbank_sberbank_phone_android(

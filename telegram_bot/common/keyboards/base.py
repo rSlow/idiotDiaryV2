@@ -82,7 +82,8 @@ class BaseKeyboardBuilder(ReplyKeyboardBuilder):
                     prepared_row.append(button)
 
                 else:
-                    raise TypeError(f"button {button} is not matches to 'str', 'Enum' or 'KeyboardButton'")
+                    raise TypeError(f"button {button} is not matches to "
+                                    f"'str', 'EnumType', 'KeyboardButton', 'ButtonWithValidator'")
             return prepared_row
 
         for row in buttons_list:

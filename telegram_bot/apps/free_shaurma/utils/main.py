@@ -28,8 +28,3 @@ def strike(text):
     for i in text:
         stroked += (i + sym)
     return stroked
-
-
-def get_now():
-    tz = pytz.timezone("Asia/Vladivostok")
-    return datetime.now().astimezone(tz=tz)

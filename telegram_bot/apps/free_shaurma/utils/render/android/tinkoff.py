@@ -2,8 +2,8 @@ from io import BytesIO
 
 from PIL import Image, ImageDraw, ImageFont
 
+from common.utils.functions import get_now
 from .. import settings
-from ...main import get_now
 from ...prepare_data import prepare_tinkoff_sums
 
 

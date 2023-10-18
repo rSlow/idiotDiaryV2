@@ -11,7 +11,7 @@ class BaseButtonValidator(ABC):
 
     @abstractmethod
     def validate(self, value: Any) -> Any:
-        ...
+        pass
 
 
 class UserIDValidator(BaseButtonValidator):
@@ -19,22 +19,17 @@ class UserIDValidator(BaseButtonValidator):
 
     def __init__(self, user_id: int | str):
         super().__init__()
-
         self.user_id = str(user_id)
 
     def validate(self, value: str | int) -> Any:
-        if value != str(self.user_id):
+        if str(value) != str(self.user_id):
             return False
         return True
 
 
-class IsOwnerValidator(BaseButtonValidator):
-    arg_name = "user_id"
-
-    def validate(self, value: str | int) -> Any:
-        if str(value) != settings.OWNER_ID:
-            return False
-        return True
+class IsOwnerValidator(UserIDValidator):
+    def __init__(self):
+        super().__init__(user_id=settings.OWNER_ID)
 
 
 class ButtonWithValidator(KeyboardButton):

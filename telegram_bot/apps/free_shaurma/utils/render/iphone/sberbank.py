@@ -2,8 +2,9 @@ from io import BytesIO
 
 from PIL import Image, ImageDraw, ImageFont
 
+from common.utils.functions import get_now
 from .. import settings
-from ...main import grade, get_now
+from ...main import grade
 
 x = 1170
 y = 2532
