@@ -24,7 +24,7 @@ class DbSessionMiddleware(BaseMiddleware):
 
 
 class ContextMiddleware(BaseMiddleware):
-    def __init__(self, **context: dict[str, Any]):
+    def __init__(self, **context):
         super().__init__()
         self.context = context
 

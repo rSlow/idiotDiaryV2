@@ -1,13 +1,11 @@
-import asyncio
 import logging
-from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
 from contextlib import redirect_stdout
 from io import BytesIO
 
 from yt_dlp import YoutubeDL
 
 
-def download_audio(url: str) -> BytesIO:
+def download_audio(url: str):
     ydl_opts = {
         'extract_audio': True,
         'format': 'bestaudio',
@@ -21,4 +19,5 @@ def download_audio(url: str) -> BytesIO:
             ydl.download([url])
 
     audio_io.seek(0)
-    return audio_io
+    audio_bytes = audio_io.read()
+    return audio_bytes

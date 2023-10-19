@@ -15,7 +15,7 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot):
     init_logging()
 
     dispatcher.update.middleware(ContextMiddleware(
-        scheduler=scheduler
+        scheduler=scheduler,
     ))
     dispatcher.update.middleware(DbSessionMiddleware(session_pool=Session))
 
@@ -25,6 +25,7 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot):
     scheduler.start()
     init_schedules(bot)
 
+    await bot.delete_webhook()
     await init_webhook(dispatcher, bot)
 
 

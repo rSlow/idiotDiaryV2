@@ -11,7 +11,7 @@ from config import settings
 class Birthday(Base):
     __tablename__ = "birthdays"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     fio: Mapped[str] = mapped_column(primary_key=True)
     date: Mapped[date]
     post: Mapped[str]
@@ -25,6 +25,11 @@ class Birthday(Base):
                     cls.fio.in_([birthday.fio for birthday in data])
                 )
                 await session.execute(q)
+
+                session.add_all([
+                    cls(**birthday.model_dump())
+                    for birthday in data
+                ])
 
     @classmethod
     async def delete_data(cls):
