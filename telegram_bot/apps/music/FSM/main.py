@@ -5,14 +5,18 @@ class MusicState(StatesGroup):
     start = State()
 
 
-class MusicDownloadState(StatesGroup):
+class YTDownloadState(StatesGroup):
     wait_url = State()
     download = State()
 
 
-class MusicEditState(StatesGroup):
+class EyeD3State(StatesGroup):
+    wait_file = State()
     main = State()
-    edit_image = State()
-    edit_title = State()
-    edit_artist = State()
-    edit_album = State()
+
+
+class EyeD3EditState(StatesGroup):
+    image = State()
+    title = State()
+    artist = State()
+    album = State()

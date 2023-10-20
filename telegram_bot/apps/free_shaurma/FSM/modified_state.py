@@ -3,13 +3,13 @@ from typing import Type, Optional, Any, Callable
 from aiogram.fsm.state import StatesGroup, State
 
 from apps.free_shaurma.validators import BaseStateValidator
-from common.keyboards.base import BaseKeyboardBuilder, CancelKeyboard
+from common.keyboards.base import BaseReplyKeyboardBuilder, CancelKeyboard
 
 
 class BankState(State):
     def __init__(self,
                  start_text: str,
-                 keyboard: Type[BaseKeyboardBuilder] = CancelKeyboard,
+                 keyboard: Type[BaseReplyKeyboardBuilder] = CancelKeyboard,
                  validator: BaseStateValidator | Callable[[Any], Any] | None = None,
                  state: str | None = None,
                  group_name: str | None = None):

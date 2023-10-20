@@ -1,8 +1,8 @@
-from .base import BaseKeyboardBuilder
+from .base import BaseReplyKeyboardBuilder
 from .base_validators import ButtonWithValidator, IsOwnerValidator
 
 
-class StartKeyboard(BaseKeyboardBuilder):
+class StartKeyboard(BaseReplyKeyboardBuilder):
     class Buttons:
         not_working_place = "нерабочая площадка 😶‍🌫️"
         free_shaurma = "(бес)платная шаурма 🌯"

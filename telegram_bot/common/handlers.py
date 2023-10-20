@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 
 from config.logger import logger
 from .FSM import CommonState
-from .keyboards.base import BaseKeyboardBuilder
+from .keyboards.base import BaseReplyKeyboardBuilder
 from .keyboards.start import StartKeyboard
 
 first_router = Router()
@@ -12,7 +12,7 @@ last_router = Router()
 
 
 @first_router.message(Command("start", "cancel"))
-@first_router.message(F.text == BaseKeyboardBuilder.on_main_button_text)
+@first_router.message(F.text == BaseReplyKeyboardBuilder.on_main_button_text)
 async def start(message: types.Message, state: FSMContext, text: str | None = None):
     await state.set_state(CommonState.start)
     await message.answer(

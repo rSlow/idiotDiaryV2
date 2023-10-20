@@ -1,11 +1,11 @@
-from common.keyboards.base import BaseKeyboardBuilder
+from common.keyboards.base import BaseReplyKeyboardBuilder
 
 
-class ConvertVideoKeyboard(BaseKeyboardBuilder):
+class ConvertVideoKeyboard(BaseReplyKeyboardBuilder):
     pass
 
 
-class ConvertAgainVideoKeyboard(BaseKeyboardBuilder):
+class ConvertAgainVideoKeyboard(BaseReplyKeyboardBuilder):
     class Buttons:
         again = "Еще одно 🔄"
 

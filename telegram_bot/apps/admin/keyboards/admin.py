@@ -1,7 +1,7 @@
-from common.keyboards.base import BaseKeyboardBuilder
+from common.keyboards.base import BaseReplyKeyboardBuilder
 
 
-class AdminKeyboard(BaseKeyboardBuilder):
+class AdminKeyboard(BaseReplyKeyboardBuilder):
     class Buttons:
         clear_birthdays = "Очистить дни рождения"
 

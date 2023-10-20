@@ -8,11 +8,11 @@ from yt_dlp import YoutubeDL
 def download_audio(url: str):
     ydl_opts = {
         'extract_audio': True,
-        'format': 'bestaudio',
-        # 'outtmpl': '123.mp3',
+        'format': 'bestaudio[ext=mp4]',
         'outtmpl': '-',
         'logger': logging.getLogger()
     }
+    filename = "123.mp3"
     audio_io = BytesIO()
     with redirect_stdout(audio_io):
         with YoutubeDL(ydl_opts) as ydl:
@@ -20,4 +20,4 @@ def download_audio(url: str):
 
     audio_io.seek(0)
     audio_bytes = audio_io.read()
-    return audio_bytes
+    return audio_bytes, filename

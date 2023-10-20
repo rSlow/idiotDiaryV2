@@ -1,5 +1,5 @@
-from common.keyboards.base import BaseKeyboardBuilder
+from common.keyboards.base import BaseReplyKeyboardBuilder
 
 
-class DownloadVideoKeyboard(BaseKeyboardBuilder):
+class DownloadVideoKeyboard(BaseReplyKeyboardBuilder):
     pass

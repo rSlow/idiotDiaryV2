@@ -1,12 +1,12 @@
-from common.keyboards.base import BaseKeyboardBuilder
+from common.keyboards.base import BaseReplyKeyboardBuilder
 from ..settings import FSSettings
 
 
-class DeviceKeyboard(BaseKeyboardBuilder):
+class DeviceKeyboard(BaseReplyKeyboardBuilder):
     buttons_list = [device.value.device_type.value for device in FSSettings]
 
 
-class FromBanksKeyboard(BaseKeyboardBuilder):
+class FromBanksKeyboard(BaseReplyKeyboardBuilder):
     def __init__(self, device_name: str):
         super().__init__()
         self.buttons_list = [
@@ -16,7 +16,7 @@ class FromBanksKeyboard(BaseKeyboardBuilder):
         ]
 
 
-class ToBanksKeyboard(BaseKeyboardBuilder):
+class ToBanksKeyboard(BaseReplyKeyboardBuilder):
     def __init__(self, device_name: str, bank_name: str):
         super().__init__()
         self.buttons_list = [

@@ -1,7 +1,7 @@
-from common.keyboards.base import BaseKeyboardBuilder
+from common.keyboards.base import BaseReplyKeyboardBuilder
 
 
-class MusicMainKeyboard(BaseKeyboardBuilder):
+class MusicMainKeyboard(BaseReplyKeyboardBuilder):
     class Buttons:
         edit_music = "Редактор eyeD3 👁‍🗨"
         download_from_yt = "Скачать музыку из видео ⬇️"

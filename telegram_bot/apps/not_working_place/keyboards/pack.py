@@ -1,7 +1,7 @@
-from common.keyboards.base import BaseKeyboardBuilder
+from common.keyboards.base import BaseReplyKeyboardBuilder
 
 
-class PackKeyboard(BaseKeyboardBuilder):
+class PackKeyboard(BaseReplyKeyboardBuilder):
     class Buttons:
         accept = "Запаковать!"
 
@@ -10,7 +10,7 @@ class PackKeyboard(BaseKeyboardBuilder):
     ]
 
 
-class PackFinishKeyboard(BaseKeyboardBuilder):
+class PackFinishKeyboard(BaseReplyKeyboardBuilder):
     class Buttons:
         again = "Еще один архив"
 

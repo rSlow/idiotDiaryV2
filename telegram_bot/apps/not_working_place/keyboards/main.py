@@ -1,8 +1,8 @@
-from common.keyboards.base import BaseKeyboardBuilder
+from common.keyboards.base import BaseReplyKeyboardBuilder
 from common.keyboards.base_validators import ButtonWithValidator, IsOwnerValidator
 
 
-class NotWorkingPlaceKeyboard(BaseKeyboardBuilder):
+class NotWorkingPlaceKeyboard(BaseReplyKeyboardBuilder):
     class Buttons:
         pack = "Запаковать 💼"
         morph = "Склонения 💬"
