@@ -1,9 +1,11 @@
 import logging
 import os
+import sys
 
 from loguru import logger
 
 from config import settings
+from config.settings import ENV
 
 LOGS_FOLDER = "logs"
 LOGS_DIR = settings.BASE_DIR / LOGS_FOLDER
@@ -21,7 +23,9 @@ def init_logging():
 
 
 logger.remove()
+loguru_sink = ENV.str("LOGURU_FILE", None)
 logger.add(
-    sink=LOGS_DIR / "errors.log",
+    sink=LOGS_DIR / loguru_sink if loguru_sink is not None else sys.stdout,
     format="<green>{time:HH:mm:ss}</green> | {level} | <level>{message}</level>",
+    colorize=bool(loguru_sink)
 )

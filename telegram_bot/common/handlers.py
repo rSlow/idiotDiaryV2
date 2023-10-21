@@ -18,14 +18,15 @@ async def start(message: types.Message, state: FSMContext, text: str | None = No
     await message.answer(
         text=text or "Куда надо?",
         reply_markup=StartKeyboard.build(
-            validator_args={"user_id": message.from_user.id}
+            validator_args={"user_id": message.chat.id}
         )
     )
 
 
-@first_router.error(F.update.message.as_("message"))
-async def key_error_pass(event: types.ErrorEvent, message: types.Message, state: FSMContext):
+@first_router.error()
+async def key_error_pass(event: types.ErrorEvent, state: FSMContext):
     data = await state.get_data()
+    message = event.update.message if event.update.message is not None else event.update.callback_query.message
     if isinstance(event.exception, KeyError) and not data:  # check if empty FSM data and KeyError exception
         await start(
             message=message,

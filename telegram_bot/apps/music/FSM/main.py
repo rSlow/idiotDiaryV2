@@ -6,7 +6,8 @@ class MusicState(StatesGroup):
 
 
 class YTDownloadState(StatesGroup):
-    wait_url = State()
+    url = State()
+    timecode = State()
     download = State()
 
 
@@ -16,7 +17,7 @@ class EyeD3State(StatesGroup):
 
 
 class EyeD3EditState(StatesGroup):
-    image = State()
     title = State()
     artist = State()
     album = State()
+    thumbnail = State()
