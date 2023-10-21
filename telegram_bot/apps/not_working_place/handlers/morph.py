@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiohttp import ClientSession
 
 from common.keyboards.base import CancelKeyboard
-from config import settings, types as t
+from config import settings
 from ..FSM.morph import MorphFIO
 from ..FSM.start import Start
 from ..keyboards.main import NotWorkingPlaceKeyboard
@@ -29,17 +29,17 @@ async def morph_fio_start(message: types.Message, state: FSMContext):
     F.text.as_("fio"),
     MorphFIO.morph
 )
-async def morph_fio(message: types.Message, fio: str, prev_handler: t.HANDLER_TYPE):
+async def morph_fio(message: types.Message, fio: str):
     async with ClientSession() as session:
         response = await session.post(
             url=settings.MORPH_URL,
             json={"fio": fio}
         )
-        cased_fios: dict[str, str] = await response.json()
+        cased_objects: dict[str, str] = await response.json()
 
     message_text = "\n".join([
-        f"<b>{settings.MORPH_CASE_ALIASES[case_idx]}</b>: <code>{cased_fio}</code>"
-        for case_idx, cased_fio in cased_fios.items()
+        f"<b><u>{settings.MORPH_CASE_ALIASES[case_idx]}:</u></b> <code>{cased_fio}</code>"
+        for case_idx, cased_fio in cased_objects.items()
     ])
     await message.answer(
         text=message_text,

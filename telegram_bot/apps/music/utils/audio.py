@@ -34,7 +34,8 @@ def download_audio(
     with YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
 
-    subprocess.run(["ffmpeg", "-i", file_path_mp4, "-b:a", "71100", file_path_mp3])
+    subprocess.run(["ffmpeg", "-i", file_path_mp4, "-acodec", "libmp3lame", file_path_mp3])
+    # subprocess.run(["ffmpeg", "-i", file_path_mp4, "--ac", "2", "-b:a", "192k", file_path_mp3])
 
     with open(file_path_mp3, "rb") as file:
         audio_bytes = file.read()

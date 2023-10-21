@@ -46,7 +46,10 @@ async def timecode_video(message: types.Message, state: FSMContext, url: str):
     await state.update_data(yt_dlp=yt_data)
 
     await message.answer(
-        text="При необходимости отправьте таймкод в формате 'ЧЧ:ММ:СС-ЧЧ:ММ:СС' или нажмите кнопку 'Полностью'",
+        text="При необходимости отправьте таймкод в форматах:\n"
+             "  - ЧЧ:ММ:СС-ЧЧ:ММ:СС \n"
+             "  - ММ:СС-ММ:СС \n"
+             "или нажмите кнопку 'Полностью'",
         reply_markup=TimecodeKeyboard.build()
     )
 
