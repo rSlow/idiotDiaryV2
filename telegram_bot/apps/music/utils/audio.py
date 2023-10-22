@@ -5,7 +5,7 @@ import uuid
 
 from yt_dlp import YoutubeDL
 
-from ...music import settings
+from .. import settings
 
 
 def download_audio(
@@ -13,9 +13,13 @@ def download_audio(
         from_second: int | None = None,
         to_second: str | None = None,
 ):
-    temp_filename = uuid.uuid4().hex
-    temp_filename_mp3 = temp_filename + ".mp3"
-    temp_filename_m4a = temp_filename + ".m4a"
+    info_dict = YoutubeDL().extract_info(url, download=False)
+    title = info_dict.get('title')
+    channel = info_dict.get('channel')
+    filename = f"{channel} - {title}" if title and channel else uuid.uuid4().hex
+
+    temp_filename_mp3 = filename + ".mp3"
+    temp_filename_m4a = filename + ".m4a"
     file_path_mp3 = settings.TEMP_DIR / temp_filename_mp3
     file_path_mp4 = settings.TEMP_DIR / temp_filename_m4a
 

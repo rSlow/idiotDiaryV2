@@ -1,24 +1,24 @@
 import uuid
 from typing import Any
 
+import eyed3
+from aiogram import Bot
 from aiogram import Router, F, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram import Bot
 from aiogram.types import FSInputFile, ReplyKeyboardRemove
-import eyed3
 from eyed3.id3 import Tag
 
 from common.jinja import render_template
+from common.keyboards.base import CancelKeyboard
 from common.utils.sync_to_async import set_async
 from .main import music_start
 from .. import settings
+from ..FSM.main import MusicState, EyeD3State, EyeD3EditState
 from ..factory import EyeD3EditCBFactory, EyeD3MessagesEnum, EyeD3ActionsEnum
 from ..keyboards.eyed3_main import EyeD3MainKeyboard, EyeD3BackToMainKeyboard
 from ..keyboards.main import MusicMainKeyboard
-
-from common.keyboards.base import CancelKeyboard
-from ..FSM.main import MusicState, EyeD3State, EyeD3EditState
+from ..utils.eyed3_editor import set_eyed3_value, get_eyed3_data, get_eyed3_value
 from ..utils.image import process_image
 from ..utils.temp_dowlnoader import TempFileDownloader
 
@@ -45,7 +45,7 @@ async def start_eyed3_editor(message: types.Message, state: FSMContext):
 )
 async def eyed3_parse_file(message: types.Message, state: FSMContext, audio: types.Audio, bot: Bot):
     file_id = audio.file_id
-    filename = uuid.uuid4().hex + settings.AUDIO_FILE_EXT
+    filename = audio.file_name or uuid.uuid4().hex + settings.AUDIO_FILE_EXT
     file_path = settings.TEMP_DIR / filename
 
     service_message = await message.answer("Обработка...")
@@ -64,6 +64,7 @@ async def eyed3_parse_file(message: types.Message, state: FSMContext, audio: typ
         artist = audio.performer
         thumbnail = audio.thumbnail.file_id if audio.thumbnail else None
         await state.update_data(eyed3_data={
+            "filename": filename,
             "file_id": file_id,
             "album": album,
             "title": title,
@@ -126,17 +127,17 @@ async def eyed3_update_param(
         raw_state: str,
         bot: Bot
 ):
-    data = await state.get_data()
-    eyed3_data: dict[str, Any] = data.get("eyed3_data", {})
     edited_param = raw_state.split(":")[-1]
-
     if edited_param == EyeD3ActionsEnum.thumbnail.value:
         edited_param_value = message.photo[-1].file_id
     else:
         edited_param_value = message.text
-    eyed3_data[edited_param] = edited_param_value
 
-    await state.update_data(eyed3_data=eyed3_data)
+    await set_eyed3_value(
+        state=state,
+        eyed3_key=edited_param,
+        value=edited_param_value
+    )
 
     chat_id = message.chat.id
     await message.delete()
@@ -144,6 +145,25 @@ async def eyed3_update_param(
         state=state,
         bot=bot,
         chat_id=chat_id
+    )
+
+
+# ----- CLEANER ----- #
+
+@music_eyed3_router.callback_query(
+    F.data == EyeD3BackToMainKeyboard.Buttons.clear.callback_data,
+    StateFilter(EyeD3EditState)
+)
+async def eyed3_back_to_main(callback: types.CallbackQuery, state: FSMContext, bot: Bot, raw_state):
+    await set_eyed3_value(
+        state=state,
+        eyed3_key=raw_state.split(":")[-1],
+        value=None
+    )
+    await eyed3_main_page(
+        bot=bot,
+        chat_id=callback.message.chat.id,
+        state=state
     )
 
 
@@ -190,12 +210,15 @@ async def eyed3_back_to_main(callback: types.CallbackQuery, state: FSMContext, b
     EyeD3State.main
 )
 async def eyed3_export(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
-    data = await state.get_data()
-    eyed3_data: dict[str, Any] = data.get("eyed3_data", {})
+    eyed3_data = await get_eyed3_data(state=state)
 
     file_id = eyed3_data.get("file_id")
     chat_id = callback.message.chat.id
-    filename = uuid.uuid4().hex + settings.AUDIO_FILE_EXT
+    filename = await get_eyed3_value(
+        state=state,
+        key="filename",
+        default=uuid.uuid4().hex + settings.AUDIO_FILE_EXT
+    )
     file_path = settings.TEMP_DIR / filename
 
     await callback.message.delete()
@@ -227,9 +250,11 @@ async def eyed3_export(callback: types.CallbackQuery, state: FSMContext, bot: Bo
 
         eyed3_tag.save(str(file_path))
 
+        if eyed3_tag.artist and eyed3_tag.title:
+            filename = f"{eyed3_tag.artist} - {eyed3_tag.title}{settings.AUDIO_FILE_EXT}"
         audio_file = FSInputFile(
             path=file_path,
-            filename=f"{eyed3_tag.artist} - {eyed3_tag.title}{settings.AUDIO_FILE_EXT}"
+            filename=filename
         )
         await callback.message.answer_document(
             document=audio_file

@@ -51,7 +51,12 @@ class EyeD3BackToMainKeyboard(BaseInlineKeyboardBuilder):
             text="Назад 🔙",
             callback_data="back_to_edit"
         )
+        clear = InlineKeyboardButton(
+            text="Очистить 🗑",
+            callback_data="clear"
+        )
 
     buttons_list = [
         Buttons.back,
+        Buttons.clear,
     ]
