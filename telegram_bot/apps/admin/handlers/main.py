@@ -1,7 +1,10 @@
+import os.path
+
 from aiogram import types, Router, F
 from aiogram.fsm.context import FSMContext
 
 from common.filters import OwnerFilter
+from config import settings
 from ..FSM.admin import AdminStates
 from ..keyboards.admin import AdminKeyboard
 from common.keyboards.start import StartKeyboard
@@ -35,3 +38,19 @@ async def clear_birthdays(message: types.Message):
     await message.answer(
         text="Все дни рождения удалены.",
     )
+
+
+@admin_router.message(
+    F.text == AdminKeyboard.Buttons.get_logs,
+    AdminStates.start
+)
+async def get_logs(message: types.Message):
+    files = [
+        types.FSInputFile(
+            path=filename,
+            filename=filename.name
+        ) for filename in settings.LOGS_DIR.glob("*.log")
+        if os.path.getsize(filename)  # check file is not empty
+    ]
+    media = [types.InputMediaDocument(media=file) for file in files]
+    await message.answer_media_group(media)

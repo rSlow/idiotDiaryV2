@@ -35,7 +35,6 @@ def download_audio(
         ydl.download([url])
 
     subprocess.run(["ffmpeg", "-i", file_path_mp4, "-acodec", "libmp3lame", file_path_mp3])
-    # subprocess.run(["ffmpeg", "-i", file_path_mp4, "--ac", "2", "-b:a", "192k", file_path_mp3])
 
     with open(file_path_mp3, "rb") as file:
         audio_bytes = file.read()
