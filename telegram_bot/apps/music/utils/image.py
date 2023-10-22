@@ -8,7 +8,7 @@ def process_image(image_io: BinaryIO):
     with Image.open(image_io) as image:
         new_image = ImageOps.fit(
             image=image,
-            size=(512, 512)
+            size=(1024, 1024)
         )
     new_image_io = BytesIO()
     new_image.save(

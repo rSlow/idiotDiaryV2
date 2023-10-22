@@ -6,7 +6,7 @@ from aiogram import Bot
 from aiogram import Router, F, types
 from aiogram.filters import StateFilter
 from aiogram.fsm.context import FSMContext
-from aiogram.types import FSInputFile, ReplyKeyboardRemove
+from aiogram.types import FSInputFile, ReplyKeyboardRemove, BufferedInputFile
 from eyed3.id3 import Tag
 
 from common.jinja import render_template
@@ -15,9 +15,10 @@ from common.utils.sync_to_async import set_async
 from .main import music_start
 from .. import settings
 from ..FSM.main import MusicState, EyeD3State, EyeD3EditState
-from ..factory import EyeD3EditCBFactory, EyeD3MessagesEnum, EyeD3ActionsEnum
+from ..factory import EyeD3EditCBFactory, EyeD3MessagesEnum
 from ..keyboards.eyed3_main import EyeD3MainKeyboard, EyeD3BackToMainKeyboard
 from ..keyboards.main import MusicMainKeyboard
+from ..utils.audio import download_audio
 from ..utils.eyed3_editor import set_eyed3_value, get_eyed3_data, get_eyed3_value
 from ..utils.image import process_image
 from ..utils.temp_dowlnoader import TempFileDownloader
@@ -32,18 +33,23 @@ music_eyed3_router = Router(name="music_eyed3")
 async def start_eyed3_editor(message: types.Message, state: FSMContext):
     await state.set_state(EyeD3State.wait_file)
     await message.answer(
-        text=f"Ожидаю файл...",
+        text=f"Ожидаю файл или ссылку на YouTube...",
         reply_markup=CancelKeyboard.build(one_time_keyboard=True)
     )
 
 
-# ----- INITIALIZE ----- #
+# ----- INITIALIZE FROM FILE ----- #
 
 @music_eyed3_router.message(
     F.audio.as_("audio"),
     EyeD3State.wait_file
 )
-async def eyed3_parse_file(message: types.Message, state: FSMContext, audio: types.Audio, bot: Bot):
+async def eyed3_parse_file(
+        message: types.Message,
+        state: FSMContext,
+        audio: types.Audio,
+        bot: Bot,
+):
     file_id = audio.file_id
     filename = audio.file_name or uuid.uuid4().hex + settings.AUDIO_FILE_EXT
     file_path = settings.TEMP_DIR / filename
@@ -77,6 +83,29 @@ async def eyed3_parse_file(message: types.Message, state: FSMContext, audio: typ
         chat_id=message.chat.id,
         state=state,
         bot=bot
+    )
+
+
+# ----- INITIALIZE FROM URL ----- #
+
+@music_eyed3_router.message(
+    F.text[F.regexp(settings.HTTPS_REGEXP)].as_("url"),
+    EyeD3State.wait_file
+)
+async def eyed3_from_url(message: types.Message, state: FSMContext, url: str, bot: Bot):
+    service_message = await message.answer("Скачиваю...")
+    audio_io, filename = await set_async(download_audio)(url)
+    audio_file = BufferedInputFile(
+        file=audio_io,
+        filename=filename
+    )
+    audio = await message.answer_document(document=audio_file)
+    await service_message.delete()
+    await eyed3_parse_file(
+        message=message,
+        state=state,
+        bot=bot,
+        audio=audio.audio,
     )
 
 
@@ -115,11 +144,11 @@ async def eyed3_main_page(
         )
 
 
-# ----- EDITOR ----- #
+# ----- EDITOR TEXT ----- #
 
 @music_eyed3_router.message(
-    F.text | F.photo,
-    StateFilter(EyeD3EditState),
+    F.text,
+    StateFilter(EyeD3EditState.title, EyeD3EditState.artist, EyeD3EditState.album),
 )
 async def eyed3_update_param(
         message: types.Message,
@@ -128,15 +157,45 @@ async def eyed3_update_param(
         bot: Bot
 ):
     edited_param = raw_state.split(":")[-1]
-    if edited_param == EyeD3ActionsEnum.thumbnail.value:
-        edited_param_value = message.photo[-1].file_id
+    await set_eyed3_value(
+        state=state,
+        eyed3_key=edited_param,
+        value=message.text
+    )
+
+    chat_id = message.chat.id
+    await message.delete()
+    await eyed3_main_page(
+        state=state,
+        bot=bot,
+        chat_id=chat_id
+    )
+
+
+# ----- EDITOR PHOTO ----- #
+
+@music_eyed3_router.message(
+    F.photo | F.document,
+    StateFilter(EyeD3EditState.thumbnail),
+)
+async def eyed3_update_thumbnail(
+        message: types.Message,
+        state: FSMContext,
+        raw_state: str,
+        bot: Bot
+):
+    edited_param = raw_state.split(":")[-1]
+    if photos := message.photo:
+        file_id = photos[-1].file_id
+    elif document := message.document:
+        file_id = document.file_id
     else:
-        edited_param_value = message.text
+        raise TypeError("can't read file_id from message file")
 
     await set_eyed3_value(
         state=state,
         eyed3_key=edited_param,
-        value=edited_param_value
+        value=file_id
     )
 
     chat_id = message.chat.id
@@ -241,10 +300,10 @@ async def eyed3_export(callback: types.CallbackQuery, state: FSMContext, bot: Bo
                 eyed3_tag.images.remove(image.description)
 
             image_io = await bot.download(thumbnail)
-            processed_image_io = process_image(image_io)
+            processed_image_io = await set_async(process_image)(image_io)
             eyed3_tag.images.set(
                 type_=3,
-                img_data=processed_image_io.read(),
+                img_data=await set_async(processed_image_io.read)(),
                 mime_type="image/jpeg"
             )
 
