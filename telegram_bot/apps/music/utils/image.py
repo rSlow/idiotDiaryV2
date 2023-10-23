@@ -5,10 +5,11 @@ from PIL import Image, ImageOps
 
 
 def process_image(image_io: BinaryIO):
+    quality = 1024
     with Image.open(image_io) as image:
         new_image = ImageOps.fit(
             image=image,
-            size=(1024, 1024)
+            size=(quality, quality)
         )
     new_image_io = BytesIO()
     new_image.save(

@@ -1,6 +1,6 @@
-import os
 from pathlib import Path
 
+from aiofiles import os
 from aiogram import Bot, types
 
 
@@ -16,15 +16,15 @@ class TempFileDownloader:
         return self.file_path.parent
 
     async def __aenter__(self):
-        if not os.path.isdir(self.parent):
-            os.mkdir(self.parent)
+        if not await os.path.isdir(self.parent):
+            await os.mkdir(self.parent)
         await self.bot.download(
             file=self.file_id,
             destination=self.file_path
         )
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if os.path.isfile(self.file_path):
-            os.remove(self.file_path)
+        if await os.path.isfile(self.file_path):
+            await os.remove(self.file_path)
         if self.message_to_del:
             await self.message_to_del.delete()

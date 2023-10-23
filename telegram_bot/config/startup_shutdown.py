@@ -28,7 +28,7 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot):
     init_schedules(bot)
 
     await bot.delete_webhook()
-    await init_webhook(dispatcher, bot)
+    await init_webhook(bot)
 
 
 async def on_shutdown(dispatcher: Dispatcher, bot: Bot):

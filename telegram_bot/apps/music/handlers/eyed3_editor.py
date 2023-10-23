@@ -311,14 +311,15 @@ async def eyed3_export(callback: types.CallbackQuery, state: FSMContext, bot: Bo
 
         if eyed3_tag.artist and eyed3_tag.title:
             filename = f"{eyed3_tag.artist} - {eyed3_tag.title}{settings.AUDIO_FILE_EXT}"
-        audio_file = FSInputFile(
-            path=file_path,
-            filename=filename
-        )
-        await callback.message.answer_document(
-            document=audio_file
-        )
-        await music_start(
-            message=callback.message,
-            state=state
-        )
+
+    audio_file = FSInputFile(
+        path=file_path,
+        filename=filename
+    )
+    await callback.message.answer_document(
+        document=audio_file
+    )
+    await music_start(
+        message=callback.message,
+        state=state
+    )
