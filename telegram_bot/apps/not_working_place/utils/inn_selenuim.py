@@ -16,7 +16,7 @@ def get_inn_selenium(data: INNSchema):
     [options.add_argument(arg) for arg in args]
 
     driver = webdriver.Remote(
-        f"http://selenium:{settings.SELENIUM_PORT}/wd/hub",
+        settings.SELENIUM_URL,
         DesiredCapabilities.CHROME,
         options=options
     )
