@@ -11,7 +11,7 @@ from ..filters.inn_filter import INNSchema
 
 def get_inn_selenium(data: INNSchema):
     options = Options()
-    args = ['--headless', 'window-size=1920x1080', "--disable-gpu", "--no-sandbox"]
+    args = ['--headless', 'window-size=1920x1080', "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage"]
     [options.add_argument(arg) for arg in args]
 
     driver = webdriver.Chrome(options=options)
@@ -43,7 +43,7 @@ def get_inn_selenium(data: INNSchema):
             _input = find_by_id(key)
             for c in value:
                 _input.send_keys(c)
-                sleep(0.03)
+                sleep(0.02)
             sleep(0.1)
 
         find_by_id("btn_send").click()

@@ -17,7 +17,7 @@ services:
     env_file:
       - ./.env
     ports:
-      - '6432:5432'
+      - "6432:5432"
     volumes:
       - pg_idv2:/var/lib/postgresql/data/pgdata/idiotDiaryV2
     environment:
@@ -27,17 +27,17 @@ services:
     image: redis
     restart: always
     ports:
-      - '6379:6379'
+      - "6379:6379"
     command:
-      - 'redis-server'
-      - '--loglevel ${REDIS_LOGLEVEL:-warning}'
-      - '--databases 2'
-      - '--save 900 1'
-      - '--save 300 10'
-      - '--save 60 10000'
-      - '--maxmemory ${REDIS_MAXMEM:-50mb}'
-      - '--maxmemory-policy ${REDIS_POLICY:-noeviction}'
-      - '--requirepass ${REDIS_PASS}'
+      - "redis-server"
+      - "--loglevel ${REDIS_LOGLEVEL:-warning}"
+      - "--databases 2"
+      - "--save 900 1"
+      - "--save 300 10"
+      - "--save 60 10000"
+      - "--maxmemory ${REDIS_MAXMEM:-50mb}"
+      - "--maxmemory-policy ${REDIS_POLICY:-noeviction}"
+      - "--requirepass ${REDIS_PASS}"
     volumes:
       - redis:/data
     env_file:
