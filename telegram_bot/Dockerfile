@@ -2,7 +2,7 @@ FROM python:3.11
 
 WORKDIR /app
 RUN apt-get -y update && apt-get -y upgrade && apt-get install -y --no-install-recommends ffmpeg
-RUN apt-get install firefox
+RUN apt-get -y install firefox-esr
 
 COPY ./requirements.txt .
 RUN pip install --upgrade pip
