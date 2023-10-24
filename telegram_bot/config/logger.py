@@ -23,5 +23,5 @@ loguru_sink = settings.ENV.str("LOGURU_FILE", None)
 logger.add(
     sink=settings.LOGS_DIR / loguru_sink if loguru_sink is not None else sys.stdout,
     format="<green>{time:HH:mm:ss}</green> | {level} | <level>{message}</level>",
-    colorize=bool(loguru_sink)
+    colorize=not bool(loguru_sink)
 )
