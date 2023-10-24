@@ -7,6 +7,7 @@ RUN apt-get -y update && apt-get -y upgrade && apt-get install -y --no-install-r
 RUN apt-get install -y wget
 RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 RUN apt-get install ./google-chrome-stable_current_amd64.deb -y
+RUN rm ./google-chrome-stable_current_amd64.deb
 
 COPY ./requirements.txt .
 RUN pip install --upgrade pip
