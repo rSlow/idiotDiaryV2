@@ -1,8 +1,8 @@
 FROM python:3.11 as builder
 
 ENV DEBIAN_FRONTEND noninteractive
-ENV GECKODRIVER_VER v0.29.0
-ENV FIREFOX_VER 87.0
+ENV GECKODRIVER_VER 0.33.0
+ENV FIREFOX_VER 118.0.2
 
 WORKDIR /app
 
@@ -25,7 +25,7 @@ RUN set -x \
 
 # Add geckodriver
 RUN set -x \
-   && curl -sSLO https://github.com/mozilla/geckodriver/releases/download/${GECKODRIVER_VER}/geckodriver-${GECKODRIVER_VER}-linux64.tar.gz \
+   && curl -sSLO https://github.com/mozilla/geckodriver/releases/download/v${GECKODRIVER_VER}/geckodriver-v${GECKODRIVER_VER}-linux64.tar.gz \
    && tar zxf geckodriver-*.tar.gz \
    && mv geckodriver /usr/bin/
 
