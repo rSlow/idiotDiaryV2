@@ -10,6 +10,7 @@ services:
     depends_on:
       - postgres
       - redis
+      - selenium
 
   postgres:
     image: postgres
@@ -56,6 +57,15 @@ services:
       - ./.env
     depends_on:
       - aiogram
+
+  selenium:
+    image: selenium/standalone-chrome:latest
+    restart: always
+    ports:
+      - "${SELENIUM_PORT}:4444"
+      - "7900:7900"
+    shm_size: 2g
+    privileged: true
 
 volumes:
   redis:
