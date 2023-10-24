@@ -51,7 +51,7 @@ services:
       - "443:443"
       - "80:80"
     volumes:
-      - ~/certs-data/certs/:/data/certs/:ro
+      - ${CERTS_DIR}:/data/certs/:ro
       - ./nginx/default.conf:/etc/nginx/templates/default.conf.template/:rw
     env_file:
       - ./.env
@@ -61,6 +61,7 @@ services:
   selenium:
     image: selenium/standalone-chrome:latest
     restart: always
+    shm_size: 500m
     ports:
       - "${SELENIUM_PORT}:4444"
       - "7900:7900"
