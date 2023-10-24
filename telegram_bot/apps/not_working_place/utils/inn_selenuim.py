@@ -2,7 +2,7 @@ import time
 from typing import Callable
 
 from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
 
@@ -14,7 +14,7 @@ def get_inn_selenium(data: INNSchema):
     args = ['--headless', 'window-size=1920x1080', "--disable-gpu", "--no-sandbox"]
     [options.add_argument(arg) for arg in args]
 
-    driver = webdriver.Firefox(options=options)
+    driver = webdriver.Chrome(options=options)
 
     # short function names
     find_by_id: Callable[[str], WebElement] = lambda id_value: driver.find_element(By.ID, id_value)
