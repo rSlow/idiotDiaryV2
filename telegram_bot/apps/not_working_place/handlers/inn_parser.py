@@ -30,8 +30,8 @@ async def inn_parse_start(message: types.Message, state: FSMContext):
 
 
 @inn_router.message(
-    INNFilter(),
-    INNParser.start
+    INNParser.start,
+    INNFilter()
 )
 async def get_inn(message: types.Message, state: FSMContext, inn: INNSchema):
     s_msg = await message.answer(

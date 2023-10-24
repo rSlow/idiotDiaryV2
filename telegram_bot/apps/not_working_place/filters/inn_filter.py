@@ -52,7 +52,7 @@ class INNFilter(BaseFilter):
                 fio, passport, birthday = lines
                 date_passport = None
             case _:
-                raise ValidationError
+                return False
         try:
             model = INNSchema(
                 fio=fio,
