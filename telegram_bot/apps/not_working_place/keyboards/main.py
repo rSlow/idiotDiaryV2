@@ -9,6 +9,7 @@ class NotWorkingPlaceKeyboard(BaseReplyKeyboardBuilder):
         download_video_note = "Скачать кружочек 📹"
         convert_voice = "Конвертировать голосовое 🎤"
         check_birthdays = "Проверить ДР 🎈"
+        inn_parse = "Узнать ИНН 📇"
 
     buttons_list = [
         Buttons.pack,
@@ -18,5 +19,6 @@ class NotWorkingPlaceKeyboard(BaseReplyKeyboardBuilder):
         ButtonWithValidator(
             text=Buttons.check_birthdays,
             validator=IsOwnerValidator()
-        )
+        ),
+        Buttons.inn_parse,
     ]

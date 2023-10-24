@@ -1,5 +1,6 @@
 from aiogram import Router
 
+from .inn_parser import inn_router
 from .main import start_nwp_router
 from .morph import morph_router
 from .pack_photos import pack_photos_router
@@ -15,4 +16,5 @@ nwp_router.include_routers(
     voice_convert_router,
     morph_router,
     birthday_router,
+    inn_router,
 )
