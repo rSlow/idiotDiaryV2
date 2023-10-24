@@ -4,9 +4,9 @@ WORKDIR /app
 RUN apt-get -y update && apt-get -y upgrade && apt-get install -y --no-install-recommends ffmpeg
 
 # install chrome
-RUN curl -LO  https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-RUN apt-get install -y ./google-chrome-stable_current_amd64.deb
-RUN rm google-chrome-stable_current_amd64.deb
+RUN apt-get install -y wget
+RUN wget -q https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
+RUN apt-get install ./google-chrome-stable_current_amd64.deb -y
 
 COPY ./requirements.txt .
 RUN pip install --upgrade pip
