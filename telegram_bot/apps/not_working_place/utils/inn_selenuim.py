@@ -3,23 +3,18 @@ from typing import Callable
 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webelement import WebElement
+from selenium.webdriver.chrome.options import Options
 from selenium import webdriver
-from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
-from config import settings
 from ..filters.inn_filter import INNSchema
 
 
 def get_inn_selenium(data: INNSchema):
-    options = webdriver.ChromeOptions()
+    options = Options()
     args = ['--headless', 'window-size=1920x1080', "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage"]
     [options.add_argument(arg) for arg in args]
 
-    driver = webdriver.Remote(
-        settings.SELENIUM_URL,
-        DesiredCapabilities.CHROME,
-        options=options
-    )
+    driver = webdriver.Chrome(options=options)
 
     # short function names
     find_by_id: Callable[[str], WebElement] = lambda id_value: driver.find_element(By.ID, id_value)
