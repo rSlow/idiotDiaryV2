@@ -1,21 +1,25 @@
 import time
 from typing import Callable
 
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.firefox.service import Service
 from selenium.webdriver.remote.webelement import WebElement
+from selenium import webdriver
+from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+from config import settings
 from ..filters.inn_filter import INNSchema
 
 
 def get_inn_selenium(data: INNSchema):
-    options = Options()
+    options = webdriver.ChromeOptions()
     args = ['--headless', 'window-size=1920x1080', "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage"]
     [options.add_argument(arg) for arg in args]
-    service = Service("/opt/firefox/firefox")
-    driver = webdriver.Firefox(options=options, service=service)
+
+    driver = webdriver.Remote(
+        f"http://selenium:{settings.SELENIUM_PORT}/wd/hub",
+        DesiredCapabilities.CHROME,
+        options=options
+    )
 
     # short function names
     find_by_id: Callable[[str], WebElement] = lambda id_value: driver.find_element(By.ID, id_value)

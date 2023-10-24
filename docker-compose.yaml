@@ -7,9 +7,12 @@ services:
     volumes:
       - ./.env/:/app/.env/:ro
       - ./telegram_bot/logs/:/app/logs/:rw
+    ports:
+      - "${WEB_SERVER_PORT}:${WEB_SERVER_PORT}"
     depends_on:
       - postgres
       - redis
+      - selenium
 
   postgres:
     image: postgres
@@ -57,6 +60,13 @@ services:
     depends_on:
       - aiogram
 
+  selenium:
+    image: selenium/standalone-chrome:latest
+    ports:
+      - "${SELENIUM_PORT}:4444"
+      - "7900:7900"
+    shm_size: 2g
+    privileged: true
 
 volumes:
   redis:
