@@ -5,9 +5,11 @@ import uuid
 
 from yt_dlp import YoutubeDL
 
+from common.utils.sync_to_async import set_async
 from .. import settings
 
 
+@set_async
 def download_audio(
         url: str,
         from_second: int | None = None,

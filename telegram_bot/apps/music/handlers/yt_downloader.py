@@ -76,7 +76,7 @@ async def download(message: types.Message, state: FSMContext, timecode: str | No
     service_message = await message.answer(
         text="Начинаю скачивание..."
     )
-    audio_io, filename = await set_async(audio.download_audio)(url, from_time, to_time)
+    audio_io, filename = await audio.download_audio(url, from_time, to_time)
     await service_message.edit_text(
         text="Отправляю файл..."
     )

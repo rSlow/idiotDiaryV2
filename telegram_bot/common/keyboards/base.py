@@ -23,7 +23,7 @@ class InlineTypeInterface(TypeInterface):
     button_type = InlineKeyboardButton
 
 
-class BaseKeyboardBuilder(KeyboardBuilder[ButtonType]):
+class BaseKeyboardBuilder(KeyboardBuilder):
     buttons_list: Any = abstractproperty
     button_type: Type[ButtonType] = abstractproperty
 
@@ -40,8 +40,8 @@ class BaseKeyboardBuilder(KeyboardBuilder[ButtonType]):
 
     validator_args: dict[str, Any] | None = None
 
-    def __init__(self, button_type: Type[ButtonType]):
-        super().__init__(button_type=button_type)
+    def __init__(self, **__):
+        super().__init__(button_type=self.button_type)
 
     def _add_from_text(self, text: str):
         self.add(KeyboardButton(text=text))
@@ -72,10 +72,12 @@ class BaseKeyboardBuilder(KeyboardBuilder[ButtonType]):
     @classmethod
     def build(cls,
               validator_args: Optional[dict[str, Any]] = None,
+              markup_args: Optional[dict[str, Any]] = None,
               **kwargs):
-        keyboard = cls(button_type=cls.button_type)
-        for attr, value in kwargs.items():
-            setattr(keyboard, attr, value)
+        keyboard = cls(**kwargs)
+        if markup_args:
+            for attr, value in markup_args.items():
+                setattr(keyboard, attr, value)
         if validator_args:
             keyboard.validator_args = validator_args
         return keyboard.as_markup()
@@ -106,9 +108,6 @@ class BaseReplyKeyboardBuilder(BaseKeyboardBuilder):
     buttons_list: ReplyTypeInterface.button_type = []
     button_type: Type[ButtonType] = KeyboardButton
 
-    def __init__(self):
-        super().__init__(button_type=self.button_type)
-
     def _prepare_button(self, button: ReplyTypeInterface.button_type):
         if isinstance(button, str):
             return self.button_type(text=button)
@@ -134,9 +133,6 @@ class BaseInlineKeyboardBuilder(BaseKeyboardBuilder):
     add_on_main_button = False
     buttons_list: InlineTypeInterface.button_type = []
     button_type: Type[ButtonType] = InlineKeyboardButton
-
-    def __init__(self):
-        super().__init__(button_type=self.button_type)
 
     def _prepare_button(self, button: InlineTypeInterface.button_type):
         if isinstance(button, InlineKeyboardButton):

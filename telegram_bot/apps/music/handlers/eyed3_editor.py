@@ -20,7 +20,7 @@ from ..keyboards.eyed3_main import EyeD3MainKeyboard, EyeD3BackToMainKeyboard
 from ..keyboards.main import MusicMainKeyboard
 from ..utils.audio import download_audio
 from ..utils.eyed3_editor import set_eyed3_value, get_eyed3_data, get_eyed3_value
-from ..utils.image import process_image
+from ..utils.image import process_image, get_aiogram_thumbnail
 from ..utils.temp_dowlnoader import TempFileDownloader
 
 music_eyed3_router = Router(name="music_eyed3")
@@ -34,7 +34,7 @@ async def start_eyed3_editor(message: types.Message, state: FSMContext):
     await state.set_state(EyeD3State.wait_file)
     await message.answer(
         text=f"Ожидаю файл или ссылку на YouTube...",
-        reply_markup=CancelKeyboard.build(one_time_keyboard=True)
+        reply_markup=CancelKeyboard.build(markup_args={"one_time_keyboard": True})
     )
 
 
@@ -94,7 +94,7 @@ async def eyed3_parse_file(
 )
 async def eyed3_from_url(message: types.Message, state: FSMContext, url: str, bot: Bot):
     service_message = await message.answer("Скачиваю...")
-    audio_io, filename = await set_async(download_audio)(url)
+    audio_io, filename = await download_audio(url)
     audio_file = BufferedInputFile(
         file=audio_io,
         filename=filename
@@ -300,7 +300,7 @@ async def eyed3_export(callback: types.CallbackQuery, state: FSMContext, bot: Bo
                 eyed3_tag.images.remove(image.description)
 
             image_io = await bot.download(thumbnail)
-            processed_image_io = await set_async(process_image)(image_io)
+            processed_image_io = await process_image(image_io)
             eyed3_tag.images.set(
                 type_=3,
                 img_data=await set_async(processed_image_io.read)(),
@@ -312,13 +312,15 @@ async def eyed3_export(callback: types.CallbackQuery, state: FSMContext, bot: Bo
         if eyed3_tag.artist and eyed3_tag.title:
             filename = f"{eyed3_tag.artist} - {eyed3_tag.title}{settings.AUDIO_FILE_EXT}"
 
-    audio_file = FSInputFile(
-        path=file_path,
-        filename=filename
-    )
-    await callback.message.answer_document(
-        document=audio_file
-    )
+        audio_file = FSInputFile(
+            path=file_path,
+            filename=filename
+        )
+        await callback.message.answer_document(
+            document=audio_file,
+            thumbnail=await get_aiogram_thumbnail(processed_image_io) if thumbnail is not None else None
+        )
+
     await music_start(
         message=callback.message,
         state=state
