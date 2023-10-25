@@ -49,6 +49,7 @@ services:
     restart: always
     ports:
       - "${BASE_WEBHOOK_PORT}:443"
+      - "8444:80"
     volumes:
       - ${CERTS_DIR}:/data/certs/:ro
       - ./nginx/default.conf:/etc/nginx/templates/default.conf.template/:rw
