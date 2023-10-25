@@ -106,6 +106,9 @@ class BaseReplyKeyboardBuilder(BaseKeyboardBuilder):
     buttons_list: ReplyTypeInterface.button_type = []
     button_type: Type[ButtonType] = KeyboardButton
 
+    def __init__(self):
+        super().__init__(button_type=self.button_type)
+
     def _prepare_button(self, button: ReplyTypeInterface.button_type):
         if isinstance(button, str):
             return self.button_type(text=button)
@@ -131,6 +134,9 @@ class BaseInlineKeyboardBuilder(BaseKeyboardBuilder):
     add_on_main_button = False
     buttons_list: InlineTypeInterface.button_type = []
     button_type: Type[ButtonType] = InlineKeyboardButton
+
+    def __init__(self):
+        super().__init__(button_type=self.button_type)
 
     def _prepare_button(self, button: InlineTypeInterface.button_type):
         if isinstance(button, InlineKeyboardButton):

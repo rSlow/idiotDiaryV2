@@ -48,8 +48,7 @@ services:
     image: nginx
     restart: always
     ports:
-      - "443:443"
-      - "80:80"
+      - "${BASE_WEBHOOK_PORT}:443"
     volumes:
       - ${CERTS_DIR}:/data/certs/:ro
       - ./nginx/default.conf:/etc/nginx/templates/default.conf.template/:rw
