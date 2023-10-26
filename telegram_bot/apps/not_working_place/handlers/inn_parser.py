@@ -4,13 +4,12 @@ from aiogram.types import ReplyKeyboardRemove
 
 from common.jinja import render_template
 from common.keyboards.base import CancelKeyboard
-from common.utils.sync_to_async import set_async
 from .main import start_nwp
 from ..FSM.inn_parser import INNParser
 from ..FSM.start import Start
 from ..filters.inn_filter import INNFilter, INNSchema
 from ..keyboards.main import NotWorkingPlaceKeyboard
-from ..utils.inn_selenuim import get_inn_selenium
+from ..utils.inn_selenuim import get_inn_selenium, SeleniumTimeout
 
 inn_router = Router(name="inn")
 
@@ -41,9 +40,16 @@ async def get_inn(message: types.Message, state: FSMContext, inn: INNSchema):
     await state.set_state(INNParser.parse)
 
     try:
-        result_inn = await set_async(get_inn_selenium)(data=inn)
-        await message.answer(text=f"ИНН - <code>{result_inn}</code>" if result_inn is not None else "Не найдено.")
+        result_inn = await get_inn_selenium(data=inn)
         await start_nwp(
+            text=f"ИНН - <code>{result_inn}</code>" if result_inn is not None else "Не найдено.",
+            message=message,
+            state=state
+        )
+    except SeleniumTimeout:
+        await start_nwp(
+            text="Запрос не может выполниться по независящим от бота причинам. Возможно, причина в сайте налоговой. "
+                 "Задача отменена.",
             message=message,
             state=state
         )

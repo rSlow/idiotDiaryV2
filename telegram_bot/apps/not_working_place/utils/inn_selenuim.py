@@ -6,10 +6,18 @@ from selenium.webdriver.remote.webelement import WebElement
 from selenium import webdriver
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 
+from common.utils.functions import coro_timer
+from common.utils.sync_to_async import set_async
 from config import settings
 from ..filters.inn_filter import INNSchema
 
 
+class SeleniumTimeout(TimeoutError):
+    pass
+
+
+@coro_timer(30, exc=SeleniumTimeout)
+@set_async
 def get_inn_selenium(data: INNSchema):
     options = webdriver.ChromeOptions()
     args = ['--headless', 'window-size=1920x1080', "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage"]
@@ -55,7 +63,8 @@ def get_inn_selenium(data: INNSchema):
         sleep(3)
 
         inn_block = find_by_id("resultInn")
-        return inn_block.text if inn_block is not None else None
+        if inn_block and (inn := inn_block.text):
+            return inn
 
     finally:
         driver.close()

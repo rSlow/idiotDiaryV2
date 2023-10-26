@@ -13,11 +13,11 @@ start_nwp_router = Router()
     F.text == StartKeyboard.Buttons.not_working_place,
     CommonState.start
 )
-async def start_nwp(message: types.Message, state: FSMContext):
+async def start_nwp(message: types.Message, state: FSMContext, text: str | None = None):
     await main(
         message=message,
         state=state,
-        text="(не)рабочая площадка. Выберите действие:"
+        text=text if text else "(не)рабочая площадка. Выберите действие:"
     )
 
 
