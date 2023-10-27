@@ -1,4 +1,5 @@
 from datetime import date, timedelta, datetime
+from uuid import UUID
 
 from sqlalchemy import select, extract, and_, delete
 from sqlalchemy.orm import Mapped, mapped_column
@@ -11,10 +12,10 @@ from config import settings
 class Birthday(Base):
     __tablename__ = "birthdays"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    fio: Mapped[str] = mapped_column(primary_key=True)
+    uuid: Mapped[UUID] = mapped_column(primary_key=True)
+    fio: Mapped[str] = mapped_column()
     date: Mapped[date]
-    post: Mapped[str]
+    post: Mapped[str] = mapped_column(nullable=True)
     rank: Mapped[str] = mapped_column(nullable=True)
 
     @classmethod
