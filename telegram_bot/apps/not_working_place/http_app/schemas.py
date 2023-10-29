@@ -2,15 +2,21 @@ from datetime import date
 from typing import Annotated
 from uuid import UUID
 
-import pydantic
-from pydantic import Field, UUID4, AfterValidator
+from pydantic import UUID4, AfterValidator, BaseModel
+
+
+class UUIDValidationError(TypeError):
+    pass
 
 
 def uuid_validator(v: str):
-    return UUID(v, version=4)
+    try:
+        return UUID(v, version=4)
+    except ValueError:
+        raise UUIDValidationError()
 
 
-class SBirthday(pydantic.BaseModel):
+class SBirthday(BaseModel):
     uuid: UUID4 | Annotated[str, AfterValidator(uuid_validator)]
     fio: str
     date: date

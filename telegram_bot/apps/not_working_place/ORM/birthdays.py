@@ -61,3 +61,18 @@ class Birthday(Base):
         today = datetime.now().astimezone(settings.TIMEZONE).date()
         tomorrow = today + timedelta(days=1)
         return await cls.get_date_list(tomorrow)
+
+    @classmethod
+    async def delete_birthday(cls, uuid: UUID):
+        async with Session() as session:
+            q = select(cls).filter_by(
+                uuid=uuid
+            )
+            res = await session.execute(q)
+            birthday: cls | None = res.scalars().one_or_none()
+
+            if birthday is None:
+                return False
+            else:
+                await session.delete(birthday)
+                return True
