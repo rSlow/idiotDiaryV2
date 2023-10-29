@@ -18,7 +18,7 @@ services:
     env_file:
       - ./.env
     ports:
-      - "6432:5432"
+      - "${POSTGRES_PORT}:5432"
     volumes:
       - pg_idv2:/var/lib/postgresql/data/pgdata/idiotDiaryV2
     environment:
