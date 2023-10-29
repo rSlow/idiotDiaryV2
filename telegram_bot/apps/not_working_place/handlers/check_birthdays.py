@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta, date
 
 from aiogram import Router, F, types
+from aiogram.filters import Command
 
 from common.jinja import render_template
 from config import settings
@@ -11,10 +12,10 @@ from ..keyboards.main import NotWorkingPlaceKeyboard
 birthday_router = Router(name="morph")
 
 
+@birthday_router.message(Command("birthdays"))
 @birthday_router.message(
     Start.main,
     F.text == NotWorkingPlaceKeyboard.Buttons.check_birthdays,
-
 )
 async def check_birthdays(message: types.Message):
     today = datetime.now().astimezone(settings.TIMEZONE).date()
