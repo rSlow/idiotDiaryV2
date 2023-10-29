@@ -17,8 +17,8 @@ start_fsh_router = Router(name="start_fsh")
 
 
 @start_fsh_router.message(
+    CommonState.start,
     F.text == StartKeyboard.Buttons.free_shaurma,
-    CommonState.start
 )
 async def choose_device(message: types.Message, state: FSMContext):
     await state.set_state(ChooseBankParams.device)
@@ -30,8 +30,8 @@ async def choose_device(message: types.Message, state: FSMContext):
 
 
 @start_fsh_router.message(
-    F.text[F.in_(enums.DeviceNames.as_value_list())].as_("device_value"),
     ChooseBankParams.device,
+    F.text[F.in_(enums.DeviceNames.as_value_list())].as_("device_value"),
 )
 async def choose_from_bank(message: types.Message, state: FSMContext, device_value: str):
     device_enum = enums.DeviceNames.find_from_value(device_value)
@@ -48,8 +48,8 @@ async def choose_from_bank(message: types.Message, state: FSMContext, device_val
 
 
 @start_fsh_router.message(
+    ChooseBankParams.from_bank,
     F.text[F.in_(enums.BankNames.as_value_list())].as_("from_bank_value"),
-    ChooseBankParams.from_bank
 )
 async def choose_to_bank(message: types.Message, state: FSMContext, from_bank_value: str):
     storage_data = await state.get_data()
@@ -71,6 +71,7 @@ async def choose_to_bank(message: types.Message, state: FSMContext, from_bank_va
 
 
 @start_fsh_router.message(
+    ChooseBankParams.to_bank,
     F.text[F.in_(enums.BankNames.as_value_list())].as_("to_bank_value"),
 )
 async def start_bank_cycle(message: types.Message, state: FSMContext, to_bank_value: str):
@@ -96,9 +97,9 @@ async def start_bank_cycle(message: types.Message, state: FSMContext, to_bank_va
 # ---------- TEST ---------- #
 
 @start_fsh_router.message(
-    Command("test"),
+    ChooseBankParams.device,
     OwnerFilter(),
-    ChooseBankParams.device
+    Command("test"),
 )
 async def test(message: types.Message):
     from_bank_name = "tinkoff"

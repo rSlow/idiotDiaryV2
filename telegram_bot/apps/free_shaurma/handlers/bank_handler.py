@@ -10,11 +10,11 @@ bank_router = Router(name="bank_router")
 
 
 @bank_router.message(
-    F.text.as_("raw_value"),
     StateFilter(
         TinkoffForm,
         SberbankForm
-    )
+    ),
+    F.text.as_("raw_value"),
 )
 async def bank_cycle(message: types.Message, state: FSMContext, raw_state: str, raw_value: str):
     storage_data = await state.get_data()

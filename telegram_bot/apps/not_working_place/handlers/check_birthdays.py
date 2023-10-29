@@ -12,8 +12,8 @@ birthday_router = Router(name="morph")
 
 
 @birthday_router.message(
+    Start.main,
     F.text == NotWorkingPlaceKeyboard.Buttons.check_birthdays,
-    Start.main
 
 )
 async def check_birthdays(message: types.Message):

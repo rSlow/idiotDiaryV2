@@ -4,6 +4,7 @@ from aiogram import types, Router, F
 from aiogram.fsm.context import FSMContext
 
 from common.filters import OwnerFilter
+from common.keyboards.base import YesNoKeyboard
 from config import settings
 from ..FSM.admin import AdminStates
 from ..keyboards.admin import AdminKeyboard
@@ -15,9 +16,13 @@ admin_router = Router(name="admin")
 
 
 @admin_router.message(
-    F.text == StartKeyboard.Buttons.admin,
+    AdminStates.confirm_delete_birthdays,
+    F.text == YesNoKeyboard.Buttons.no,
+)
+@admin_router.message(
+    CommonState.start,
     OwnerFilter(),
-    CommonState.start
+    F.text == StartKeyboard.Buttons.admin,
 )
 async def start_admin(message: types.Message, state: FSMContext):
     await state.set_state(AdminStates.start)
@@ -29,20 +34,37 @@ async def start_admin(message: types.Message, state: FSMContext):
 
 
 @admin_router.message(
+    AdminStates.start,
     F.text == AdminKeyboard.Buttons.clear_birthdays,
-    AdminStates.start
 )
-async def clear_birthdays(message: types.Message):
+async def confirm_clear_birthdays(message: types.Message, state: FSMContext):
+    await state.set_state(AdminStates.confirm_delete_birthdays)
+
+    await message.answer(
+        text="Вы уверены?",
+        reply_markup=YesNoKeyboard.build(markup_args={"add_on_main_button": False})
+    )
+
+
+@admin_router.message(
+    AdminStates.confirm_delete_birthdays,
+    F.text == YesNoKeyboard.Buttons.yes,
+)
+async def clear_birthdays(message: types.Message, state: FSMContext):
     await Birthday.delete_data()
 
     await message.answer(
         text="Все дни рождения удалены.",
     )
+    await start_admin(
+        message=message,
+        state=state
+    )
 
 
 @admin_router.message(
+    AdminStates.start,
     F.text == AdminKeyboard.Buttons.get_logs,
-    AdminStates.start
 )
 async def get_logs(message: types.Message):
     files = [

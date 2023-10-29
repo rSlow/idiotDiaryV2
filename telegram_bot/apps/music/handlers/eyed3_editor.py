@@ -27,8 +27,8 @@ music_eyed3_router = Router(name="music_eyed3")
 
 
 @music_eyed3_router.message(
+    MusicState.start,
     F.text == MusicMainKeyboard.Buttons.edit_music,
-    MusicState.start
 )
 async def start_eyed3_editor(message: types.Message, state: FSMContext):
     await state.set_state(EyeD3State.wait_file)
@@ -41,8 +41,8 @@ async def start_eyed3_editor(message: types.Message, state: FSMContext):
 # ----- INITIALIZE FROM FILE ----- #
 
 @music_eyed3_router.message(
+    EyeD3State.wait_file,
     F.audio.as_("audio"),
-    EyeD3State.wait_file
 )
 async def eyed3_parse_file(
         message: types.Message,
@@ -89,8 +89,8 @@ async def eyed3_parse_file(
 # ----- INITIALIZE FROM URL ----- #
 
 @music_eyed3_router.message(
+    EyeD3State.wait_file,
     F.text[F.regexp(settings.HTTPS_REGEXP)].as_("url"),
-    EyeD3State.wait_file
 )
 async def eyed3_from_url(message: types.Message, state: FSMContext, url: str, bot: Bot):
     service_message = await message.answer("Скачиваю...")
@@ -147,8 +147,8 @@ async def eyed3_main_page(
 # ----- EDITOR TEXT ----- #
 
 @music_eyed3_router.message(
-    F.text,
     StateFilter(EyeD3EditState.title, EyeD3EditState.artist, EyeD3EditState.album),
+    F.text,
 )
 async def eyed3_update_param(
         message: types.Message,
@@ -175,8 +175,8 @@ async def eyed3_update_param(
 # ----- EDITOR PHOTO ----- #
 
 @music_eyed3_router.message(
-    F.photo | F.document,
     StateFilter(EyeD3EditState.thumbnail),
+    F.photo | F.document,
 )
 async def eyed3_update_thumbnail(
         message: types.Message,
@@ -210,8 +210,8 @@ async def eyed3_update_thumbnail(
 # ----- CLEANER ----- #
 
 @music_eyed3_router.callback_query(
+    StateFilter(EyeD3EditState),
     F.data == EyeD3BackToMainKeyboard.Buttons.clear.callback_data,
-    StateFilter(EyeD3EditState)
 )
 async def eyed3_back_to_main(callback: types.CallbackQuery, state: FSMContext, bot: Bot, raw_state):
     await set_eyed3_value(
@@ -229,8 +229,8 @@ async def eyed3_back_to_main(callback: types.CallbackQuery, state: FSMContext, b
 # ----- EDITOR LAUNCHER ----- #
 
 @music_eyed3_router.callback_query(
+    EyeD3State.main,
     EyeD3EditCBFactory.filter(),
-    EyeD3State.main
 )
 async def eyed3_edit_param(
         callback: types.CallbackQuery,
@@ -251,8 +251,8 @@ async def eyed3_edit_param(
 # ----- BACK TO MAIN ----- #
 
 @music_eyed3_router.callback_query(
+    StateFilter(EyeD3EditState),
     F.data == EyeD3BackToMainKeyboard.Buttons.back.callback_data,
-    StateFilter(EyeD3EditState)
 )
 async def eyed3_back_to_main(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
     await eyed3_main_page(
@@ -265,8 +265,8 @@ async def eyed3_back_to_main(callback: types.CallbackQuery, state: FSMContext, b
 # ----- SAVE ----- #
 
 @music_eyed3_router.callback_query(
+    EyeD3State.main,
     F.data == EyeD3MainKeyboard.Buttons.export.callback_data,
-    EyeD3State.main
 )
 async def eyed3_export(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
     eyed3_data = await get_eyed3_data(state=state)

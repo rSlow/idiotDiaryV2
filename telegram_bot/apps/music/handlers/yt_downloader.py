@@ -19,8 +19,8 @@ music_yt_router = Router(name="music_yt")
 
 
 @music_yt_router.message(
+    MusicState.start,
     F.text == MusicMainKeyboard.Buttons.download_from_yt,
-    MusicState.start
 )
 async def start_download_audio(message: types.Message, state: FSMContext):
     await state.set_state(YTDownloadState.url)
@@ -35,8 +35,8 @@ async def start_download_audio(message: types.Message, state: FSMContext):
 
 
 @music_yt_router.message(
+    YTDownloadState.url,
     F.text[F.regexp(settings.HTTPS_REGEXP)].as_("url"),
-    YTDownloadState.url
 )
 async def timecode_video(message: types.Message, state: FSMContext, url: str):
     await state.set_state(YTDownloadState.timecode)
@@ -55,12 +55,12 @@ async def timecode_video(message: types.Message, state: FSMContext, url: str):
 
 
 @music_yt_router.message(
+    YTDownloadState.timecode,
     F.text[F.regexp(settings.FULL_TIMECODE_REGEXP)].as_("timecode"),
-    YTDownloadState.timecode
 )
 @music_yt_router.message(
+    YTDownloadState.timecode,
     F.text == TimecodeKeyboard.Buttons.full,
-    YTDownloadState.timecode
 )
 async def download(message: types.Message, state: FSMContext, timecode: str | None = None):
     await state.set_state(YTDownloadState.download)
@@ -93,8 +93,8 @@ async def download(message: types.Message, state: FSMContext, timecode: str | No
 
 
 @music_yt_router.message(
+    YTDownloadState.url,
     ~(F.text.regexp(settings.HTTPS_REGEXP)),
-    YTDownloadState.url
 )
 async def invalid_link(message: types.Message):
     service_message = await message.answer("Неверный формат ссылки.")

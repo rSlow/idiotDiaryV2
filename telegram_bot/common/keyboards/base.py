@@ -143,3 +143,14 @@ class BaseInlineKeyboardBuilder(BaseKeyboardBuilder):
 
 class CancelKeyboard(BaseReplyKeyboardBuilder):
     pass
+
+
+class YesNoKeyboard(BaseReplyKeyboardBuilder):
+    class Buttons:
+        yes = "Да"
+        no = "Нет"
+
+    buttons_list = [
+        Buttons.yes,
+        Buttons.no,
+    ]

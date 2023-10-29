@@ -16,8 +16,8 @@ start_music_router = Router(name="start_music")
 
 
 @start_music_router.message(
+    CommonState.start,
     F.text == StartKeyboard.Buttons.music,
-    CommonState.start
 )
 async def music_start(message: types.Message, state: FSMContext):
     await state.set_state(MusicState.start)

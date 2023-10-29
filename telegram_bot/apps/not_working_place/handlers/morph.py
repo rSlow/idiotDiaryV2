@@ -12,9 +12,8 @@ morph_router = Router(name="morph")
 
 
 @morph_router.message(
+    Start.main,
     F.text == NotWorkingPlaceKeyboard.Buttons.morph,
-    Start.main
-
 )
 async def morph_fio_start(message: types.Message, state: FSMContext):
     await state.set_state(MorphFIO.morph)
@@ -26,8 +25,8 @@ async def morph_fio_start(message: types.Message, state: FSMContext):
 
 
 @morph_router.message(
+    MorphFIO.morph,
     F.text.as_("fio"),
-    MorphFIO.morph
 )
 async def morph_fio(message: types.Message, fio: str):
     async with ClientSession() as session:

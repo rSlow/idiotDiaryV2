@@ -10,8 +10,8 @@ start_nwp_router = Router()
 
 
 @start_nwp_router.message(
+    CommonState.start,
     F.text == StartKeyboard.Buttons.not_working_place,
-    CommonState.start
 )
 async def start_nwp(message: types.Message, state: FSMContext, text: str | None = None):
     await main(

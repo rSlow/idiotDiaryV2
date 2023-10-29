@@ -15,8 +15,8 @@ inn_router = Router(name="inn")
 
 
 @inn_router.message(
+    Start.main,
     F.text == NotWorkingPlaceKeyboard.Buttons.inn_parse,
-    Start.main
 )
 async def inn_parse_start(message: types.Message, state: FSMContext):
     await state.set_state(INNParser.start)
