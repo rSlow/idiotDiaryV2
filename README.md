@@ -1,157 +1,221 @@
-## Collection of Python Telegram [bots](https://t.me/idiotDiaryV2Bot) from [@rs1ow](https://t.me/rs1ow )
+# Collection of Python Telegram [bots](https://t.me/idiotDiaryV2Bot) from [@rs1ow](https://t.me/rs1ow )
 
-### Based on:
-
-1. [python 3.11](https://www.python.org/downloads/release/python-3110)
-2. [aiogram](https://aiogram.dev), version: 3.1.1 - async Telegram bot app for Python
-3. [SQLAlchemy](https://www.sqlalchemy.org), version: 2.0 - ORM for Postgres database
-4. [alembic](https://alembic.sqlalchemy.org/en/latest), version: 1.12.0 - applying migrations to SQLAlchemy
-5. [redis](https://redis.io/docs/connect/clients/python), version: latest - for using RedisStorage in aiogram
-6. [aiohttp](https://docs.aiohttp.org/en/stable), version: 4.0 - web server for webhook, as well as for HTTP requests
-7. [nginx](https://hub.docker.com/_/nginx), version: latest - web server for aiohttp, + SSL
-8. [selenium](https://hub.docker.com/r/selenium/standalone-chrome), version: standalone-chrome, as a docker container -
-   for parsing sites
-9. [eyed3](https://eyed3.readthedocs.io/en/latest), version: 0.9.7 - editing MP3 tags
-10. [yt-dlp](https://github.com/yt-dlp/yt-dlp), version: 2023.10.13 - download videos from YouTube
-11. [ffmpeg](https://www.ffmpeg.org), version: latest (apt) - downloader for yt-dlp
-12. [Jinja2](https://jinja.palletsprojects.com), version: 3.1.2 - generating template messages
+## Based on:
 
 ---
 
-### Bot Applications:
+1. [python 3.11](https://www.python.org/downloads/release/python-3110)
+2. [aiogram](https://aiogram.dev), `version: 3.1.1` - async Telegram bot app for Python
+3. [SQLAlchemy](https://www.sqlalchemy.org), `version: 2.0` - ORM for Postgres database
+4. [alembic](https://alembic.sqlalchemy.org/en/latest), `version: 1.12.0` - applying migrations to SQLAlchemy
+5. [redis](https://redis.io/docs/connect/clients/python), `version: latest` - for using RedisStorage in aiogram
+6. [aiohttp](https://docs.aiohttp.org/en/stable), `version: 4.0` - web server for webhook, as well as for HTTP requests
+7. [nginx](https://hub.docker.com/_/nginx), `version: latest` - web server for aiohttp, + SSL
+8. [selenium](https://hub.docker.com/r/selenium/standalone-chrome), `version: standalone-chrome`, as a docker
+   container - for parsing sites
+9. [eyed3](https://eyed3.readthedocs.io/en/latest), `version: 0.9.7` - editing MP3 tags
+10. [yt-dlp](https://github.com/yt-dlp/yt-dlp), `version: 2023.10.13` - download videos from YouTube
+11. [ffmpeg](https://www.ffmpeg.org), `version: latest (apt)` - downloader for yt-dlp
+12. [Jinja2](https://jinja.palletsprojects.com), `version: 3.1.2` - generating template messages
 
-#### 1. not working place 😶‍🌫️
+## Bot Applications:
+
+---
+
+### 1. not working place 😶‍🌫️
 
 - archiving photos (telegram photos and files) to a zip archive
 - declensions of full name (in Russian) in all cases of the Russian language
 - downloading a telegram video message (yes, I know that this function is in the official application, but I don't care
   😂)
-- checking the INN according to passport data (using selenium and parsing https://service.nalog.ru/inn.do)
+- checking the INN according to passport data (using selenium and parsing `https://service.nalog.ru/inn.do`)
 - checking birthdays (only for admins)
 - auto-sending information about birthdays every day at 10 AM
 
-#### 2. free shawarma 🌯 - imitation of screenshots about transfers to various banks.
+### 2. free shawarma 🌯 - imitation of screenshots about transfers to various banks.
 
 ###### ONLY FOR TESTING!
 
-#### 3. music app 🎧
+### 3. music app 🎧
 
 - async downloading music from YouTube, including downloading part of the video (based
   on [yt-dlp](https://github.com/yt-dlp/yt-dlp))
 - MP3 tag editor (based on [eyeD3](https://eyed3.readthedocs.io/en/latest))
 
-#### 4. Application for admins
+### 4. Application for admins
 
 - clearing birthdays
 - log files
 
+## ENVIRONMENTS
+
 ---
 
-#### A .env file is required to run in the root of the project.
+#### The `.env` file is required to run in the root of the project.
 
 ### Required variables .env file:
 
-    --- AIOGRAM ENVS ---
-    
-      - BOT_TOKEN - telegram bot token
-      - TIMEZONE - pytz timezone, required to send notifications using scheduler
-      - OWNER_ID - Telegram account ID, for filtering admins and accessing individual menu items
-      - MORPH_URL - HTTP-endpoint for the FULL NAME declension service
-    
-    --- HTTP ENVS ---
-    
-      - WEBHOOK_PATH - relative path for telegram webhook
-      - BASE_WEBHOOK_URL - http address of the server (domain). Required for telegram webhook
-      - BASE_WEBHOOK_PORT - port for telegram webhook. By default, 443, but it is possible to use 8443 ports
-      - WEB_SERVER_PORT - internal aiohttp port
-      - WEBHOOK_SECRET - secret token for checking the telegram validity of a webhook request
-      - CERTS_DIR - path for SSL certificates. Generating certificates using [certbot](https://certbot.eff.org /)
-    
-    --- DATABASE ENVS ---
-    
-      - POSTGRES_USER - the name of the PostgreSQL user
-      - POSTGRES_PASSWORD - password for accessing PostgreSQL
-      - POSTGRES_DB - name of the PostgreSQL database
-      - POSTGRES_PORT - external port of PostgreSQL
-      - DATABASE_URL - PostgreSQL URL for SQLAlchemy
-    
-    --- OTHER ENVS ---
-    
-      - REDIS_PASS - password for redis storage
-      - SELENIUM_PORT - external port of the selenium container
-      - SELENIUM_URL - the full URL of the selenium container, in the format http://<selenium_address>/wd/hub
+| Env variable        | Mean                                                                                        |
+|:--------------------|:--------------------------------------------------------------------------------------------|
+| `BOT_TOKEN`         | telegram bot token                                                                          |
+| `OWNER_ID`          | Telegram account ID, for filtering admins and accessing individual menu items               |
+| `MORPH_URL`         | HTTP-endpoint for the FULL NAME declension service                                          |
+| `BASE_WEBHOOK_URL`  | http address of the server (domain). Required for telegram webhook                          |
+| `WEBHOOK_PATH`      | relative path for telegram webhook                                                          |
+| `WEB_SERVER_PORT`   | internal aiohttp port                                                                       |
+| `CERTS_DIR`         | path for SSL certificates. Generating certificates using [certbot](https://certbot.eff.org) |
+| `POSTGRES_USER`     | the name of the PostgreSQL user                                                             |
+| `POSTGRES_PASSWORD` | password for accessing PostgreSQL                                                           |
+| `POSTGRES_DB`       | name of the PostgreSQL database                                                             |
+| `POSTGRES_PORT`     | external port of PostgreSQL                                                                 |
+| `DATABASE_URL`      | PostgreSQL URL for SQLAlchemy                                                               |
+| `REDIS_PASS`        | password for redis storage                                                                  |
+| `REDIS_URL`         | URL for RedisStorage in format `redis://:<password>@<host>/0`                               |
+| `SELENIUM_PORT`     | external port of the selenium container                                                     |
+| `SELENIUM_URL`      | the full URL of the selenium container, in the format `http://<selenium_address>/wd/hub`    |
 
 ### Optional variables .env file:
 
-    - aah
+| Env variable        | Mean                                                                                |
+|:--------------------|:------------------------------------------------------------------------------------|
+| `TIMEZONE`          | pytz timezone, required to send notifications using scheduler                       |
+| `WEBHOOK_SECRET`    | secret token for checking the telegram validity of a webhook request                |
+| `BASE_WEBHOOK_PORT` | port for telegram webhook. By default, `443`, but it is possible to use `8443` port |
+
+## DEPLOY
 
 ---
 
 ### Launch (2 options):
 
-    1. docker compose up -d
-    2. chmod +x ./start.sh && ./start.sh
+```bash
+docker compose up -d
+```
+
+or
+
+```bash
+chmod +x ./start.sh && ./start.sh 
+```
+
+---
 
 ### Stop (2 options):
 
-    1. docker compose down
-    2. chmod +x ./stop.sh && ./stop.sh
+```bash
+docker compose down
+```
+
+or
+
+```bash
+chmod +x ./stop.sh && ./stop.sh
+```
+
+---
 
 ### There is an update system (stop, update from github, launch) with the command
 
-    chmod +x ./update.sh && ./update.sh
+```bash
+chmod +x ./update.sh && ./update.sh
+```
+
+## HTTP ENDPOINTS:
 
 ---
 
-### HTTP ENDPOINTS:
+### 1. `/birthdays` [method - `PUT`]
 
-#### 1. /birthdays (method - `PUT`) - updating records.
+##### updating birthday rows
 
-The request body is expected - **list of objects**
+- **required**: request body [list of objects]
 
-##### expected object fields:
+  ##### expected object fields:
 
-- **uuid**: _str_ `[unique UUID as SQL primary key]`
-- **fio**: _str_ `[Full name in the format Surname, First name, Patronymic]`
-- **rank**: _str_ | None `[Rank, may be missing]`
-- **post**: _str_ `[Post]`
-- **date**: _date_ `[Date in DD.MM.YYYY format]`
+    - **uuid**: _str_ `[unique UUID as SQL primary key]`
+    - **fio**: _str_ `[Full name in the format Surname, First name, Patronymic]`
+    - **rank**: _str_ | None `[Rank, may be missing]`
+    - **post**: _str_ `[Post]`
+    - **date**: _date_ `[Date in DD.MM.YYYY format]`
 
-##### response:
+      ```json
+      [
+        {
+          "uuid": "8db2a296-76f3-4d34-9f71-fa7cf213e4d3",
+          "fio": "Иванов Роман Петрович",
+          "rank": "лейтенант",
+          "post": "Инспектор",
+          "date": "12.01.1981"
+        }
+      ]
+      ```
 
-    - 200 - OK
-    - 422 - in case of validation error
+- **response**:
 
-#### 2. **/birthdays** (method - `DELETE`) - deleting all records (clearing)
+| Status | Explaining       |
+|:-------|:-----------------| 
+| `200`  | OK               |
+| `422`  | validation error |
 
-##### response:
+### 2. `/birthdays` [method - `DELETE`]
 
-    - 200 - OK
+##### deleting all records (clearing)
 
-#### 3. **/birthdays/{uuid}** (method - `DELETE`) - deleting a specific record with a uuid identifier.
+- **response**:
 
-Expected path arguments:
+| Status | Explaining |
+|:-------|:-----------| 
+| `200`  | OK         |
 
-- **uuid**: _str_ `[unique UUID as SQL primary key]`
+### 3. `/birthdays/{uuid}` [method - `DELETE`]
 
-##### response:
+##### deleting a specific row with the uuid identifier
 
-    - 200 - OK
-    - 404 - row with this uuid was not found
-    - 422 - in case of validation error
+- **required**: path argument
+
+  ##### expected path arguments:
+
+    - **uuid**: _str_ `[unique UUID as SQL primary key]`
+
+        ```http request
+        [DELETE] /birthdays/8db2a296-76f3-4d34-9f71-fa7cf213e4d3
+        ```
+
+- **response**:
+
+| Status | Explaining                       |
+|:-------|:---------------------------------| 
+| `200`  | OK                               |
+| `404`  | row with this uuid was not found |
+| `422`  | in case of validation error      |
+
+## Features:
 
 ---
 
-### Features:
+- to run synchronous functions as asynchronous, set the decorator `@set_async`
 
-- to run synchronous functions as asynchronous, the decorator `@set_async` is used
-- to set the timer for the execution of an asynchronous function, the decorator `@coro_timer('seconds:int')` is used, as
-  a parameter takes time in seconds
-- to create your own keyboards, `BaseKeyboardBuilder` is used, namely the classes inherited from it
-  `BaseReplyKeyboardBuilder` and `BaseInlineKeyboardBuilder`
-- in `BaseReplyKeyboardBuilder` it is possible to add buttons with the validator `BaseButtonValidator`, based on the
-  builder will be
-  make a decision about adding or not adding a button to the keyboard
+    ```python
+    @set_async
+    def do_something():
+        ...
+    
+    
+    # or use as additional function
+    
+    await set_async(do_something)()
+    ```
+
+- to set the timer for the execution of an asynchronous function, the
+  decorator `@coro_timer(seconds:int, exc:Exception)` is used, as a parameter takes time in seconds. After the time
+  has elapsed, a custom exception can optionally be raised.
+
+    ```python
+    @coro_timer(10, exc=TimeoutError)
+    async def do_something():
+        ...
+    ```
+
 - It is possible to use the modified aiogram storage `MemoryStorage` - `ModifiedMemoryStorage`
     - the point is that redis in **pooling** mode does not have time to save data to storage, which is why some of the
       data may get lost.
@@ -161,3 +225,99 @@ Expected path arguments:
       reboot the bot. However, the storage data will still be lost on reboot. However, such a way out is still
       better than the possible loss of data when saving to redis.
     - **BUT**: in the bot launch mode via webhook, this problem with redis is irrelevant.
+
+## Keyboard Builder:
+
+---
+
+```python
+### Reply Keyboard Builder
+
+from common.keyboards.base import BaseReplyKeyboardBuilder, ButtonWithValidator
+from common.keyboards.base_validators import UserIDValidator
+
+
+class CustomKeyboard(BaseReplyKeyboardBuilder):
+    class Buttons:
+        button_1 = "Some Button"
+        button_2 = "Another Button"
+        button_3_with_valid = "Validation_button"
+
+    buttons_list = [
+        Buttons.button_1,
+        Buttons.button_2,
+        ButtonWithValidator(
+            text=Buttons.button_3_with_valid,
+            validator=UserIDValidator(
+                user_id="12345678"
+            )
+        ),
+    ]
+    add_on_main_button = False
+    validator_args = {"user_id": 12345678}
+    row_width = 1
+```
+
+### Possible params of BaseKeyboardBuilder:
+
+| Param                     | Type                | Explanation                                                                                                          |
+|:--------------------------|:--------------------|----------------------------------------------------------------------------------------------------------------------|
+| `buttons_list`            | `list`              | List of objects to be converted to buttons. `str`, `KeyboardButton`, `EnumType` or `ButtonWithValidator` are allowed |
+| `resize_keyboard`         | `bool`              | Adjusting the size of buttons by height                                                                              |
+| `input_field_placeholder` | `bool`              | Text with an empty input line                                                                                        |
+| `one_time_keyboard`       | `bool`              | Hiding the keyboard after pressing the button                                                                        |
+| `is_persistent`           | `bool`              | Always show the keyboard when the normal keyboard is hidden                                                          |
+| `selective`               | `bool`              | set keyboard as selective                                                                                            |
+| `row_width`               | `int or tuple[int]` | The number of buttons in the keyboard in width. Passed to `adjust()`                                                 |
+| `add_on_main_button`      | `bool`              | Adding the `Home` button                                                                                             |
+| `on_main_button_text`     | `str`               | text of the `Home` button                                                                                            |
+| `validator_args`          | `dict[str, Any]`    | dictionary consisting of keys and values for button validation                                                       |
+
+### Button with validator:
+
+```python
+# Validator
+
+from common.keyboards.base_validators import BaseButtonValidator
+
+
+class IsOwnerValidator(BaseButtonValidator):
+    arg_name = "user_id"
+
+    def __init__(self, user_id: str):
+        super().__init__()
+        self.user_id = user_id
+
+    # in this method you set, how will work mathing values 
+    def validate(self, value: str) -> bool:
+        if str(value) != self.user_id:
+            return False
+        return True
+```
+
+The `arg_name` parameter of the validator determines which value the keyboard will compare with the desired value when
+assembling buttons.
+
+### Build the keyboard (in handler)
+
+```python
+keyboard = CustomKeyboard.build(
+    validator_args={"user_id": message.from_user.id}
+)
+```
+
+## NGINX
+
+---
+
+- #### nginx need SSL certificates for webhook aiogram. Env `CERTS_DIR` will be folder `/certs`, generated by certbot.
+
+  f.e. un `.env` file:
+
+    ```dotenv
+    CERTS_DIR=~/certbot_certs/certs
+    ```
+- #### for nginx.conf needed to set domain, which will be used in setting path for ssl_certificate and ssl_certificate_key.
+    ```dotenv
+    DOMAIN=example.com
+    ```

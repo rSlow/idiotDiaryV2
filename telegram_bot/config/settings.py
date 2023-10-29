@@ -9,13 +9,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ENV = get_env(env_file=BASE_DIR / ".env")
 TEMPLATES_DIR = BASE_DIR / "common" / "jinja"
 
-SECRET_HEADER = "X-Telegram-Bot-Api-Secret-Token"
-
-WEBHOOK_SECRET = ENV.str("WEBHOOK_SECRET")
+WEBHOOK_SECRET = ENV.str("WEBHOOK_SECRET", None)
 WEBHOOK_PATH = ENV.str("WEBHOOK_PATH")
 BASE_WEBHOOK_URL = ENV.str("BASE_WEBHOOK_URL")
-BASE_WEBHOOK_PORT = ENV.str("BASE_WEBHOOK_PORT")
-WEB_SERVER_HOST = ENV.str("WEB_SERVER_HOST")
+BASE_WEBHOOK_PORT = ENV.str("BASE_WEBHOOK_PORT", "443")
 WEB_SERVER_PORT = ENV.int("WEB_SERVER_PORT")
 
 MORPH_URL = ENV.str("MORPH_URL")
@@ -28,7 +25,7 @@ MORPH_CASE_ALIASES = {
     "6": "Предложный",
 }
 
-TIMEZONE = pytz.timezone(ENV.str("TIMEZONE"))
+TIMEZONE = pytz.timezone(ENV.str("TIMEZONE", "Asia/Vladivostok"))
 OWNER_ID = ENV.str("OWNER_ID")
 SELENIUM_URL = ENV.str("SELENIUM_URL")
 
