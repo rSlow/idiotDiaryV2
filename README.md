@@ -20,12 +20,12 @@
 
 ### Bot Applications:
 
-#### 1. not working place 😶 🌫️
+#### 1. not working place 😶‍🌫️
 
 - archiving photos (telegram photos and files) to a zip archive
 - declensions of full name (in Russian) in all cases of the Russian language
 - downloading a telegram video message (yes, I know that this function is in the official application, but I don't care
-  😂))
+  😂)
 - checking the INN according to passport data (using selenium and parsing https://service.nalog.ru/inn.do)
 - checking birthdays (only for admins)
 - auto-sending information about birthdays every day at 10 AM
@@ -122,13 +122,13 @@ The request body is expected - **list of objects**
     - 200 - OK
     - 422 - in case of validation error
 
-#### 2. **/birthdays** (method - `DELETE') - deleting all records (clearing)
+#### 2. **/birthdays** (method - `DELETE`) - deleting all records (clearing)
 
 ##### response:
 
     - 200 - OK
 
-#### 3. **/birthdays/{uuid}** (method - `DELETE') - deleting a specific record with a uuid identifier.
+#### 3. **/birthdays/{uuid}** (method - `DELETE`) - deleting a specific record with a uuid identifier.
 
 Expected path arguments:
 
