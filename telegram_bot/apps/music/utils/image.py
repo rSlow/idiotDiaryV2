@@ -5,7 +5,7 @@ from typing import BinaryIO
 from PIL import Image, ImageOps
 from aiogram.types import BufferedInputFile
 
-from common.utils.sync_to_async import set_async
+from common.utils.decorators import set_async
 
 
 @set_async

@@ -11,7 +11,7 @@ from eyed3.id3 import Tag
 
 from common.jinja import render_template
 from common.keyboards.base import CancelKeyboard
-from common.utils.sync_to_async import set_async
+from common.utils.decorators import set_async
 from .main import music_start
 from .. import settings
 from ..FSM.main import MusicState, EyeD3State, EyeD3EditState

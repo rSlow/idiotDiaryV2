@@ -5,7 +5,7 @@ import uuid
 
 from yt_dlp import YoutubeDL
 
-from common.utils.sync_to_async import set_async
+from common.utils.decorators import set_async
 from .. import settings
 
 

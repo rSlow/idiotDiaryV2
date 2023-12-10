@@ -5,7 +5,6 @@ from aiogram import Router, F, types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import BufferedInputFile
 
-from common.utils.sync_to_async import set_async
 from .main import music_start
 from .. import settings
 from ..keyboards.main import MusicMainKeyboard
