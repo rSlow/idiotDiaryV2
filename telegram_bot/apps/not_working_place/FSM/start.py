@@ -1,5 +1,5 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class Start(StatesGroup):
+class NWPStartFSM(StatesGroup):
     main = State()

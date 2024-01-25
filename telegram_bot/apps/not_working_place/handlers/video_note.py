@@ -5,8 +5,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, BufferedInputFile
 
 from .main import back_to_main
-from ..FSM.start import Start
-from ..FSM.video_note import DownloadVideoNote
+from ..FSM.start import NWPStartFSM
+from ..FSM.video_note import DownloadVideoNoteFSM
 from ..keyboards.main import NotWorkingPlaceKeyboard
 from ..keyboards.video_note import DownloadVideoKeyboard
 
@@ -15,10 +15,10 @@ video_note_router = Router(name="video_note")
 
 @video_note_router.message(
     F.text == NotWorkingPlaceKeyboard.Buttons.download_video_note,
-    Start.main
+    NWPStartFSM.main
 )
 async def download_video_note_start(message: Message, state: FSMContext):
-    await state.set_state(DownloadVideoNote.main)
+    await state.set_state(DownloadVideoNoteFSM.main)
     await message.answer(
         text="Ожидаю кружочек...",
         reply_markup=DownloadVideoKeyboard.build()
@@ -27,10 +27,10 @@ async def download_video_note_start(message: Message, state: FSMContext):
 
 @video_note_router.message(
     F.video_note,
-    DownloadVideoNote.main
+    DownloadVideoNoteFSM.main
 )
 async def download_video_note(message: Message, state: FSMContext):
-    await state.set_state(DownloadVideoNote.download)
+    await state.set_state(DownloadVideoNoteFSM.download)
     receive_message = await message.answer("Видеосообщение принято, обработка...")
     video_note_file_io = await message.bot.download(
         file=message.video_note.file_id

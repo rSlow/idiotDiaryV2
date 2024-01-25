@@ -27,9 +27,27 @@ class UserIDValidator(BaseButtonValidator):
         return True
 
 
+class UserIDsValidator(BaseButtonValidator):
+    arg_name = "user_id"
+
+    def __init__(self, user_id_list: list[int | str]):
+        super().__init__()
+        self.user_id_list = [str(user_id) for user_id in user_id_list]
+
+    def validate(self, value: str | int) -> Any:
+        if str(value) not in self.user_id_list:
+            return False
+        return True
+
+
 class IsOwnerValidator(UserIDValidator):
     def __init__(self):
         super().__init__(user_id=settings.OWNER_ID)
+
+
+class BirthdaysAllowedValidator(UserIDsValidator):
+    def __init__(self):
+        super().__init__(user_id_list=settings.BIRTHDAYS_ALLOWED)
 
 
 class ButtonWithValidator(KeyboardButton):

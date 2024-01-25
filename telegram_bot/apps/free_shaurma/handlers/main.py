@@ -4,7 +4,7 @@ from aiogram.fsm.context import FSMContext
 
 from common.filters import OwnerFilter
 from common.keyboards.start import StartKeyboard
-from common.FSM import CommonState
+from common.FSM import CommonFSM
 from .. import settings
 from ..FSM.modified_state import BankStatesGroup
 from ..schemas import enums
@@ -17,7 +17,7 @@ start_fsh_router = Router(name="start_fsh")
 
 
 @start_fsh_router.message(
-    CommonState.start,
+    CommonFSM.start,
     F.text == StartKeyboard.Buttons.free_shaurma,
 )
 async def choose_device(message: types.Message, state: FSMContext):

@@ -1,19 +1,21 @@
-from datetime import date, timedelta, datetime
+from datetime import date
+from typing import Sequence, Self
 from uuid import UUID
 
-from sqlalchemy import select, extract, and_, delete
+from sqlalchemy import select, extract, and_, delete, BigInteger
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
 from ..http_app.schemas import SBirthday
 from common.ORM.database import Base, Session
-from config import settings
 
 
 class Birthday(Base):
     __tablename__ = "birthdays"
 
     uuid: Mapped[UUID] = mapped_column(primary_key=True)
-    fio: Mapped[str] = mapped_column()
+    user_id = mapped_column(BigInteger)
+    fio: Mapped[str]
     date: Mapped[date]
     post: Mapped[str] = mapped_column(nullable=True)
     rank: Mapped[str] = mapped_column(nullable=True)
@@ -33,37 +35,33 @@ class Birthday(Base):
                 ])
 
     @classmethod
-    async def delete_data(cls):
+    async def delete_data(cls,
+                          user_id: int):
         async with Session() as session:
             async with session.begin():
-                q = delete(cls)
+                q = delete(cls).filter(
+                    cls.user_id == user_id
+                )
                 await session.execute(q)
 
     @classmethod
-    async def get_date_list(cls, d: date):
-        async with Session() as session:
-            q = select(cls).filter(
-                and_(
-                    extract('month', cls.date) == d.month,
-                    extract('day', cls.date) == d.day
-                ))
-            result = await session.execute(q)
-            date_list: list[cls] = result.scalars().all()
-        return date_list
+    async def get_birthdays_in_date(cls,
+                                    session: AsyncSession,
+                                    user_id: int,
+                                    d: date) -> Sequence[Self]:
+        q = select(cls).filter(
+            and_(
+                extract('month', cls.date) == d.month,
+                extract('day', cls.date) == d.day,
+                cls.user_id == user_id
+            ),
+        )
+        result = await session.execute(q)
+        birthdays = result.scalars().all()
+        return birthdays
 
     @classmethod
-    async def get_today_list(cls):
-        today = datetime.now().astimezone(settings.TIMEZONE).date()
-        return await cls.get_date_list(today)
-
-    @classmethod
-    async def get_tomorrow_list(cls):
-        today = datetime.now().astimezone(settings.TIMEZONE).date()
-        tomorrow = today + timedelta(days=1)
-        return await cls.get_date_list(tomorrow)
-
-    @classmethod
-    async def delete_birthday(cls, uuid: UUID):
+    async def delete_birthday(cls, uuid: UUID) -> bool:
         async with Session() as session:
             q = select(cls).filter_by(
                 uuid=uuid
@@ -74,5 +72,6 @@ class Birthday(Base):
             if birthday is None:
                 return False
             else:
-                await session.delete(birthday)
+                q = delete(cls).filter(cls.uuid == birthday.uuid)
+                await session.execute(q)
                 return True

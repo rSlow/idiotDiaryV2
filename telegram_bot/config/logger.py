@@ -13,7 +13,7 @@ def init_logging():
 
     logging.basicConfig(
         level=logging.INFO,
-        filename=settings.LOGS_DIR / "log.log",
+        # filename=settings.LOGS_DIR / "log.log",
         format="[%(asctime)s - %(levelname)s] %(name)s - %(message)s",
     )
 

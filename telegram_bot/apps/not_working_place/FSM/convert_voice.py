@@ -1,6 +1,6 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class ConvertVoice(StatesGroup):
+class ConvertVoiceFSM(StatesGroup):
     start = State()
     convert = State()

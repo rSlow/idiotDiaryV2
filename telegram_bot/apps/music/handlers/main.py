@@ -9,14 +9,14 @@ from common.keyboards.base import CancelKeyboard
 from common.utils.functions import get_now
 from ..FSM.main import MusicState, YTDownloadState
 from ..keyboards.main import MusicMainKeyboard
-from common.FSM import CommonState
+from common.FSM import CommonFSM
 from common.keyboards.start import StartKeyboard
 
 start_music_router = Router(name="start_music")
 
 
 @start_music_router.message(
-    CommonState.start,
+    CommonFSM.start,
     F.text == StartKeyboard.Buttons.music,
 )
 async def music_start(message: types.Message, state: FSMContext):

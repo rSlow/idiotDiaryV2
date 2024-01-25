@@ -1,5 +1,5 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class CommonState(StatesGroup):
+class CommonFSM(StatesGroup):
     start = State()

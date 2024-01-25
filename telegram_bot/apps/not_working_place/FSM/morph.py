@@ -1,5 +1,5 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class MorphFIO(StatesGroup):
+class MorphFIOFSM(StatesGroup):
     morph = State()

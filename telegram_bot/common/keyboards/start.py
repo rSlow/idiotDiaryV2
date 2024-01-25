@@ -1,11 +1,12 @@
 from .base import BaseReplyKeyboardBuilder
-from .base_validators import ButtonWithValidator, IsOwnerValidator
+from .base_validators import ButtonWithValidator, IsOwnerValidator, BirthdaysAllowedValidator
 
 
 class StartKeyboard(BaseReplyKeyboardBuilder):
     class Buttons:
         not_working_place = "нерабочая площадка 😶‍🌫️"
         free_shaurma = "(бес)платная шаурма 🌯"
+        birthdays = "напоминальщик ДР 🎂"
         music = "Музыка 🎧"
         admin = "Админка ⚙️"
 
@@ -14,6 +15,10 @@ class StartKeyboard(BaseReplyKeyboardBuilder):
     buttons_list = [
         Buttons.not_working_place,
         Buttons.free_shaurma,
+        ButtonWithValidator(
+            text=Buttons.birthdays,
+            validator=BirthdaysAllowedValidator()
+        ),
         Buttons.music,
         ButtonWithValidator(
             text=Buttons.admin,

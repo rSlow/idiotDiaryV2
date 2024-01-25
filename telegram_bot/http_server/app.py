@@ -1,7 +1,7 @@
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler
 from aiohttp.web_app import Application
 
-from apps.not_working_place.http_app.routers import nwp_app
+from apps.birthdays.http_app.routers import birthdays_app
 from config import settings
 from config.bot import dp, bot
 
@@ -14,4 +14,4 @@ webhook_requests_handler = SimpleRequestHandler(
 )
 webhook_requests_handler.register(app, path=settings.WEBHOOK_PATH)
 
-app.add_subapp("/nwp", nwp_app)
+app.add_subapp("/birthdays", birthdays_app)

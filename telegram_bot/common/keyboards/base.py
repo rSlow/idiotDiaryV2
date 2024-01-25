@@ -10,8 +10,8 @@ from .base_validators import ButtonWithValidator
 
 class TypeInterface(ABC):
     button_type = Any
-    iterable = list[button_type] | tuple[button_type]
-    double_iterable = list[iterable] | tuple[iterable]
+    iterable = list[button_type]
+    double_iterable = list[iterable]
     buttons_list_type = iterable | double_iterable
 
 
@@ -23,7 +23,7 @@ class InlineTypeInterface(TypeInterface):
     button_type = InlineKeyboardButton
 
 
-class BaseKeyboardBuilder(KeyboardBuilder):
+class BaseKeyboardBuilder(KeyboardBuilder, ABC):
     buttons_list: Any = abstractproperty
     button_type: Type[ButtonType] = abstractproperty
 
@@ -97,15 +97,15 @@ class BaseKeyboardBuilder(KeyboardBuilder):
             return prepared_row
 
         for row in buttons_list:
-            if isinstance(row, (list, tuple)):
+            if isinstance(row, list):
                 self.row(*_prepare_row(row))
             elif isinstance(row, (str, KeyboardButton, Enum, ButtonWithValidator, InlineKeyboardButton)):
                 self.add(*_prepare_row(buttons_list))
                 return
 
 
-class BaseReplyKeyboardBuilder(BaseKeyboardBuilder):
-    buttons_list: ReplyTypeInterface.button_type = []
+class BaseReplyKeyboardBuilder(BaseKeyboardBuilder, ABC):
+    buttons_list: ReplyTypeInterface.buttons_list_type = []
     button_type: Type[ButtonType] = KeyboardButton
 
     def _prepare_button(self, button: ReplyTypeInterface.button_type):
@@ -129,7 +129,7 @@ class BaseReplyKeyboardBuilder(BaseKeyboardBuilder):
                             f"'str', 'EnumType', 'KeyboardButton', 'ButtonWithValidator'")
 
 
-class BaseInlineKeyboardBuilder(BaseKeyboardBuilder):
+class BaseInlineKeyboardBuilder(BaseKeyboardBuilder, ABC):
     add_on_main_button = False
     buttons_list: InlineTypeInterface.button_type = []
     button_type: Type[ButtonType] = InlineKeyboardButton
@@ -145,10 +145,22 @@ class CancelKeyboard(BaseReplyKeyboardBuilder):
     pass
 
 
+class BackKeyboard(BaseReplyKeyboardBuilder):
+    class Buttons:
+        back = "Назад 🔙"
+
+    add_on_main_button = False
+    buttons_list = [
+        Buttons.back
+    ]
+
+
 class YesNoKeyboard(BaseReplyKeyboardBuilder):
     class Buttons:
         yes = "Да"
         no = "Нет"
+
+    add_on_main_button = False
 
     buttons_list = [
         Buttons.yes,

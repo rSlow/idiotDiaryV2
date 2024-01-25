@@ -4,19 +4,19 @@ from aiohttp import ClientSession
 
 from common.keyboards.base import CancelKeyboard
 from config import settings
-from ..FSM.morph import MorphFIO
-from ..FSM.start import Start
+from ..FSM.morph import MorphFIOFSM
+from ..FSM.start import NWPStartFSM
 from ..keyboards.main import NotWorkingPlaceKeyboard
 
 morph_router = Router(name="morph")
 
 
 @morph_router.message(
-    Start.main,
+    NWPStartFSM.main,
     F.text == NotWorkingPlaceKeyboard.Buttons.morph,
 )
 async def morph_fio_start(message: types.Message, state: FSMContext):
-    await state.set_state(MorphFIO.morph)
+    await state.set_state(MorphFIOFSM.morph)
 
     await message.answer(
         text="Введите ФИО в формате <code>Иванов Иван Иванович</code>",
@@ -25,7 +25,7 @@ async def morph_fio_start(message: types.Message, state: FSMContext):
 
 
 @morph_router.message(
-    MorphFIO.morph,
+    MorphFIOFSM.morph,
     F.text.as_("fio"),
 )
 async def morph_fio(message: types.Message, fio: str):

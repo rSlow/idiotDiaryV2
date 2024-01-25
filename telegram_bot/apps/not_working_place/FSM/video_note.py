@@ -1,6 +1,6 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class DownloadVideoNote(StatesGroup):
+class DownloadVideoNoteFSM(StatesGroup):
     main = State()
     download = State()

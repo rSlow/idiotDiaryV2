@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, time
 from typing import Annotated
 from uuid import UUID
 
@@ -18,6 +18,7 @@ def uuid_validator(v: str):
 
 class SBirthday(BaseModel):
     uuid: UUID4 | Annotated[str, AfterValidator(uuid_validator)]
+    user_id: int
     fio: str
     date: date
     post: str | None = None

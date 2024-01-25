@@ -1,6 +1,6 @@
 from aiogram.fsm.state import StatesGroup, State
 
 
-class INNParser(StatesGroup):
+class INNParserFSM(StatesGroup):
     start = State()
     parse = State()

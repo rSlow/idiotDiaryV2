@@ -32,7 +32,8 @@ except ImportError as ex:
 
 try:
     from common.ORM.state_model import State
-    from apps.not_working_place.ORM.birthdays import Birthday
+    from apps.birthdays.ORM.birthdays import Birthday
+    from apps.birthdays.ORM.notifications import NotificationTime
 except ImportError:
     raise
 

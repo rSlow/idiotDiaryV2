@@ -35,4 +35,6 @@ class ContextMiddleware(BaseMiddleware):
             data: dict[str, Any],
     ) -> Any:
         data.update(self.context)
+        user_id = event.event.from_user.id
+        data["user_id"] = user_id
         return await handler(event, data)

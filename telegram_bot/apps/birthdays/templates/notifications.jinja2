@@ -1,0 +1,10 @@
+{% if times %}
+    Установлены следующие метки оповещения: <br>
+    {% for time in times %}
+        - {{ time.strftime(TIME_FORMAT) }} <br>
+    {% endfor %}
+{% else %}
+    Не установлено ни одной метки оповещения.
+{% endif %}
+<br>
+Выберите действие:

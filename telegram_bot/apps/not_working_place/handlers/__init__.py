@@ -6,7 +6,6 @@ from .morph import morph_router
 from .pack_photos import pack_photos_router
 from .video_note import video_note_router
 from .voice_convert import voice_convert_router
-from .check_birthdays import birthday_router
 
 nwp_router = Router(name="not_working_place")
 nwp_router.include_routers(
@@ -15,6 +14,5 @@ nwp_router.include_routers(
     video_note_router,
     voice_convert_router,
     morph_router,
-    birthday_router,
     inn_router,
 )

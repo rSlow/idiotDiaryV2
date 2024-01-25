@@ -6,8 +6,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, BufferedInputFile
 
 from config import settings
-from ..FSM.start import Start
-from ..FSM.convert_voice import ConvertVoice
+from ..FSM.start import NWPStartFSM
+from ..FSM.convert_voice import ConvertVoiceFSM
 from ..keyboards.main import NotWorkingPlaceKeyboard
 from ..keyboards.voice_convert import ConvertVideoKeyboard, ConvertAgainVideoKeyboard
 
@@ -16,15 +16,15 @@ voice_convert_router = Router()
 
 @voice_convert_router.message(
     F.text == ConvertAgainVideoKeyboard.Buttons.again,
-    ConvertVoice.convert
+    ConvertVoiceFSM.convert
 )
 @voice_convert_router.message(
     F.text == NotWorkingPlaceKeyboard.Buttons.convert_voice,
-    Start.main
+    NWPStartFSM.main
 )
 async def convert_voice_message_start(message: Message, state: FSMContext):
     await state.set_data({})
-    await state.set_state(ConvertVoice.start)
+    await state.set_state(ConvertVoiceFSM.start)
 
     await message.answer(
         text=f"Ожидаю голосовое сообщение...\n"
@@ -35,7 +35,7 @@ async def convert_voice_message_start(message: Message, state: FSMContext):
 
 @voice_convert_router.message(
     F.text,
-    ConvertVoice.start,
+    ConvertVoiceFSM.start,
 )
 async def set_voice_file_text(message: Message, state: FSMContext):
     await state.update_data({"VOICE_NAME": message.text})
@@ -49,10 +49,10 @@ async def set_voice_file_text(message: Message, state: FSMContext):
 
 @voice_convert_router.message(
     F.voice,
-    ConvertVoice.start,
+    ConvertVoiceFSM.start,
 )
 async def convert_voice_message(message: Message, state: FSMContext):
-    await state.set_state(ConvertVoice.convert)
+    await state.set_state(ConvertVoiceFSM.convert)
 
     data = await state.get_data()
     filename = data.get("VOICE_NAME")

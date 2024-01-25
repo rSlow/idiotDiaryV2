@@ -9,7 +9,9 @@
                     {{ birthday.rank }}
                 {% endif %}
 
-                {{ birthday.fio }} <br>
+                {{ birthday.fio }} -
+                {% set yearsdelta = (date - birthday.date).days / 362.25 %}
+                {{ yearsdelta|round|int }} лет<br>
             {% endfor %}
         {% endif %}
         <br>

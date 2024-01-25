@@ -23,7 +23,7 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot):
     await set_ui_commands(bot)
 
     scheduler.start()
-    init_schedules(bot)
+    await init_schedules(bot)
 
     await bot.delete_webhook()
     await init_webhook(bot)

@@ -5,8 +5,8 @@ from aiogram.types import ReplyKeyboardRemove
 from common.jinja import render_template
 from common.keyboards.base import CancelKeyboard
 from .main import start_nwp
-from ..FSM.inn_parser import INNParser
-from ..FSM.start import Start
+from ..FSM.inn_parser import INNParserFSM
+from ..FSM.start import NWPStartFSM
 from ..filters.inn_filter import INNFilter, INNSchema
 from ..keyboards.main import NotWorkingPlaceKeyboard
 from ..utils.inn_selenuim import get_inn_selenium, SeleniumTimeout
@@ -15,13 +15,13 @@ inn_router = Router(name="inn")
 
 
 @inn_router.message(
-    Start.main,
+    NWPStartFSM.main,
     F.text == NotWorkingPlaceKeyboard.Buttons.inn_parse,
 )
 async def inn_parse_start(message: types.Message, state: FSMContext):
-    await state.set_state(INNParser.start)
+    await state.set_state(INNParserFSM.start)
 
-    message_text = render_template(template_name="inn_parser_message.jinja2")
+    message_text = render_template()
     await message.answer(
         text=message_text,
         reply_markup=CancelKeyboard.build(),
@@ -29,7 +29,7 @@ async def inn_parse_start(message: types.Message, state: FSMContext):
 
 
 @inn_router.message(
-    INNParser.start,
+    INNParserFSM.start,
     INNFilter()
 )
 async def get_inn(message: types.Message, state: FSMContext, inn: INNSchema):
@@ -37,7 +37,7 @@ async def get_inn(message: types.Message, state: FSMContext, inn: INNSchema):
         text="Поиск...",
         reply_markup=ReplyKeyboardRemove()
     )
-    await state.set_state(INNParser.parse)
+    await state.set_state(INNParserFSM.parse)
 
     try:
         result_inn = await get_inn_selenium(data=inn)

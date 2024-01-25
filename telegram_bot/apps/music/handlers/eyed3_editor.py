@@ -9,7 +9,6 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, ReplyKeyboardRemove, BufferedInputFile
 from eyed3.id3 import Tag
 
-from common.jinja import render_template
 from common.keyboards.base import CancelKeyboard
 from common.utils.decorators import set_async
 from .main import music_start
@@ -21,6 +20,7 @@ from ..keyboards.main import MusicMainKeyboard
 from ..utils.audio import download_audio
 from ..utils.eyed3_editor import set_eyed3_value, get_eyed3_data, get_eyed3_value
 from ..utils.image import process_image, get_aiogram_thumbnail
+from ..utils.render import render_eyed3
 from ..utils.temp_dowlnoader import TempFileDownloader
 
 music_eyed3_router = Router(name="music_eyed3")
@@ -120,10 +120,7 @@ async def eyed3_main_page(
     data = await state.get_data()
     eyed3_data: dict[str, Any] = data.get("eyed3_data", {})
 
-    main_text = render_template(
-        template_name="eyed3_data.jinja2",
-        data=eyed3_data
-    )
+    main_text = render_eyed3(eyed3_data)
 
     message_id = eyed3_data.get("message_id")
     if message_id is None:
