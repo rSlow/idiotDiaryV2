@@ -21,11 +21,14 @@ class Birthday(Base):
     rank: Mapped[str] = mapped_column(nullable=True)
 
     @classmethod
-    async def update_data(cls, data: list[SBirthday]):
+    async def update_data(cls,
+                          user_id: int,
+                          data: list[SBirthday]) -> None:
         async with Session() as session:
             async with session.begin():
                 q = delete(cls).filter(
-                    cls.fio.in_([birthday.fio for birthday in data])
+                    cls.fio.in_([birthday.fio for birthday in data]),
+                    cls.user_id == user_id
                 )
                 await session.execute(q)
 
@@ -36,7 +39,7 @@ class Birthday(Base):
 
     @classmethod
     async def delete_data(cls,
-                          user_id: int):
+                          user_id: int) -> None:
         async with Session() as session:
             async with session.begin():
                 q = delete(cls).filter(
@@ -61,10 +64,13 @@ class Birthday(Base):
         return birthdays
 
     @classmethod
-    async def delete_birthday(cls, uuid: UUID) -> bool:
+    async def delete_birthday(cls,
+                              user_id: int,
+                              uuid: UUID) -> bool:
         async with Session() as session:
-            q = select(cls).filter_by(
-                uuid=uuid
+            q = select(cls).filter(
+                cls.uuid == uuid,
+                cls.user_id == user_id
             )
             res = await session.execute(q)
             birthday: cls | None = res.scalars().one_or_none()
@@ -72,6 +78,8 @@ class Birthday(Base):
             if birthday is None:
                 return False
             else:
-                q = delete(cls).filter(cls.uuid == birthday.uuid)
+                q = delete(cls).filter(
+                    cls.uuid == birthday.uuid
+                )
                 await session.execute(q)
                 return True

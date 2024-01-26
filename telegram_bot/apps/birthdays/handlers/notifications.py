@@ -2,7 +2,6 @@ from datetime import time
 
 from aiogram import Router, F, types, Bot
 from aiogram.fsm.context import FSMContext
-from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from sqlalchemy.exc import NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,12 +9,12 @@ from common.filters import YesKeyboardFilter, NoKeyboardFilter
 from common.keyboards.base import YesNoKeyboard, CancelKeyboard
 from common.utils.functions import get_now
 from config import formats
+from config.scheduler import NotificationScheduler
 from ..FSM.main import BirthdaysFSM, BirthdaysNotificationFSM
 from ..ORM.notifications import NotificationTime, NotificationUser
 from ..filters import TimeValidFilter, TimeNotValidFilter
 from ..keyboards.main import BirthdaysMainKeyboard
 from ..keyboards.notifications import BirthdaysNotificationsKeyboard
-from ..scheduler import remove_birthday_job, add_birthday_job
 from ..utils.render import render_notifications
 
 notifications_router = Router(name="notifications_birthdays")
@@ -70,7 +69,7 @@ async def valid_add_time_notification(message: types.Message,
                                       user_id: int,
                                       valid_time: time,
                                       session: AsyncSession,
-                                      scheduler: AsyncIOScheduler,
+                                      scheduler: NotificationScheduler,
                                       bot: Bot):
     await state.set_state(BirthdaysNotificationFSM.confirm_add_time)
     await NotificationTime.add_notification(
@@ -82,8 +81,7 @@ async def valid_add_time_notification(message: types.Message,
         session=session,
         user_id=user_id
     )
-    add_birthday_job(
-        scheduler=scheduler,
+    scheduler.add_birthday_job(
         user_id=user_id,
         t=valid_time,
         bot=bot,
@@ -127,7 +125,7 @@ async def clear_confirm_notifications(message: types.Message,
                                       state: FSMContext,
                                       user_id: int,
                                       session: AsyncSession,
-                                      scheduler: AsyncIOScheduler):
+                                      scheduler: NotificationScheduler):
     notifications = await NotificationTime.get_notifications(
         session=session,
         user_id=user_id
@@ -137,8 +135,7 @@ async def clear_confirm_notifications(message: types.Message,
         session=session
     )
     for notification in notifications:
-        remove_birthday_job(
-            scheduler=scheduler,
+        scheduler.remove_birthday_job(
             user_id=user_id,
             t=notification.time
         )
@@ -160,7 +157,7 @@ async def delete_notification(message: types.Message,
                               user_id: int,
                               session: AsyncSession,
                               valid_time: time,
-                              scheduler: AsyncIOScheduler):
+                              scheduler: NotificationScheduler):
     await state.set_state(BirthdaysNotificationFSM.del_time)
     try:
         await NotificationTime.delete_notification(
@@ -168,8 +165,7 @@ async def delete_notification(message: types.Message,
             session=session,
             notification_time=valid_time
         )
-        remove_birthday_job(
-            scheduler=scheduler,
+        scheduler.remove_birthday_job(
             user_id=user_id,
             t=valid_time
         )
