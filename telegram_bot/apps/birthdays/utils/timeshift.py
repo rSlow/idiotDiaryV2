@@ -1,11 +1,17 @@
-from datetime import datetime, time
+from datetime import time, datetime
 
 from common.utils.functions import get_now
 
 
-def get_timeshift(user_datetime: datetime):
+def get_timeshift(user_time: time):
     now = get_now().replace(tzinfo=None)
-    td = now - user_datetime
+    td = now - datetime(
+        hour=user_time.hour,
+        minute=user_time.minute,
+        day=now.day,
+        month=now.month,
+        year=now.year
+    )
 
     all_minutes_shift = step_round(td.seconds // 60, 15)
     hour_shift = round(all_minutes_shift // 60, 0)

@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import time
 
 from aiogram import Router, F, types, Bot
 from aiogram.fsm.context import FSMContext
@@ -10,7 +10,7 @@ from config.scheduler import NotificationScheduler
 from .check_birthdays import main_birthdays
 from ..FSM.main import BirthdaysFSM, TimeCorrectionFSM
 from ..ORM.notifications import NotificationUser, NotificationTime
-from ..filters import DateTimeValidFilter, DateTimeNotValidFilter
+from ..filters import TimeValidFilter, TimeNotValidFilter
 from ..keyboards.main import BirthdaysMainKeyboard
 from ..utils.render import render_time_correction
 from ..utils.timeshift import get_timeshift
@@ -34,26 +34,24 @@ async def wait_current_user_time(message: types.Message,
 
 @time_correction_router.message(
     TimeCorrectionFSM.start,
-    DateTimeValidFilter(),
+    TimeValidFilter(),
 )
 async def set_current_user_time(message: types.Message,
                                 state: FSMContext,
-                                valid_datetime: datetime,
+                                valid_time: time,
                                 session: AsyncSession,
                                 user_id: int,
                                 scheduler: NotificationScheduler,
                                 bot: Bot):
     await state.set_state(TimeCorrectionFSM.set)
-    timeshift = get_timeshift(valid_datetime)
+    timeshift = get_timeshift(valid_time)
     await NotificationUser.add_or_update_user(
         session=session,
         user_id=user_id,
         timeshift=timeshift
     )
 
-    print(valid_datetime)
-
-    await message.answer(f"Часовой пояс c временем {valid_datetime:{formats.DATETIME_FORMAT}} сохранен.")
+    await message.answer(f"Часовой пояс c временем {valid_time:{formats.TIME_FORMAT}} сохранен.")
 
     notifications = await NotificationTime.get_notifications(
         session=session,
@@ -74,7 +72,7 @@ async def set_current_user_time(message: types.Message,
 
 @time_correction_router.message(
     TimeCorrectionFSM.start,
-    DateTimeNotValidFilter(),
+    TimeNotValidFilter(),
 )
 async def set_current_user_time(message: types.Message):
     await message.answer(f"Введен неверный формат времени. Попробуйте еще раз.")
