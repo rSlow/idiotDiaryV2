@@ -27,7 +27,7 @@ class Birthday(Base):
         async with Session() as session:
             async with session.begin():
                 q = delete(cls).filter(
-                    cls.fio.in_([birthday.fio for birthday in data]),
+                    cls.uuid.in_([birthday.uuid for birthday in data]),
                     cls.user_id == user_id
                 )
                 await session.execute(q)

@@ -5,6 +5,7 @@ from aiogram.fsm.context import FSMContext
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from common.keyboards.base import BackKeyboard
+from config import formats
 from config.scheduler import NotificationScheduler
 from .check_birthdays import main_birthdays
 from ..FSM.main import BirthdaysFSM, TimeCorrectionFSM
@@ -49,8 +50,10 @@ async def set_current_user_time(message: types.Message,
         user_id=user_id,
         timeshift=timeshift
     )
-    await message.answer(f"Ваш часовой пояс - ... .\n"
-                         f"Часовой пояс сохранен.")
+
+    print(valid_datetime)
+
+    await message.answer(f"Часовой пояс c временем {valid_datetime:{formats.DATETIME_FORMAT}} сохранен.")
 
     notifications = await NotificationTime.get_notifications(
         session=session,
