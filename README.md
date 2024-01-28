@@ -30,7 +30,6 @@
   😂)
 - checking the INN according to passport data (using selenium and parsing `https://service.nalog.ru/inn.do`)
 - checking birthdays (only for admins)
-- auto-sending information about birthdays every day at 10 AM
 
 ### 2. free shawarma 🌯 - imitation of screenshots about transfers to various banks.
 
@@ -42,9 +41,14 @@
   on [yt-dlp](https://github.com/yt-dlp/yt-dlp))
 - MP3 tag editor (based on [eyeD3](https://eyed3.readthedocs.io/en/latest))
 
+### 3. birthdays app 🎂
+
+- notification of upcoming birthdays at a set time
+- correction of time zones for correct notification
+- ability to add multiple timestamps for notifications
+
 ### 4. Application for admins
 
-- clearing birthdays
 - log files
 
 ## ENVIRONMENTS
@@ -58,7 +62,8 @@
 | Env variable        | Mean                                                                                        |
 |:--------------------|:--------------------------------------------------------------------------------------------|
 | `BOT_TOKEN`         | telegram bot token                                                                          |
-| `OWNER_ID`          | Telegram account ID, for filtering admins and accessing individual menu items               |
+| `OWNER_ID`          | telegram account ID, for filtering admins                                                   |
+| `BIRTHDAYS_ALLOWED` | telegram IDs of users who are allowed to use the birthdays app                              |
 | `MORPH_URL`         | HTTP-endpoint for the FULL NAME declension service                                          |
 | `BASE_WEBHOOK_URL`  | http address of the server (domain). Required for telegram webhook                          |
 | `WEBHOOK_PATH`      | relative path for telegram webhook                                                          |
@@ -81,6 +86,7 @@
 | `TIMEZONE`          | pytz timezone, required to send notifications using scheduler                       |
 | `WEBHOOK_SECRET`    | secret token for checking the telegram validity of a webhook request                |
 | `BASE_WEBHOOK_PORT` | port for telegram webhook. By default, `443`, but it is possible to use `8443` port |
+| `LOGURU_FILE`       | the file where the logger 'loguru' will save logs                                   |
 
 ## DEPLOY
 
@@ -125,6 +131,7 @@ chmod +x ./update.sh && ./update.sh
 ---
 
 ### 1. `/birthdays` [method - `PUT`]
+### _All requests require a `user_id` request header equal to the telegram user id_
 
 ##### updating birthday rows
 

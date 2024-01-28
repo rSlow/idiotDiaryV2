@@ -15,11 +15,15 @@ def render_check_birthdays(dates: dict[date, Sequence[Birthday]]):
     )
 
 
-def render_schedule_birthdays(today_birthdays: Sequence[Birthday],
+def render_schedule_birthdays(today: date,
+                              tomorrow: date,
+                              today_birthdays: Sequence[Birthday],
                               tomorrow_birthdays: Sequence[Birthday]):
     return render_template(
         template_name="schedule_birthdays.jinja2",
         data={
+            "today": today,
+            "tomorrow": tomorrow,
             "today_birthdays": today_birthdays,
             "tomorrow_birthdays": tomorrow_birthdays
         },

@@ -1,27 +1,13 @@
+{% from "includes/birthdays.jinja2" import birthday_form %}
+
 {% if today_birthdays %}
     <u><b>Сегодня день рождения:</b></u> <br>
-    {% for today_birthday in today_birthdays %}
-        - {{ today_birthday.post }}
-
-        {% if today_birthday.rank %}
-            {{ today_birthday.rank }}
-        {% endif %}
-
-        {{ today_birthday.fio }} <br>
-    {% endfor %}
+    {{ birthday_form(date=today, birthdays=today_birthdays) }}
 {% endif %}
 
-<br>
+    <br>
 
 {% if tomorrow_birthdays %}
     <u><b>Завтра день рождения:</b></u> <br>
-    {% for tomorrow_birthday in tomorrow_birthdays %}
-        - {{ tomorrow_birthday.post }}
-
-        {% if tomorrow_birthday.rank %}
-            {{ tomorrow_birthday.rank }}
-        {% endif %}
-
-        {{ tomorrow_birthday.fio }} <br>
-    {% endfor %}
+    {{ birthday_form(date=tomorrow, birthdays=tomorrow_birthdays) }}
 {% endif %}

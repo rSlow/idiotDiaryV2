@@ -1,0 +1,16 @@
+{% macro birthday_form(date, birthdays=[]) %}
+
+    {% for birthday in birthdays %}
+        - {{ birthday.post }}
+
+        {% if birthday.rank %}
+            {{ birthday.rank }}
+        {% endif %}
+
+        {{ birthday.fio }} -
+        {% set yearsdelta = (date - birthday.date).days / 362.25 %}
+        {{ yearsdelta|round|int }} лет
+        <br>
+    {% endfor %}
+
+{% endmacro %}
