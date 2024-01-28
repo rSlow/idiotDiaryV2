@@ -7,16 +7,17 @@
 1. [python 3.11](https://www.python.org/downloads/release/python-3110)
 2. [aiogram](https://aiogram.dev), `version: 3.1.1` - async Telegram bot app for Python
 3. [SQLAlchemy](https://www.sqlalchemy.org), `version: 2.0` - ORM for Postgres database
-4. [alembic](https://alembic.sqlalchemy.org/en/latest), `version: 1.12.0` - applying migrations to SQLAlchemy
-5. [redis](https://redis.io/docs/connect/clients/python), `version: latest` - for using RedisStorage in aiogram
-6. [aiohttp](https://docs.aiohttp.org/en/stable), `version: 4.0` - web server for webhook, as well as for HTTP requests
-7. [nginx](https://hub.docker.com/_/nginx), `version: latest` - web server for aiohttp, + SSL
-8. [selenium](https://hub.docker.com/r/selenium/standalone-chrome), `version: standalone-chrome`, as a docker
+4. [apscheduler](https://apscheduler.readthedocs.io/en/3.x/), `version: 3.10.4` - for scheduled tasks in birthdays app
+5. [alembic](https://alembic.sqlalchemy.org/en/latest), `version: 1.12.0` - applying migrations to SQLAlchemy
+6. [redis](https://redis.io/docs/connect/clients/python), `version: latest` - for using RedisStorage in aiogram
+7. [aiohttp](https://docs.aiohttp.org/en/stable), `version: 4.0` - web server for webhook, as well as for HTTP requests
+8. [nginx](https://hub.docker.com/_/nginx), `version: latest` - web server for aiohttp, + SSL
+9. [selenium](https://hub.docker.com/r/selenium/standalone-chrome), `version: standalone-chrome`, as a docker
    container - for parsing sites
-9. [eyed3](https://eyed3.readthedocs.io/en/latest), `version: 0.9.7` - editing MP3 tags
-10. [yt-dlp](https://github.com/yt-dlp/yt-dlp), `version: 2023.10.13` - download videos from YouTube
-11. [ffmpeg](https://www.ffmpeg.org), `version: latest (apt)` - downloader for yt-dlp
-12. [Jinja2](https://jinja.palletsprojects.com), `version: 3.1.2` - generating template messages
+10. [eyed3](https://eyed3.readthedocs.io/en/latest), `version: 0.9.7` - editing MP3 tags
+11. [yt-dlp](https://github.com/yt-dlp/yt-dlp), `version: 2023.10.13` - download videos from YouTube
+12. [ffmpeg](https://www.ffmpeg.org), `version: latest (apt)` - downloader for yt-dlp
+13. [Jinja2](https://jinja.palletsprojects.com), `version: 3.1.2` - generating template messages
 
 ## Bot Applications:
 
@@ -28,8 +29,8 @@
 - declensions of full name (in Russian) in all cases of the Russian language
 - downloading a telegram video message (yes, I know that this function is in the official application, but I don't care
   😂)
+- converting a voice message to a regular audio file
 - checking the INN according to passport data (using selenium and parsing `https://service.nalog.ru/inn.do`)
-- checking birthdays (only for admins)
 
 ### 2. free shawarma 🌯 - imitation of screenshots about transfers to various banks.
 
@@ -131,6 +132,7 @@ chmod +x ./update.sh && ./update.sh
 ---
 
 ### 1. `/birthdays` [method - `PUT`]
+
 ### _All requests require a `user_id` request header equal to the telegram user id_
 
 ##### updating birthday rows
