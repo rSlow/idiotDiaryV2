@@ -2,7 +2,9 @@ from json import JSONDecodeError
 
 from aiohttp import web
 from pydantic import ValidationError
+from sqlalchemy.exc import IntegrityError
 
+from config.logger import logger
 from .middleware import user_id_middleware
 from .schemas import SBirthday, uuid_validator, UUIDValidationError
 from ..ORM.birthdays import Birthday
@@ -22,7 +24,11 @@ async def update_birthday(request: web.Request,
         )
         return web.Response()
     except (ValidationError, JSONDecodeError):
+        logger.exception("Error with decoding data!")
         return web.Response(status=422)
+    except IntegrityError:
+        logger.exception("Already existed UUID!")
+        return web.Response(status=409)
 
 
 @birthdays_router.delete("/")

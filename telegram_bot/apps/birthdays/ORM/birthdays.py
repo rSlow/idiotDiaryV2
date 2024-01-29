@@ -33,7 +33,8 @@ class Birthday(Base):
                 await session.execute(q)
 
                 session.add_all([
-                    cls(**birthday.model_dump())
+                    cls(**birthday.model_dump(),
+                        user_id=user_id)
                     for birthday in data
                 ])
 
