@@ -5,14 +5,15 @@ import uuid
 
 from yt_dlp import YoutubeDL
 
-from common.utils.decorators import set_async
+from common.utils.decorators import set_async, coro_timer
 from .. import settings
 
 
+@coro_timer(45, exc=TimeoutError)
 @set_async
 def download_audio(
         url: str,
-        from_second: int | None = None,
+        from_second: str | None = None,
         to_second: str | None = None,
 ):
     info_dict = YoutubeDL().extract_info(url, download=False)
@@ -52,7 +53,7 @@ def download_audio(
     return audio_bytes, temp_filename_mp3
 
 
-def valid(from_second: int | None = None, to_second: str | None = None):
+def valid(from_second: str | None = None, to_second: str | None = None):
     if from_second is not None and to_second is not None:
         if re.match(settings.TIMECODE_REGEXP, from_second) and re.match(settings.TIMECODE_REGEXP, to_second):
             return True

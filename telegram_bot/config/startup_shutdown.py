@@ -3,6 +3,7 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
+from common.context_message import ContextMessageManager
 from common.middlewares import DbSessionMiddleware, ContextMiddleware
 from common.ORM.database import Session
 from config import settings
@@ -19,7 +20,10 @@ async def on_startup(dispatcher: Dispatcher, bot: Bot):
     scheduler.start()
     await scheduler.init(bot)
 
-    dispatcher.update.middleware(ContextMiddleware(scheduler=scheduler))
+    dispatcher.update.middleware(ContextMiddleware(
+        scheduler=scheduler,
+        message_manager=ContextMessageManager
+    ))
     dispatcher.update.middleware(DbSessionMiddleware(session_pool=Session))
     dispatcher.update.middleware(CallbackAnswerMiddleware())
 

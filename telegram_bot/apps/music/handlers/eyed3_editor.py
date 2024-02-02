@@ -9,6 +9,7 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import FSInputFile, ReplyKeyboardRemove, BufferedInputFile
 from eyed3.id3 import Tag
 
+from common.context_message import ContextMessageManager
 from common.keyboards.base import CancelKeyboard
 from common.utils.decorators import set_async
 from .main import music_start
@@ -44,40 +45,46 @@ async def start_eyed3_editor(message: types.Message, state: FSMContext):
     EyeD3State.wait_file,
     F.audio.as_("audio"),
 )
-async def eyed3_parse_file(
-        message: types.Message,
-        state: FSMContext,
-        audio: types.Audio,
-        bot: Bot,
-):
+async def eyed3_parse_file(message: types.Message,
+                           state: FSMContext,
+                           audio: types.Audio,
+                           bot: Bot,
+                           message_manager: type[ContextMessageManager]):
     file_id = audio.file_id
     filename = audio.file_name or uuid.uuid4().hex + settings.AUDIO_FILE_EXT
     file_path = settings.TEMP_DIR / filename
 
-    service_message = await message.answer("Обработка...")
+    async with message_manager(
+            bot=bot,
+            state=state,
+            message_text="Обработка..."
+    ):
+        async with TempFileDownloader(
+                file_path=file_path,
+                bot=bot,
+                file_id=file_id
+        ):
+            eyed3_audio = await set_async(eyed3.load)(file_path)
+            if eyed3_audio is None:
+                return await message.answer(
+                    text="Невозможно распознать файл. Попробуйте загрузить другой файл."
+                )
 
-    async with TempFileDownloader(file_path=file_path, bot=bot, file_id=file_id, message_to_del=service_message):
-        eyed3_audio = await set_async(eyed3.load)(file_path)
-        if eyed3_audio is None:
-            return await message.answer(
-                text="Невозможно распознать файл. Попробуйте загрузить другой файл."
-            )
+            eyed3_tag: Tag = eyed3_audio.tag if eyed3_audio.tag is not None else Tag()
 
-        eyed3_tag: Tag = eyed3_audio.tag if eyed3_audio.tag is not None else Tag()
-
-        album = eyed3_tag.album
-        title = audio.title
-        artist = audio.performer
-        thumbnail = audio.thumbnail.file_id if audio.thumbnail else None
-        await state.update_data(eyed3_data={
-            "filename": filename,
-            "file_id": file_id,
-            "album": album,
-            "title": title,
-            "artist": artist,
-            "thumbnail": thumbnail,
-            "message_id": None
-        })
+            album = eyed3_tag.album
+            title = audio.title
+            artist = audio.performer
+            thumbnail = audio.thumbnail.file_id if audio.thumbnail else None
+            await state.update_data(eyed3_data={
+                "filename": filename,
+                "file_id": file_id,
+                "album": album,
+                "title": title,
+                "artist": artist,
+                "thumbnail": thumbnail,
+                "message_id": None
+            })
 
     await eyed3_main_page(
         chat_id=message.chat.id,
@@ -92,15 +99,28 @@ async def eyed3_parse_file(
     EyeD3State.wait_file,
     F.text[F.regexp(settings.HTTPS_REGEXP)].as_("url"),
 )
-async def eyed3_from_url(message: types.Message, state: FSMContext, url: str, bot: Bot):
-    service_message = await message.answer("Скачиваю...")
-    audio_io, filename = await download_audio(url)
-    audio_file = BufferedInputFile(
-        file=audio_io,
-        filename=filename
-    )
-    audio = await message.answer_document(document=audio_file)
-    await service_message.delete()
+async def eyed3_from_url(message: types.Message,
+                         state: FSMContext,
+                         url: str,
+                         bot: Bot,
+                         message_manager: type[ContextMessageManager]):
+    async with message_manager(message_text="Скачиваю...",
+                               state=state,
+                               bot=bot):
+        try:
+            audio_io, filename = await download_audio(url)
+        except TimeoutError:
+            await music_start(
+                message=message,
+                state=state,
+                text="Скачивание шло слишком долго. Возможно, это ошибка бота, "
+                     "либо вы отправили ссылку на слишком больше видео."
+            )
+        audio_file = BufferedInputFile(
+            file=audio_io,
+            filename=filename
+        )
+        audio = await message.answer_document(document=audio_file)
     await eyed3_parse_file(
         message=message,
         state=state,
@@ -111,11 +131,9 @@ async def eyed3_from_url(message: types.Message, state: FSMContext, url: str, bo
 
 # ----- MAIN PAGE ----- #
 
-async def eyed3_main_page(
-        state: FSMContext,
-        bot: Bot,
-        chat_id: int,
-):
+async def eyed3_main_page(state: FSMContext,
+                          bot: Bot,
+                          chat_id: int):
     await state.set_state(EyeD3State.main)
     data = await state.get_data()
     eyed3_data: dict[str, Any] = data.get("eyed3_data", {})
@@ -147,12 +165,10 @@ async def eyed3_main_page(
     StateFilter(EyeD3EditState.title, EyeD3EditState.artist, EyeD3EditState.album),
     F.text,
 )
-async def eyed3_update_param(
-        message: types.Message,
-        state: FSMContext,
-        raw_state: str,
-        bot: Bot
-):
+async def eyed3_update_param(message: types.Message,
+                             state: FSMContext,
+                             raw_state: str,
+                             bot: Bot):
     edited_param = raw_state.split(":")[-1]
     await set_eyed3_value(
         state=state,
@@ -175,12 +191,10 @@ async def eyed3_update_param(
     StateFilter(EyeD3EditState.thumbnail),
     F.photo | F.document,
 )
-async def eyed3_update_thumbnail(
-        message: types.Message,
-        state: FSMContext,
-        raw_state: str,
-        bot: Bot
-):
+async def eyed3_update_thumbnail(message: types.Message,
+                                 state: FSMContext,
+                                 raw_state: str,
+                                 bot: Bot):
     edited_param = raw_state.split(":")[-1]
     if photos := message.photo:
         file_id = photos[-1].file_id
@@ -210,7 +224,10 @@ async def eyed3_update_thumbnail(
     StateFilter(EyeD3EditState),
     F.data == EyeD3BackToMainKeyboard.Buttons.clear.callback_data,
 )
-async def eyed3_back_to_main(callback: types.CallbackQuery, state: FSMContext, bot: Bot, raw_state):
+async def eyed3_back_to_main(callback: types.CallbackQuery,
+                             state: FSMContext,
+                             bot: Bot,
+                             raw_state: str):
     await set_eyed3_value(
         state=state,
         eyed3_key=raw_state.split(":")[-1],
@@ -229,11 +246,9 @@ async def eyed3_back_to_main(callback: types.CallbackQuery, state: FSMContext, b
     EyeD3State.main,
     EyeD3EditCBFactory.filter(),
 )
-async def eyed3_edit_param(
-        callback: types.CallbackQuery,
-        callback_data: EyeD3EditCBFactory,
-        state: FSMContext
-):
+async def eyed3_edit_param(callback: types.CallbackQuery,
+                           callback_data: EyeD3EditCBFactory,
+                           state: FSMContext):
     action_name = callback_data.action.name
     message_text = EyeD3MessagesEnum[action_name].value
     edit_state = getattr(EyeD3EditState, action_name)
@@ -251,7 +266,9 @@ async def eyed3_edit_param(
     StateFilter(EyeD3EditState),
     F.data == EyeD3BackToMainKeyboard.Buttons.back.callback_data,
 )
-async def eyed3_back_to_main(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
+async def eyed3_back_to_main(callback: types.CallbackQuery,
+                             state: FSMContext,
+                             bot: Bot):
     await eyed3_main_page(
         bot=bot,
         chat_id=callback.message.chat.id,
@@ -265,11 +282,13 @@ async def eyed3_back_to_main(callback: types.CallbackQuery, state: FSMContext, b
     EyeD3State.main,
     F.data == EyeD3MainKeyboard.Buttons.export.callback_data,
 )
-async def eyed3_export(callback: types.CallbackQuery, state: FSMContext, bot: Bot):
+async def eyed3_export(callback: types.CallbackQuery,
+                       state: FSMContext,
+                       bot: Bot,
+                       message_manager: type[ContextMessageManager]):
     eyed3_data = await get_eyed3_data(state=state)
 
     file_id = eyed3_data.get("file_id")
-    chat_id = callback.message.chat.id
     filename = await get_eyed3_value(
         state=state,
         key="filename",
@@ -278,45 +297,46 @@ async def eyed3_export(callback: types.CallbackQuery, state: FSMContext, bot: Bo
     file_path = settings.TEMP_DIR / filename
 
     await callback.message.delete()
-    service_message = await bot.send_message(
-        chat_id=chat_id,
-        text="Обработка...",
-        reply_markup=ReplyKeyboardRemove()
-    )
 
-    async with TempFileDownloader(file_path=file_path, bot=bot, file_id=file_id, message_to_del=service_message):
-        eyed3_tag: Tag = Tag()
-        eyed3_tag.album = eyed3_data.get("album")
-        eyed3_tag.title = eyed3_data.get("title")
-        eyed3_tag.artist = eyed3_data.get("artist")
-        thumbnail = eyed3_data.get("thumbnail")
+    async with message_manager(bot=bot,
+                               state=state,
+                               message_text="Обработка...",
+                               keyboard=ReplyKeyboardRemove()):
+        async with TempFileDownloader(file_path=file_path,
+                                      bot=bot,
+                                      file_id=file_id):
+            eyed3_tag: Tag = Tag()
+            eyed3_tag.album = eyed3_data.get("album")
+            eyed3_tag.title = eyed3_data.get("title")
+            eyed3_tag.artist = eyed3_data.get("artist")
+            thumbnail = eyed3_data.get("thumbnail")
 
-        if thumbnail is not None:
-            # delete all existing
-            for image in eyed3_tag.images:
-                eyed3_tag.images.remove(image.description)
+            if thumbnail is not None:
+                # delete all existing
+                for image in eyed3_tag.images:
+                    eyed3_tag.images.remove(image.description)
 
-            image_io = await bot.download(thumbnail)
-            processed_image_io = await process_image(image_io)
-            eyed3_tag.images.set(
-                type_=3,
-                img_data=await set_async(processed_image_io.read)(),
-                mime_type="image/jpeg"
+                image_io = await bot.download(thumbnail)
+                processed_image_io = await process_image(image_io)
+                eyed3_tag.images.set(
+                    type_=3,
+                    img_data=await set_async(processed_image_io.read)(),
+                    mime_type="image/jpeg"
+                )
+
+            eyed3_tag.save(str(file_path))
+
+            if eyed3_tag.artist and eyed3_tag.title:
+                filename = f"{eyed3_tag.artist} - {eyed3_tag.title}{settings.AUDIO_FILE_EXT}"
+
+            audio_file = FSInputFile(
+                path=file_path,
+                filename=filename
             )
-
-        eyed3_tag.save(str(file_path))
-
-        if eyed3_tag.artist and eyed3_tag.title:
-            filename = f"{eyed3_tag.artist} - {eyed3_tag.title}{settings.AUDIO_FILE_EXT}"
-
-        audio_file = FSInputFile(
-            path=file_path,
-            filename=filename
-        )
-        await callback.message.answer_document(
-            document=audio_file,
-            thumbnail=await get_aiogram_thumbnail(processed_image_io) if thumbnail is not None else None
-        )
+            await callback.message.answer_document(
+                document=audio_file,
+                thumbnail=await get_aiogram_thumbnail(processed_image_io) if thumbnail is not None else None
+            )
 
     await music_start(
         message=callback.message,

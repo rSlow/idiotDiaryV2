@@ -1,7 +1,8 @@
-from aiogram import Router, F, types
+from aiogram import Router, F, types, Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 
+from common.context_message import ContextMessageManager
 from common.keyboards.base import CancelKeyboard
 from .main import start_nwp
 from ..FSM.inn_parser import INNParserFSM
@@ -32,26 +33,27 @@ async def inn_parse_start(message: types.Message, state: FSMContext):
     INNParserFSM.start,
     INNFilter()
 )
-async def get_inn(message: types.Message, state: FSMContext, inn: INNSchema):
-    s_msg = await message.answer(
-        text="Поиск...",
-        reply_markup=ReplyKeyboardRemove()
-    )
+async def get_inn(message: types.Message,
+                  state: FSMContext,
+                  bot: Bot,
+                  inn: INNSchema,
+                  message_manager: type[ContextMessageManager]):
     await state.set_state(INNParserFSM.parse)
-
-    try:
-        result_inn = await get_inn_selenium(data=inn)
-        await start_nwp(
-            text=f"ИНН - <code>{result_inn}</code>" if result_inn is not None else "Не найдено.",
-            message=message,
-            state=state
-        )
-    except SeleniumTimeout:
-        await start_nwp(
-            text="Запрос не может выполниться по независящим от бота причинам. Возможно, причина в сайте налоговой. "
-                 "Задача отменена.",
-            message=message,
-            state=state
-        )
-    finally:
-        await s_msg.delete()
+    async with message_manager(bot=bot,
+                               state=state,
+                               message_text="Поиск...",
+                               keyboard=ReplyKeyboardRemove()):
+        try:
+            result_inn = await get_inn_selenium(data=inn)
+            await start_nwp(
+                text=f"ИНН - <code>{result_inn}</code>" if result_inn is not None else "Не найдено.",
+                message=message,
+                state=state
+            )
+        except SeleniumTimeout:
+            await start_nwp(
+                text="Запрос не может выполниться по независящим от бота причинам. "
+                     "Возможно, причина в сайте налоговой. Задача отменена.",
+                message=message,
+                state=state
+            )
