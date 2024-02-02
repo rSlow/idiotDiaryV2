@@ -3,7 +3,7 @@ from aiogram.fsm.context import FSMContext
 from aiohttp import ClientSession
 
 from common.keyboards.base import CancelKeyboard
-from config import settings
+from .. import settings
 from ..FSM.morph import MorphFIOFSM
 from ..FSM.start import NWPStartFSM
 from ..keyboards.main import NotWorkingPlaceKeyboard

@@ -8,9 +8,8 @@ from .database import Base, Engine
 class Setting(Base):
     __tablename__ = "settings"
 
-    id: Mapped[int] = mapped_column(primary_key=True)
-    key: Mapped[str] = mapped_column(unique=True)
-    value: Mapped[str]
+    key: Mapped[str] = mapped_column(primary_key=True)
+    value: Mapped[str] = mapped_column(nullable=True)
 
     @classmethod
     def get(cls,

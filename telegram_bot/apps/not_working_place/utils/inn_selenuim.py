@@ -7,7 +7,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.remote.webelement import WebElement
 
 from common.utils.decorators import set_async, coro_timer
-from config import settings
+from .. import settings
 from ..filters.inn_filter import INNSchema
 
 

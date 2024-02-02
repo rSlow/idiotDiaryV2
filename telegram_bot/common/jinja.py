@@ -4,7 +4,7 @@ from typing import Sequence
 
 from jinja2 import Environment, FileSystemLoader
 
-from config import settings, formats
+from config import formats
 from .utils.functions import get_now
 
 PATH_TYPE = str | PathLike | Sequence[str | PathLike]
@@ -12,8 +12,8 @@ PATH_TYPE = str | PathLike | Sequence[str | PathLike]
 
 def render_template(
         template_name: str,
-        data: dict | None = None,
-        templates_dir: PATH_TYPE | None = None
+        templates_dir: PATH_TYPE,
+        data: dict | None = None
 ) -> str:
     if data is None:
         context = {}
@@ -22,7 +22,7 @@ def render_template(
     context.update(get_context())
 
     env = Environment(
-        loader=FileSystemLoader(searchpath=templates_dir or settings.TEMPLATES_DIR),
+        loader=FileSystemLoader(searchpath=templates_dir),
         trim_blocks=True,
         lstrip_blocks=True,
         autoescape=True
