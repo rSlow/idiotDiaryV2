@@ -1,11 +1,11 @@
 import datetime
+import zipfile
 from io import BytesIO
 from typing import BinaryIO
 
 from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import BufferedInputFile
-import zipfile
 
 from common.utils.stage_gather import stage_gather
 

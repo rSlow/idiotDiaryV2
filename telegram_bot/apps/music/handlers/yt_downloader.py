@@ -5,14 +5,13 @@ from aiogram import Router, F, types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import BufferedInputFile
 
+from common.keyboards.base import CancelKeyboard
 from .main import music_start
 from .. import settings
+from ..FSM.main import MusicState, YTDownloadState
 from ..keyboards.main import MusicMainKeyboard
 from ..keyboards.yt_downloader import TimecodeKeyboard
 from ..utils import audio
-
-from common.keyboards.base import CancelKeyboard
-from ..FSM.main import MusicState, YTDownloadState
 
 music_yt_router = Router(name="music_yt")
 

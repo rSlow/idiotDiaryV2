@@ -1,8 +1,8 @@
 from aiogram import Router
 
+from common.filters import BirthdaysAllowedFilter
 from .check_birthdays import main_birthday_router
 from .notifications import notifications_router
-from common.filters import BirthdaysAllowedFilter
 from .time_correction import time_correction_router
 
 birthdays_router = Router(name="birthdays")

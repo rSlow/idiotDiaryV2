@@ -4,8 +4,8 @@ from typing import Sequence
 from aiogram import Bot
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
-from apps.birthdays.scheduler import send_birthdays
 from apps.birthdays.ORM.notifications import NotificationUser, NotificationTime
+from apps.birthdays.scheduler import send_birthdays
 
 
 class NotificationScheduler(AsyncIOScheduler):

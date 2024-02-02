@@ -6,8 +6,8 @@ from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, BufferedInputFile
 
 from config import settings
-from ..FSM.start import NWPStartFSM
 from ..FSM.convert_voice import ConvertVoiceFSM
+from ..FSM.start import NWPStartFSM
 from ..keyboards.main import NotWorkingPlaceKeyboard
 from ..keyboards.voice_convert import ConvertVideoKeyboard, ConvertAgainVideoKeyboard
 

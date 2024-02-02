@@ -1,7 +1,7 @@
 from aiogram import Router
 
-from .main import start_fsh_router
 from .bank_handler import bank_router
+from .main import start_fsh_router
 
 fsh_router = Router(name="free_shaurma")
 

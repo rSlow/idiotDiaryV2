@@ -3,10 +3,10 @@ from typing import Optional
 from aiogram import Router, F, types
 from aiogram.fsm.context import FSMContext
 
-from ..FSM.main import MusicState
-from ..keyboards.main import MusicMainKeyboard
 from common.FSM import CommonFSM
 from common.keyboards.start import StartKeyboard
+from ..FSM.main import MusicState
+from ..keyboards.main import MusicMainKeyboard
 
 start_music_router = Router(name="start_music")
 

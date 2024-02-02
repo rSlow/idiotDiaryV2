@@ -1,5 +1,5 @@
-from .. import settings
 from common.jinja import render_template
+from .. import settings
 
 
 def render_inn():

@@ -1,8 +1,8 @@
 from typing import Optional
 
+from aiogram import Bot
 from aiogram.fsm.context import FSMContext
 from aiogram.types import Message, ReplyKeyboardMarkup, InlineKeyboardMarkup, ReplyKeyboardRemove, ForceReply
-from aiogram import Bot
 
 TypeKeyboard = InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove | ForceReply | None
 

@@ -1,2 +1,2 @@
-from . import tinkoff
 from . import sberbank
+from . import tinkoff

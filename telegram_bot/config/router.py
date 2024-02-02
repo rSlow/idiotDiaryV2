@@ -1,10 +1,10 @@
 from aiogram import Router
 
-from apps.birthdays.handlers import birthdays_router
-from apps.not_working_place.handlers import nwp_router
-from apps.free_shaurma.handlers import fsh_router
 from apps.admin.handlers import admin_router
+from apps.birthdays.handlers import birthdays_router
+from apps.free_shaurma.handlers import fsh_router
 from apps.music.handlers import music_router
+from apps.not_working_place.handlers import nwp_router
 
 apps_router = Router(name="apps")
 

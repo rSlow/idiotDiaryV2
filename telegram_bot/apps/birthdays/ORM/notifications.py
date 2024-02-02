@@ -1,3 +1,4 @@
+from datetime import time
 from typing import Self, Sequence, Optional
 
 from sqlalchemy import select, delete, ForeignKey
@@ -5,7 +6,6 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column, relationship, selectinload
 
 from common.ORM.database import Base, Session
-from datetime import time
 
 
 class NotificationUser(Base):

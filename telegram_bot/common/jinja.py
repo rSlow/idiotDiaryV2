@@ -4,8 +4,8 @@ from typing import Sequence
 
 from jinja2 import Environment, FileSystemLoader
 
-from .utils.functions import get_now
 from config import settings, formats
+from .utils.functions import get_now
 
 PATH_TYPE = str | PathLike | Sequence[str | PathLike]
 

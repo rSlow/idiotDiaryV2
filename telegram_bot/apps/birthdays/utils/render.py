@@ -1,9 +1,9 @@
 from datetime import date
 from typing import Sequence
 
-from ..ORM.birthdays import Birthday
 from common.jinja import render_template
 from .. import settings as birthdays_settings
+from ..ORM.birthdays import Birthday
 from ..ORM.notifications import NotificationTime
 
 

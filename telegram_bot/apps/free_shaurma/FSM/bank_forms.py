@@ -1,8 +1,8 @@
 from aiogram.fsm.state import StatesGroup, State
 
 from .modified_state import BankStatesGroup, BankState
-from ..keyboards.bank_cycle import RandomSumKeyboard
 from .. import validators
+from ..keyboards.bank_cycle import RandomSumKeyboard
 
 
 class ChooseBankParams(StatesGroup):

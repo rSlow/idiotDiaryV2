@@ -1,8 +1,8 @@
 from typing import Sequence
 
+from common.keyboards.base import BaseReplyKeyboardBuilder
 from config import formats
 from ..ORM.notifications import NotificationTime
-from common.keyboards.base import BaseReplyKeyboardBuilder
 
 
 class BirthdaysNotificationsKeyboard(BaseReplyKeyboardBuilder):

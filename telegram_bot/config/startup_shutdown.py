@@ -3,9 +3,9 @@ import logging
 from aiogram import Bot, Dispatcher
 from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
+from common.ORM.database import Session
 from common.context_message import ContextMessageManager
 from common.middlewares import DbSessionMiddleware, ContextMiddleware
-from common.ORM.database import Session
 from config import settings
 from config.logger import init_logging
 from config.scheduler import NotificationScheduler

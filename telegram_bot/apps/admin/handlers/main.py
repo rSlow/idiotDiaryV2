@@ -3,13 +3,12 @@ import os.path
 from aiogram import types, Router, F
 from aiogram.fsm.context import FSMContext
 
+from common.FSM import CommonFSM
 from common.filters import OwnerFilter, NoKeyboardFilter
-from common.keyboards.base import YesNoKeyboard
+from common.keyboards.start import StartKeyboard
 from config import settings
 from ..FSM.admin import AdminStates
 from ..keyboards.admin import AdminKeyboard
-from common.keyboards.start import StartKeyboard
-from common.FSM import CommonFSM
 
 admin_router = Router(name="admin")
 

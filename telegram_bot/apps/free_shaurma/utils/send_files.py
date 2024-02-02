@@ -1,8 +1,7 @@
 import logging
-
-from aiogram import types
 from io import BytesIO
 
+from aiogram import types
 from aiogram.types import BufferedInputFile
 
 from common.keyboards.base import CancelKeyboard

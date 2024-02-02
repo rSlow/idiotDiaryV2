@@ -3,8 +3,8 @@ from typing import Any, Iterable
 from aiogram.filters import BaseFilter
 from aiogram.types import TelegramObject, Message
 
-from .keyboards.base import YesNoKeyboard, BackKeyboard
 from config import settings
+from .keyboards.base import YesNoKeyboard, BackKeyboard
 
 UserIDType = int | str | Iterable[int] | Iterable[str]
 

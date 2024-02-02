@@ -6,8 +6,8 @@ from sqlalchemy import select, extract, and_, delete, BigInteger
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
-from ..http_app.schemas import SBirthday
 from common.ORM.database import Base, Session
+from ..http_app.schemas import SBirthday
 
 
 class Birthday(Base):

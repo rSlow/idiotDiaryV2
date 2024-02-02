@@ -1,11 +1,10 @@
 from abc import ABC
 from dataclasses import field, dataclass
-from io import BytesIO
 from typing import Callable, Iterable
 
-from ..FSM.modified_state import BankStatesGroup
 from .enums import BankNames
 from ..FSM import bank_forms
+from ..FSM.modified_state import BankStatesGroup
 
 
 @dataclass
