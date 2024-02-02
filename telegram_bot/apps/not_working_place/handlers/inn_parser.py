@@ -2,7 +2,6 @@ from aiogram import Router, F, types
 from aiogram.fsm.context import FSMContext
 from aiogram.types import ReplyKeyboardRemove
 
-from common.jinja import render_template
 from common.keyboards.base import CancelKeyboard
 from .main import start_nwp
 from ..FSM.inn_parser import INNParserFSM
@@ -10,6 +9,7 @@ from ..FSM.start import NWPStartFSM
 from ..filters.inn_filter import INNFilter, INNSchema
 from ..keyboards.main import NotWorkingPlaceKeyboard
 from ..utils.inn_selenuim import get_inn_selenium, SeleniumTimeout
+from ..utils.render import render_inn
 
 inn_router = Router(name="inn")
 
@@ -21,7 +21,7 @@ inn_router = Router(name="inn")
 async def inn_parse_start(message: types.Message, state: FSMContext):
     await state.set_state(INNParserFSM.start)
 
-    message_text = render_template()
+    message_text = render_inn()
     await message.answer(
         text=message_text,
         reply_markup=CancelKeyboard.build(),
