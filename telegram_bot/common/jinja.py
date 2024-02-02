@@ -16,10 +16,10 @@ def render_template(
         templates_dir: PATH_TYPE | None = None
 ) -> str:
     if data is None:
-        data = {}
-
-    context = get_context()
-    data.update(context)
+        context = {}
+    else:
+        context = data.copy()
+    context.update(get_context())
 
     env = Environment(
         loader=FileSystemLoader(searchpath=templates_dir or settings.TEMPLATES_DIR),
@@ -29,7 +29,7 @@ def render_template(
     )
 
     template = env.get_template(template_name)
-    rendered = template.render(**data)
+    rendered = template.render(**context)
     rendered = rendered.replace("\n", " ")
     rendered = rendered.replace("<br>", "\n")
     rendered = re.sub(" +", " ", rendered).replace(" .", ".").replace(" ,", ",")
