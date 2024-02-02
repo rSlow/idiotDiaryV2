@@ -18,7 +18,7 @@ from ..FSM.main import MusicState, EyeD3State, EyeD3EditState
 from ..factory import EyeD3EditCBFactory, EyeD3MessagesEnum
 from ..keyboards.eyed3_main import EyeD3MainKeyboard, EyeD3BackToMainKeyboard
 from ..keyboards.main import MusicMainKeyboard
-from ..utils.audio import download_audio
+from ..utils.audio import download_audio, BigDurationError
 from ..utils.eyed3_editor import set_eyed3_value, get_eyed3_data, get_eyed3_value
 from ..utils.image import process_image, get_aiogram_thumbnail
 from ..utils.render import render_eyed3
@@ -54,16 +54,12 @@ async def eyed3_parse_file(message: types.Message,
     filename = audio.file_name or uuid.uuid4().hex + settings.AUDIO_FILE_EXT
     file_path = settings.TEMP_DIR / filename
 
-    async with message_manager(
-            bot=bot,
-            state=state,
-            message_text="Обработка..."
-    ):
-        async with TempFileDownloader(
-                file_path=file_path,
-                bot=bot,
-                file_id=file_id
-        ):
+    async with message_manager(bot=bot,
+                               state=state,
+                               message_text="Обработка..."):
+        async with TempFileDownloader(file_path=file_path,
+                                      bot=bot,
+                                      file_id=file_id):
             eyed3_audio = await set_async(eyed3.load)(file_path)
             if eyed3_audio is None:
                 return await message.answer(
@@ -107,15 +103,7 @@ async def eyed3_from_url(message: types.Message,
     async with message_manager(message_text="Скачиваю...",
                                state=state,
                                bot=bot):
-        try:
-            audio_io, filename = await download_audio(url)
-        except TimeoutError:
-            await music_start(
-                message=message,
-                state=state,
-                text="Скачивание шло слишком долго. Возможно, это ошибка бота, "
-                     "либо вы отправили ссылку на слишком больше видео."
-            )
+        audio_io, filename = await download_audio(url)
         audio_file = BufferedInputFile(
             file=audio_io,
             filename=filename

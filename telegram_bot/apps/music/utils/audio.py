@@ -2,14 +2,19 @@ import os
 import re
 import subprocess
 import uuid
+from datetime import timedelta, datetime
+from typing import Optional
 
 from yt_dlp import YoutubeDL
 
-from common.utils.decorators import set_async, coro_timer
+from common.utils.decorators import set_async
 from .. import settings
 
 
-@coro_timer(45, exc=TimeoutError)
+class BigDurationError(MemoryError):
+    pass
+
+
 @set_async
 def download_audio(
         url: str,
@@ -17,6 +22,7 @@ def download_audio(
         to_second: str | None = None,
 ):
     info_dict = YoutubeDL().extract_info(url, download=False)
+    url_duration = info_dict.get('duration')
     title = info_dict.get('title')
     channel = info_dict.get('channel')
     filename = f"{channel} - {title}" if title and channel else uuid.uuid4().hex
@@ -29,11 +35,16 @@ def download_audio(
     ydl_opts = {
         "extract_audio": True,
         "format": 'bestaudio[ext=mp4]',
-        "outtmpl": str(file_path_mp4),
+        "outtmpl": file_path_mp4.as_posix(),
         "external_downloader": "ffmpeg",
     }
-    if valid(from_second, to_second):
-        ydl_opts["external_downloader_args"] = {'ffmpeg': ["-ss", from_second, "-to", to_second]}
+    timecodes = TimecodeValidator(from_second, to_second)
+    duration = timecodes.time_interval.seconds if timecodes.has_timecodes else url_duration
+    if duration > 600:
+        raise BigDurationError
+
+    if timecodes.has_timecodes:
+        ydl_opts["external_downloader_args"] = {'ffmpeg': ["-ss", timecodes.from_second, "-to", timecodes.to_second]}
 
     if not settings.TEMP_DIR.exists():
         settings.TEMP_DIR.mkdir(exist_ok=True)
@@ -53,8 +64,56 @@ def download_audio(
     return audio_bytes, temp_filename_mp3
 
 
-def valid(from_second: str | None = None, to_second: str | None = None):
-    if from_second is not None and to_second is not None:
-        if re.match(settings.TIMECODE_REGEXP, from_second) and re.match(settings.TIMECODE_REGEXP, to_second):
+class TimeValidationError(TypeError):
+    def __init__(self, value: Optional[str] = None):
+        super().__init__(f"timecode{' value' if value is not None else 's'} is unvalidated")
+
+
+class TimecodeValidator:
+    def __init__(self,
+                 from_second: str | None = None,
+                 to_second: str | None = None):
+        self.from_second = from_second
+        self.to_second = to_second
+
+        if type(from_second) is not type(to_second):
+            raise TypeError("you cant determine only one of 'from_second' and 'to_second'")
+
+        if self.has_timecodes and not self.is_valid:
+            raise TimeValidationError
+
+    @staticmethod
+    def is_match(value: str, is_short: bool = False) -> bool:
+        pattern = [settings.TIMECODE_REGEXP, settings.SHORT_TIMECODE_REGEXP][is_short]
+        if re.match(pattern, value):
             return True
-    return False
+        return False
+
+    @property
+    def is_valid(self) -> bool:
+        if self.has_timecodes:
+            if self.is_match(self.from_second) and self.is_match(self.to_second):
+                return True
+        return False
+
+    def get_dt_obj(self, value: str) -> datetime:
+        if self.is_match(value, is_short=True):
+            return datetime.strptime(
+                value, settings.STRFTIME_SHORT_FORMAT
+            )
+        elif self.is_match(value):
+            return datetime.strptime(
+                value, settings.STRFTIME_FORMAT
+            )
+        else:
+            raise TimeValidationError(value)
+
+    @property
+    def has_timecodes(self):
+        return self.from_second is not None and self.to_second is not None
+
+    @property
+    def time_interval(self) -> timedelta:
+        from_time = self.get_dt_obj(self.from_second)
+        to_time = self.get_dt_obj(self.to_second)
+        return to_time - from_time

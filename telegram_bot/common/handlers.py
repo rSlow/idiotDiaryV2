@@ -23,7 +23,7 @@ async def start(message: types.Message, state: FSMContext, text: str | None = No
     )
 
 
-@first_router.error()
+@last_router.error()
 async def key_error_pass(event: types.ErrorEvent, state: FSMContext):
     data = await state.get_data()
     message = event.update.message if event.update.message is not None else event.update.callback_query.message
