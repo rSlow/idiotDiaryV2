@@ -20,7 +20,8 @@ start_fsh_router = Router(name="start_fsh")
     CommonFSM.start,
     F.text == StartKeyboard.Buttons.free_shaurma,
 )
-async def choose_device(message: types.Message, state: FSMContext):
+async def choose_device(message: types.Message,
+                        state: FSMContext):
     await state.set_state(ChooseBankParams.device)
 
     await message.answer(
@@ -33,7 +34,9 @@ async def choose_device(message: types.Message, state: FSMContext):
     ChooseBankParams.device,
     F.text[F.in_(enums.DeviceNames.as_value_list())].as_("device_value"),
 )
-async def choose_from_bank(message: types.Message, state: FSMContext, device_value: str):
+async def choose_from_bank(message: types.Message,
+                           state: FSMContext,
+                           device_value: str):
     device_enum = enums.DeviceNames.find_from_value(device_value)
     await state.update_data(device=device_enum.name)
 
@@ -82,7 +85,7 @@ async def start_bank_cycle(message: types.Message, state: FSMContext, to_bank_va
     to_bank_name: str = enums.BankNames.find_from_value(to_bank_value).name
     await state.update_data(to_bank=to_bank_name)
 
-    bank_state_group: BankStatesGroup = settings.FSSettings[device_name].value.find_bank(from_bank_name).state_group
+    bank_state_group: BankStatesGroup = settings.FSSettings[device_name].value[from_bank_name].state_group
 
     await state.update_data({"bank_values": {}})
 
@@ -106,7 +109,7 @@ async def test(message: types.Message):
     to_bank_name = "tinkoff"
     device_name = "iphone"
 
-    render_func = FSSettings[device_name].value.find_bank(from_bank_name).find_bank(to_bank_name).render_func
+    render_func = FSSettings[device_name].value[from_bank_name][to_bank_name].render_func
 
     image_io = render_func(
         name="Евгений П.",

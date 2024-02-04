@@ -22,7 +22,8 @@ voice_convert_router = Router()
     F.text == NotWorkingPlaceKeyboard.Buttons.convert_voice,
     NWPStartFSM.main
 )
-async def convert_voice_message_start(message: Message, state: FSMContext):
+async def convert_voice_message_start(message: Message,
+                                      state: FSMContext):
     await state.set_data({})
     await state.set_state(ConvertVoiceFSM.start)
 
@@ -37,7 +38,8 @@ async def convert_voice_message_start(message: Message, state: FSMContext):
     F.text,
     ConvertVoiceFSM.start,
 )
-async def set_voice_file_text(message: Message, state: FSMContext):
+async def set_voice_file_text(message: Message,
+                              state: FSMContext):
     await state.update_data({"VOICE_NAME": message.text})
 
     inf_msg = await message.answer(
@@ -51,7 +53,8 @@ async def set_voice_file_text(message: Message, state: FSMContext):
     F.voice,
     ConvertVoiceFSM.start,
 )
-async def convert_voice_message(message: Message, state: FSMContext):
+async def convert_voice_message(message: Message,
+                                state: FSMContext):
     await state.set_state(ConvertVoiceFSM.convert)
 
     data = await state.get_data()

@@ -7,7 +7,7 @@ from loguru import logger
 from config import settings
 
 
-def init_logging():
+def init_logging() -> None:
     if not settings.LOGS_DIR.is_dir():
         os.mkdir(settings.LOGS_FOLDER)
 

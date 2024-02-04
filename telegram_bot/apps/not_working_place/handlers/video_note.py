@@ -17,7 +17,8 @@ video_note_router = Router(name="video_note")
     F.text == NotWorkingPlaceKeyboard.Buttons.download_video_note,
     NWPStartFSM.main
 )
-async def download_video_note_start(message: Message, state: FSMContext):
+async def download_video_note_start(message: Message,
+                                    state: FSMContext):
     await state.set_state(DownloadVideoNoteFSM.main)
     await message.answer(
         text="Ожидаю кружочек...",
@@ -29,7 +30,8 @@ async def download_video_note_start(message: Message, state: FSMContext):
     F.video_note,
     DownloadVideoNoteFSM.main
 )
-async def download_video_note(message: Message, state: FSMContext):
+async def download_video_note(message: Message,
+                              state: FSMContext):
     await state.set_state(DownloadVideoNoteFSM.download)
     receive_message = await message.answer("Видеосообщение принято, обработка...")
     video_note_file_io = await message.bot.download(

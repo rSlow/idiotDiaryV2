@@ -5,7 +5,8 @@ from aiogram import Bot
 
 
 class TempFileDownloader:
-    def __init__(self, file_path: Path,
+    def __init__(self,
+                 file_path: Path,
                  bot: Bot,
                  file_id: str):
         self.file_path = file_path

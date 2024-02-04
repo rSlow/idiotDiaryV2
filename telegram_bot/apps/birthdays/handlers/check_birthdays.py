@@ -31,7 +31,8 @@ main_birthday_router = Router(name="main_birthdays")
     TimeCorrectionFSM.start,
     BackFilter(),
 )
-async def main_birthdays(message: types.Message, state: FSMContext):
+async def main_birthdays(message: types.Message,
+                         state: FSMContext):
     await state.set_state(BirthdaysFSM.main)
     await message.answer(
         text="Выберите действие:",
@@ -46,7 +47,9 @@ async def main_birthdays(message: types.Message, state: FSMContext):
     BirthdaysFSM.main,
     F.text == BirthdaysMainKeyboard.Buttons.check,
 )
-async def check_birthdays(message: types.Message, user_id: int, session: AsyncSession):
+async def check_birthdays(message: types.Message,
+                          user_id: int,
+                          session: AsyncSession):
     today = get_now().date()
     dates: dict[date, Sequence[Birthday]] = {}
     for i in range(4):
@@ -67,7 +70,8 @@ async def check_birthdays(message: types.Message, user_id: int, session: AsyncSe
     BirthdaysFSM.main,
     F.text == BirthdaysMainKeyboard.Buttons.clear_data,
 )
-async def confirm_clear_birthdays(message: types.Message, state: FSMContext):
+async def confirm_clear_birthdays(message: types.Message,
+                                  state: FSMContext):
     await state.set_state(BirthdaysFSM.clear_confirm)
 
     await message.answer(
@@ -80,8 +84,14 @@ async def confirm_clear_birthdays(message: types.Message, state: FSMContext):
     BirthdaysFSM.clear_confirm,
     YesKeyboardFilter(),
 )
-async def clear_birthdays(message: types.Message, state: FSMContext, user_id: int):
-    await Birthday.delete_data(user_id)
+async def clear_birthdays(message: types.Message,
+                          state: FSMContext,
+                          user_id: int,
+                          session: AsyncSession):
+    await Birthday.delete_data(
+        user_id=user_id,
+        session=session
+    )
 
     await message.answer(
         text="Все дни рождения удалены.",

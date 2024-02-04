@@ -8,15 +8,17 @@ TypeKeyboard = InlineKeyboardMarkup | ReplyKeyboardMarkup | ReplyKeyboardRemove 
 
 
 class ContextMessageManager:
-    def __init__(self, bot: Bot,
+    def __init__(self,
+                 bot: Bot,
                  state: FSMContext,
                  message_text: str,
                  keyboard: Optional[TypeKeyboard] = None):
         self.bot = bot
-        self.message: Message | None = None
         self.state = state
         self.message_text = message_text
         self.keyboard = keyboard
+
+        self.message: Message | None = None
 
     async def __aenter__(self):
         chat_id = self.state.key.chat_id

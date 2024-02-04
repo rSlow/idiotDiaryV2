@@ -17,10 +17,12 @@ class FromBanksKeyboard(BaseReplyKeyboardBuilder):
 
 
 class ToBanksKeyboard(BaseReplyKeyboardBuilder):
-    def __init__(self, device_name: str, bank_name: str):
+    def __init__(self,
+                 device_name: str,
+                 bank_name: str):
         super().__init__()
         self.buttons_list = [
             bank.name_enum.value
             for bank in
-            FSSettings[device_name].value.find_bank(bank_name).to_banks
+            FSSettings[device_name].value[bank_name].to_banks
         ]

@@ -19,7 +19,8 @@ inn_router = Router(name="inn")
     NWPStartFSM.main,
     F.text == NotWorkingPlaceKeyboard.Buttons.inn_parse,
 )
-async def inn_parse_start(message: types.Message, state: FSMContext):
+async def inn_parse_start(message: types.Message,
+                          state: FSMContext):
     await state.set_state(INNParserFSM.start)
 
     message_text = render_inn()

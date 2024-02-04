@@ -9,7 +9,7 @@ class UUIDValidationError(TypeError):
     pass
 
 
-def uuid_validator(v: str):
+def uuid_validator(v: str) -> UUID:
     try:
         return UUID(v, version=4)
     except ValueError:

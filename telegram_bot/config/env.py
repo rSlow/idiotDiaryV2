@@ -3,7 +3,8 @@ from pathlib import Path
 from environs import Env
 
 
-def get_env(env_dir: Path | None = None, env_file: Path | None = None):
+def get_env(env_dir: Path | None = None,
+            env_file: Path | None = None) -> Env:
     env = Env()
 
     if env_dir is not None:

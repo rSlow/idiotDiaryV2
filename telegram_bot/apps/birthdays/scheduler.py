@@ -8,7 +8,8 @@ from .ORM.birthdays import Birthday
 from .utils.render import render_schedule_birthdays
 
 
-async def send_birthdays(bot: Bot, user_id: int):
+async def send_birthdays(bot: Bot,
+                         user_id: int) -> None:
     today = get_now().date()
     tomorrow = today + timedelta(days=1)
     async with Session() as session:

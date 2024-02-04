@@ -9,7 +9,7 @@ from apps.birthdays.scheduler import send_birthdays
 
 
 class NotificationScheduler(AsyncIOScheduler):
-    async def init(self, bot: Bot):
+    async def init(self, bot: Bot) -> None:
         notification_users = await NotificationUser.get_all()
         for notification_user in notification_users:
             for notification_time in notification_user.times:

@@ -1,6 +1,6 @@
 import re
 from os import PathLike
-from typing import Sequence
+from typing import Sequence, Any
 
 from jinja2 import Environment, FileSystemLoader
 
@@ -10,11 +10,9 @@ from .utils.functions import get_now
 PATH_TYPE = str | PathLike | Sequence[str | PathLike]
 
 
-def render_template(
-        template_name: str,
-        templates_dir: PATH_TYPE,
-        data: dict | None = None
-) -> str:
+def render_template(template_name: str,
+                    templates_dir: PATH_TYPE,
+                    data: dict | None = None) -> str:
     if data is None:
         context = {}
     else:
@@ -38,7 +36,7 @@ def render_template(
     return rendered
 
 
-def get_context():
+def get_context() -> dict[str, Any]:
     return {
         "TIME_FORMAT": formats.TIME_FORMAT,
         "TIME_STRING_FORMAT": formats.TIME_STRING_FORMAT,

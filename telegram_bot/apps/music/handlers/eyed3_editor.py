@@ -31,7 +31,8 @@ music_eyed3_router = Router(name="music_eyed3")
     MusicState.start,
     F.text == MusicMainKeyboard.Buttons.edit_music,
 )
-async def start_eyed3_editor(message: types.Message, state: FSMContext):
+async def start_eyed3_editor(message: types.Message,
+                             state: FSMContext):
     await state.set_state(EyeD3State.wait_file)
     await message.answer(
         text=f"Ожидаю файл или ссылку на YouTube...",
@@ -313,7 +314,7 @@ async def eyed3_export(callback: types.CallbackQuery,
                     mime_type="image/jpeg"
                 )
 
-            eyed3_tag.save(str(file_path))
+            eyed3_tag.save(file_path.as_posix())
 
             if eyed3_tag.artist and eyed3_tag.title:
                 filename = f"{eyed3_tag.artist} - {eyed3_tag.title}{settings.AUDIO_FILE_EXT}"

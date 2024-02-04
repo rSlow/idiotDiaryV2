@@ -11,7 +11,7 @@ class Device(ABC):
     from_banks: Iterable[FromBank]
     device_type: DeviceNames
 
-    def find_bank(self, bank_name: str):
+    def __getitem__(self, bank_name: str):
         for bank_obj in self.from_banks:
             if bank_obj.name_enum.name == bank_name:
                 return bank_obj

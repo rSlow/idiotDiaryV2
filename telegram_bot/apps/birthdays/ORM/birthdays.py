@@ -40,13 +40,13 @@ class Birthday(Base):
 
     @classmethod
     async def delete_data(cls,
-                          user_id: int) -> None:
-        async with Session() as session:
-            async with session.begin():
-                q = delete(cls).filter(
-                    cls.user_id == user_id
-                )
-                await session.execute(q)
+                          user_id: int,
+                          session: AsyncSession) -> None:
+        async with session.begin():
+            q = delete(cls).filter(
+                cls.user_id == user_id
+            )
+            await session.execute(q)
 
     @classmethod
     async def get_birthdays_in_date(cls,

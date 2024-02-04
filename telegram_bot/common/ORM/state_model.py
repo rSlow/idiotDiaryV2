@@ -35,9 +35,7 @@ class State(Base):
                              state: bytes | str):
         async with Session() as session:
             async with session.begin():
-                query = select(
-                    cls
-                ).filter_by(
+                query = select(cls).filter_by(
                     user_id=user_id
                 ).filter_by(
                     chat_id=chat_id

@@ -29,7 +29,7 @@ class FromBank(ABC):
     state_group: type[BankStatesGroup]
     name_enum: BankNames
 
-    def find_bank(self, bank_name: str):
+    def __getitem__(self, bank_name: str):
         for bank_obj in self.to_banks:
             if bank_obj.name_enum.name == bank_name:
                 return bank_obj

@@ -9,7 +9,7 @@ from common.utils.decorators import set_async
 
 
 @set_async
-def process_image(image_io: BinaryIO):
+def process_image(image_io: BinaryIO) -> BytesIO:
     quality = 1024
     with Image.open(image_io) as image:
         new_image = ImageOps.fit(
@@ -26,7 +26,7 @@ def process_image(image_io: BinaryIO):
 
 
 @set_async
-def get_aiogram_thumbnail(image_io: BytesIO):
+def get_aiogram_thumbnail(image_io: BytesIO) -> BufferedInputFile:
     image_io.seek(0)
     return BufferedInputFile(
         file=image_io.read(),

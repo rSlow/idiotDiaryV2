@@ -20,7 +20,8 @@ music_yt_router = Router(name="music_yt")
     MusicState.start,
     F.text == MusicMainKeyboard.Buttons.download_from_yt,
 )
-async def start_download_audio(message: types.Message, state: FSMContext):
+async def start_download_audio(message: types.Message,
+                               state: FSMContext):
     await state.set_state(YTDownloadState.url)
     await state.update_data(yt_dlp={
         "url": None,
@@ -36,7 +37,9 @@ async def start_download_audio(message: types.Message, state: FSMContext):
     YTDownloadState.url,
     F.text[F.regexp(settings.HTTPS_REGEXP)].as_("url"),
 )
-async def timecode_video(message: types.Message, state: FSMContext, url: str):
+async def timecode_video(message: types.Message,
+                         state: FSMContext,
+                         url: str):
     await state.set_state(YTDownloadState.timecode)
     data = await state.get_data()
     yt_data: dict[str, Any] = data["yt_dlp"]
@@ -60,7 +63,9 @@ async def timecode_video(message: types.Message, state: FSMContext, url: str):
     YTDownloadState.timecode,
     F.text == TimecodeKeyboard.Buttons.full,
 )
-async def download(message: types.Message, state: FSMContext, timecode: str | None = None):
+async def download(message: types.Message,
+                   state: FSMContext,
+                   timecode: str | None = None):
     await state.set_state(YTDownloadState.download)
     url = (await state.get_data()).get("yt_dlp").get("url")
     if url is None:

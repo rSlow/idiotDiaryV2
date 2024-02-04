@@ -22,7 +22,8 @@ admin_router = Router(name="admin")
     OwnerFilter(),
     F.text == StartKeyboard.Buttons.admin,
 )
-async def start_admin(message: types.Message, state: FSMContext):
+async def start_admin(message: types.Message,
+                      state: FSMContext):
     await state.set_state(AdminStates.start)
 
     await message.answer(

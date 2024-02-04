@@ -1,3 +1,4 @@
+from abc import ABC
 from typing import Any, Iterable
 
 from aiogram.filters import BaseFilter
@@ -6,35 +7,39 @@ from aiogram.types import TelegramObject, Message
 from config import settings
 from .keyboards.base import YesNoKeyboard, BackKeyboard
 
-UserIDType = int | str | Iterable[int] | Iterable[str]
+UserIDType = str | Iterable[str]
 
 
-class YesKeyboardFilter(BaseFilter):
+class MessageTextFilter(BaseFilter, ABC):
+    def __init__(self, text: str):
+        self.text = text
+
     async def __call__(self, message: Message):
-        if message.text == YesNoKeyboard.Buttons.yes:
+        if message.text == self.text:
             return True
         return False
 
 
-class BackFilter(BaseFilter):
-    async def __call__(self, message: Message):
-        if message.text == BackKeyboard.Buttons.back:
-            return True
-        return False
+class YesKeyboardFilter(MessageTextFilter):
+    def __init__(self):
+        super().__init__(text=YesNoKeyboard.Buttons.yes)
 
 
-class NoKeyboardFilter(BaseFilter):
-    async def __call__(self, message: Message):
-        if message.text == YesNoKeyboard.Buttons.no:
-            return True
-        return False
+class NoKeyboardFilter(MessageTextFilter):
+    def __init__(self):
+        super().__init__(text=YesNoKeyboard.Buttons.no)
+
+
+class BackFilter(MessageTextFilter):
+    def __init__(self):
+        super().__init__(text=BackKeyboard.Buttons.back)
 
 
 class UserIDFilter(BaseFilter):
     def __init__(self, users_id: UserIDType):
 
-        if not isinstance(users_id, Iterable):
-            users_id = [users_id]
+        if not isinstance(users_id, list | tuple):
+            users_id = (users_id,)
         self.users_id = users_id
 
     async def __call__(self,

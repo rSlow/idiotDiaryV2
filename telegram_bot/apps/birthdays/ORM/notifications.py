@@ -110,6 +110,8 @@ class NotificationTime(Base):
     async def clear_notifications(cls,
                                   session: AsyncSession,
                                   user_id: int) -> None:
+        await session.close()
+
         async with session.begin():
             q = delete(cls).filter(
                 cls.user_id == user_id

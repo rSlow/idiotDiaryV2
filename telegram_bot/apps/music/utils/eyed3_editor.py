@@ -13,11 +13,9 @@ async def get_eyed3_data(state: FSMContext):
     )
 
 
-async def get_eyed3_value(
-        state: FSMContext,
-        key: str,
-        default: Any = None
-):
+async def get_eyed3_value(state: FSMContext,
+                          key: str,
+                          default: Any = None):
     eyed3_data = await get_eyed3_data(state=state)
     return eyed3_data.get(key, default)
 

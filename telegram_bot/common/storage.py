@@ -15,8 +15,7 @@ class ModifiedMemoryStorage(MemoryStorage):
     async def set_state(self,
                         key: StorageKey,
                         state: StateType = None,
-                        also_to_db: bool = True
-                        ) -> None:
+                        also_to_db: bool = True) -> None:
         await super().set_state(
             key=key,
             state=state
@@ -50,23 +49,19 @@ redis_storage = RedisStorage.from_url(ENV.str("REDIS_URL"))
 ValueType = Union[int, str, float, bool, Type[None]]
 
 
-async def get_category_data(
-        state: FSMContext,
-        category_key: str,
-        category_default: Any,
-):
+async def get_category_data(state: FSMContext,
+                            category_key: str,
+                            category_default: Any):
     data = await state.get_data()
     category_data: dict[str, Any] = data.get(category_key, category_default)
     return category_data
 
 
-async def set_category_value(
-        state: FSMContext,
-        category_key: str,
-        category_default: Any,
-        param: str,
-        value: ValueType
-):
+async def set_category_value(state: FSMContext,
+                             category_key: str,
+                             category_default: Any,
+                             param: str,
+                             value: ValueType):
     data = await state.get_data()
     category_data: dict[str, Any] = data.get(category_key, category_default)
     category_data[param] = value

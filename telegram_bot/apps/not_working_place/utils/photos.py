@@ -12,11 +12,12 @@ from common.utils.stage_gather import stage_gather
 PHOTOS = "photos"
 
 
-async def init_photos_proxy(state: FSMContext):
+async def init_photos_proxy(state: FSMContext) -> None:
     await state.update_data({PHOTOS: []})
 
 
-async def add_photo_file_id(state: FSMContext, file_id: str):
+async def add_photo_file_id(state: FSMContext,
+                            file_id: str) -> None:
     data = await state.get_data()
     photos = data.get(PHOTOS, [])
     photos.append(file_id)
@@ -34,13 +35,15 @@ async def clear_file_id_list(state: FSMContext) -> None:
     await state.set_data(data)
 
 
-async def download_photo(file_id: str, bot: Bot):
+async def download_photo(file_id: str,
+                         bot: Bot) -> BinaryIO:
     file = await bot.get_file(file_id)
-    photo_io: BinaryIO = await bot.download_file(file_path=file.file_path)
+    photo_io = await bot.download_file(file_path=file.file_path)
     return photo_io
 
 
-async def get_zip_file(file_id_list: list[str], bot: Bot):
+async def get_zip_file(file_id_list: list[str],
+                       bot: Bot) -> BufferedInputFile:
     tasks = []
     for i, file_id in enumerate(file_id_list, 1):
         tasks.append(download_photo(file_id=file_id, bot=bot))

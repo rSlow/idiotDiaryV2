@@ -1,10 +1,8 @@
 from .main import grade
 
 
-def prepare_tinkoff_sums(
-        start_sum: int,
-        transfer_sum: int,
-):
+def prepare_tinkoff_sums(start_sum: int | float,
+                         transfer_sum: int | float):
     str_start_sum = grade(f"{start_sum:.2f}".replace(".", ",")) + " ₽"
     str_transfer_sum = grade(f"{transfer_sum}".replace(".", ",")) + " ₽"
     str_end_sum = grade(f"{round(start_sum - transfer_sum, 2):.2f}".replace(".", ",")) + " ₽"

@@ -15,11 +15,3 @@ def grade(number: str):
 
     graded_number = graded_number.strip() + fractional
     return graded_number
-
-
-def strike(text):
-    sym = u'\u0336'
-    stroked = ""
-    for i in text:
-        stroked += (i + sym)
-    return stroked

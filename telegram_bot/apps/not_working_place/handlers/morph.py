@@ -15,7 +15,8 @@ morph_router = Router(name="morph")
     NWPStartFSM.main,
     F.text == NotWorkingPlaceKeyboard.Buttons.morph,
 )
-async def morph_fio_start(message: types.Message, state: FSMContext):
+async def morph_fio_start(message: types.Message,
+                          state: FSMContext):
     await state.set_state(MorphFIOFSM.morph)
 
     await message.answer(
@@ -28,7 +29,8 @@ async def morph_fio_start(message: types.Message, state: FSMContext):
     MorphFIOFSM.morph,
     F.text.as_("fio"),
 )
-async def morph_fio(message: types.Message, fio: str):
+async def morph_fio(message: types.Message,
+                    fio: str):
     async with ClientSession() as session:
         response = await session.post(
             url=settings.MORPH_URL,

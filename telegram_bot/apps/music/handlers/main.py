@@ -3,6 +3,7 @@ from typing import Optional
 from aiogram import Router, F, types
 from aiogram.filters import ExceptionTypeFilter
 from aiogram.fsm.context import FSMContext
+from yt_dlp import DownloadError
 
 from common.FSM import CommonFSM
 from common.keyboards.start import StartKeyboard
@@ -39,4 +40,18 @@ async def big_duration_audio_error(_: types.ErrorEvent,
         state=state,
         text="Видео, на которое вы отправили ссылку, идет более 10 минут. По техническим причинам "
              "на данный момент скачивание аудио более 10 минут невозможно."
+    )
+
+
+@start_music_router.error(
+    ExceptionTypeFilter(DownloadError),
+    F.update.message.as_("message")
+)
+async def download_error(event: types.ErrorEvent,
+                         message: types.Message,
+                         state: FSMContext):
+    return await music_start(
+        message=message,
+        state=state,
+        text=f"Ошибка скачивания видео: <b>{event.exception.args[0]}</b>."
     )

@@ -3,7 +3,7 @@ from datetime import time, datetime
 from common.utils.functions import get_now
 
 
-def get_timeshift(user_time: time):
+def get_timeshift(user_time: time) -> time:
     now = get_now().replace(tzinfo=None)
     td = now - datetime(
         hour=user_time.hour,
@@ -23,5 +23,5 @@ def get_timeshift(user_time: time):
     )
 
 
-def step_round(number: int, step: int):
+def step_round(number: int, step: int) -> int:
     return step * round(number / step)

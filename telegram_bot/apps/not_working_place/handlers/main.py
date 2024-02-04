@@ -13,7 +13,9 @@ start_nwp_router = Router()
     CommonFSM.start,
     F.text == StartKeyboard.Buttons.not_working_place,
 )
-async def start_nwp(message: types.Message, state: FSMContext, text: str | None = None):
+async def start_nwp(message: types.Message,
+                    state: FSMContext,
+                    text: str | None = None):
     await main(
         message=message,
         state=state,
@@ -21,7 +23,8 @@ async def start_nwp(message: types.Message, state: FSMContext, text: str | None 
     )
 
 
-async def back_to_main(message: types.Message, state: FSMContext):
+async def back_to_main(message: types.Message,
+                       state: FSMContext):
     await main(
         message=message,
         state=state,
@@ -29,7 +32,9 @@ async def back_to_main(message: types.Message, state: FSMContext):
     )
 
 
-async def main(message: types.Message, text: str, state: FSMContext):
+async def main(message: types.Message,
+               state: FSMContext,
+               text: str):
     await state.set_state(NWPStartFSM.main)
 
     await message.answer(

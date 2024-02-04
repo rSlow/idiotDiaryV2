@@ -13,7 +13,8 @@ from config.ui_config import set_ui_commands
 from http_server.webhook import init_webhook
 
 
-async def on_startup(dispatcher: Dispatcher, bot: Bot):
+async def on_startup(dispatcher: Dispatcher,
+                     bot: Bot):
     init_logging()
 
     scheduler = NotificationScheduler(timezone=settings.TIMEZONE)

@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
-from .exceptions import ValidationError
+
+class ValidationError(AssertionError):
+    pass
 
 
 class BaseStateValidator(ABC):
@@ -42,7 +44,8 @@ class SumValidator(BaseStateValidator):
     def __init__(self):
         super().__init__(error_text="Неправильная форма суммы. Попробуйте еще раз...")
 
-    def validate(self, value: str) -> int | float:
+    def validate(self,
+                 value: str) -> int | float:
         transfer_sum_edited = value.replace(",", ".")
         try:
             float_transfer_sum = round(float(transfer_sum_edited), 2)
@@ -60,7 +63,7 @@ class PhoneValidator(BaseStateValidator):
         super().__init__(error_text="Неправильный формат номера. Попробуйте еще раз...")
 
     def validate(self, value: str) -> str:
-        digits = list(filter(str.isdigit, value))
+        digits = list(filter(lambda v: v.isdigit(), value))
 
         try:
             if (digits[0] == "8" or digits[0] == "7") and len(digits) == 11:

@@ -15,9 +15,9 @@ class SeleniumTimeout(TimeoutError):
     pass
 
 
-@coro_timer(30, exc=SeleniumTimeout)
+@coro_timer(40, exc=SeleniumTimeout)
 @set_async
-def get_inn_selenium(data: INNSchema):
+def get_inn_selenium(data: INNSchema) -> str:
     options = webdriver.ChromeOptions()
     args = ['--headless', 'window-size=1920x1080', "--disable-gpu", "--no-sandbox", "--disable-dev-shm-usage"]
     [options.add_argument(arg) for arg in args]

@@ -13,7 +13,9 @@ last_router = Router()
 
 @first_router.message(Command("start", "cancel"))
 @first_router.message(F.text == BaseReplyKeyboardBuilder.on_main_button_text)
-async def start(message: types.Message, state: FSMContext, text: str | None = None):
+async def start(message: types.Message,
+                state: FSMContext,
+                text: str | None = None):
     await state.set_state(CommonFSM.start)
     await message.answer(
         text=text or "Куда надо?",
@@ -24,7 +26,8 @@ async def start(message: types.Message, state: FSMContext, text: str | None = No
 
 
 @last_router.error()
-async def key_error_pass(event: types.ErrorEvent, state: FSMContext):
+async def key_error_pass(event: types.ErrorEvent,
+                         state: FSMContext):
     data = await state.get_data()
     message = event.update.message if event.update.message is not None else event.update.callback_query.message
     if isinstance(event.exception, KeyError) and not data:  # check if empty FSM data and KeyError exception

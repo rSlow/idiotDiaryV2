@@ -15,7 +15,8 @@ pack_photos_router = Router(name="pack_photos")
     F.text == NotWorkingPlaceKeyboard.Buttons.pack,
     NWPStartFSM.main
 )
-async def wait_photos(message: types.Message, state: FSMContext):
+async def wait_photos(message: types.Message,
+                      state: FSMContext):
     await state.set_state(ImagesZipFSM.start)
 
     await photos.init_photos_proxy(state)
@@ -30,7 +31,8 @@ async def wait_photos(message: types.Message, state: FSMContext):
     F.photo,
     StateFilter(ImagesZipFSM.waiting, ImagesZipFSM.start)
 )
-async def append_photo(message: types.Message, state: FSMContext):
+async def append_photo(message: types.Message,
+                       state: FSMContext):
     await state.set_state(ImagesZipFSM.waiting)
 
     file_id = message.photo[-1].file_id
@@ -42,7 +44,8 @@ async def append_photo(message: types.Message, state: FSMContext):
     F.text == PackKeyboard.Buttons.accept,
     ImagesZipFSM.waiting
 )
-async def return_zip(message: types.Message, state: FSMContext):
+async def return_zip(message: types.Message,
+                     state: FSMContext):
     file_id_list = await photos.get_file_id_list(state)
     await photos.clear_file_id_list(state)
 
@@ -76,5 +79,9 @@ async def return_zip(message: types.Message, state: FSMContext):
     F.text == PackFinishKeyboard.Buttons.again,
     ImagesZipFSM.finish
 )
-async def zip_again(message: types.Message, state: FSMContext):
-    await wait_photos(message=message, state=state)
+async def zip_again(message: types.Message,
+                    state: FSMContext):
+    await wait_photos(
+        message=message,
+        state=state
+    )
