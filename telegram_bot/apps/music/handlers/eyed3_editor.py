@@ -18,7 +18,7 @@ from ..FSM.main import MusicState, EyeD3State, EyeD3EditState
 from ..factory import EyeD3EditCBFactory, EyeD3MessagesEnum
 from ..keyboards.eyed3_main import EyeD3MainKeyboard, EyeD3BackToMainKeyboard
 from ..keyboards.main import MusicMainKeyboard
-from ..utils.audio import download_audio, BigDurationError
+from ..utils.audio import download_audio
 from ..utils.eyed3_editor import set_eyed3_value, get_eyed3_data, get_eyed3_value
 from ..utils.image import process_image, get_aiogram_thumbnail
 from ..utils.render import render_eyed3
@@ -114,6 +114,7 @@ async def eyed3_from_url(message: types.Message,
         state=state,
         bot=bot,
         audio=audio.audio,
+        message_manager=message_manager
     )
 
 
