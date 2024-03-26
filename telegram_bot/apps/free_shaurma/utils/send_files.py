@@ -21,7 +21,7 @@ def render_callback(func: RenderFunc) -> OnFinish:
             data=manager.dialog_data,
             render_func=func
         )
-        await manager.start(state=CommonFSM.start, mode=StartMode.RESET_STACK)
+        await manager.start(state=CommonFSM.state, mode=StartMode.RESET_STACK)
 
     return on_finish
 
