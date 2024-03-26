@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import pytz
@@ -6,7 +7,8 @@ from .env import get_env
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-ENV = get_env(env_file=BASE_DIR / ".env")
+ENV_FILE: str = os.getenv("ENV_FILE", ".env")
+ENV = get_env(env_file=BASE_DIR / ENV_FILE)
 
 DEBUG: bool = ENV.bool("DEBUG", None)
 

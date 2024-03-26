@@ -4,8 +4,10 @@ services:
   aiogram:
     build: ./telegram_bot
     restart: always
+    environment:
+      - ENV_FILE=${ENV_FILE:-.env}
     volumes:
-      - ./.env/:/app/.env/:ro
+      - ./${ENV_FILE:-.env}/:/app/${ENV_FILE:-.env}/:ro
       - ./telegram_bot/logs/:/app/logs/:rw
     depends_on:
       - postgres
@@ -16,7 +18,7 @@ services:
     image: postgres
     restart: always
     env_file:
-      - ./.env
+      - ${ENV_FILE:-.env}
     ports:
       - "${POSTGRES_PORT}:5432"
     volumes:
@@ -42,7 +44,7 @@ services:
     volumes:
       - redis:/data
     env_file:
-      - ./.env
+      - ${ENV_FILE:-.env}
 
   nginx:
     image: nginx
@@ -54,7 +56,7 @@ services:
       - ${CERTS_DIR}:/data/certs/:ro
       - ./nginx/default.conf:/etc/nginx/templates/default.conf.template/:rw
     env_file:
-      - ./.env
+      - ${ENV_FILE:-.env}
     depends_on:
       - aiogram
 
@@ -63,7 +65,7 @@ services:
     restart: always
     shm_size: 500m
     ports:
-      - "${SELENIUM_PORT}:4444"
+      - "${SELENIUM_PORT}:${SELENIUM_PORT}"
       - "7900:7900"
     privileged: true
 
