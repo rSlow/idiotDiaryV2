@@ -19,9 +19,9 @@ class WhenUserID:
                  manager: DialogManager):
         user: User = manager.middleware_data["event_from_user"]
         user_id = user.id
-        if user_id in self.users_id:
-            return False
-        return True
+        if str(user_id) in self.users_id:
+            return True
+        return False
 
 
 class WhenOwner(WhenUserID):
