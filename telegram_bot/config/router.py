@@ -11,7 +11,7 @@ apps_router = Router(name="apps")
 apps_router.include_routers(
     nwp_router,
     fsh_router,
-    admin_router,
+    birthdays_router,
     music_router,
-    birthdays_router
+    admin_router,
 )

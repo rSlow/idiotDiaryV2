@@ -1,87 +1,58 @@
-from aiogram import types, F, Router
-from aiogram.filters import StateFilter
-from aiogram.fsm.context import FSMContext
+from aiogram import types
+from aiogram.enums import ContentType
+from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
+from aiogram_dialog.api.entities import Context
+from aiogram_dialog.widgets.input import MessageInput
+from aiogram_dialog.widgets.kbd import Button
+from aiogram_dialog.widgets.text import Const, Format
 
-from ..FSM.images_zip import ImagesZipFSM
-from ..FSM.start import NWPStartFSM
-from ..keyboards.main import NotWorkingPlaceKeyboard
-from ..keyboards.pack import PackKeyboard, PackFinishKeyboard
+from common.buttons import CANCEL_BUTTON
+from ..states import ImagesZipFSM
 from ..utils import photos
 
-pack_photos_router = Router(name="pack_photos")
+DD_KEY = "PHOTOS"
 
 
-@pack_photos_router.message(
-    F.text == NotWorkingPlaceKeyboard.Buttons.pack,
-    NWPStartFSM.main
-)
-async def wait_photos(message: types.Message,
-                      state: FSMContext):
-    await state.set_state(ImagesZipFSM.start)
-
-    await photos.init_photos_proxy(state)
-
-    await message.answer(
-        text="Жду фотографий. Как отправлены все - нажать 'Запаковать!'",
-        reply_markup=PackKeyboard.build()
-    )
+async def photos_count_getter(aiogd_context: Context, **__):
+    photo_list = aiogd_context.dialog_data.get(DD_KEY, [])
+    return {"count": len(photo_list)}
 
 
-@pack_photos_router.message(
-    F.photo,
-    StateFilter(ImagesZipFSM.waiting, ImagesZipFSM.start)
-)
-async def append_photo(message: types.Message,
-                       state: FSMContext):
-    await state.set_state(ImagesZipFSM.waiting)
-
-    file_id = message.photo[-1].file_id
-    await photos.add_photo_file_id(state, file_id)
+async def photo_handler(message: types.Message,
+                        _: MessageInput,
+                        manager: DialogManager) -> None:
+    manager.show_mode = ShowMode.EDIT
+    manager.dialog_data.setdefault(DD_KEY, []).append(message.photo[-1].file_id)
     await message.delete()
 
 
-@pack_photos_router.message(
-    F.text == PackKeyboard.Buttons.accept,
-    ImagesZipFSM.waiting
-)
-async def return_zip(message: types.Message,
-                     state: FSMContext):
-    file_id_list = await photos.get_file_id_list(state)
-    await photos.clear_file_id_list(state)
-
-    if not file_id_list:
-        await message.answer(
-            text="Не было отправлено ни одной фотографии, пробуем еще раз!"
-        )
-        await wait_photos(message=message, state=state)
-
-    else:
-        temp_message = await message.answer(
-            text=f"Запаковывается {len(file_id_list)} фотографий..."
-        )
-
-        await state.set_state(ImagesZipFSM.finish)
-        zip_file = await photos.get_zip_file(file_id_list, bot=message.bot)
-
-        await temp_message.delete()
-
-        temp_message = await message.answer(
-            text="Архив отправляется..."
-        )
-        await message.answer_document(
-            document=zip_file,
-            reply_markup=PackFinishKeyboard.build()
-        )
-        await temp_message.delete()
+async def send_photos(callback: types.CallbackQuery,
+                      _: Button,
+                      manager: DialogManager):
+    file_id_list = manager.dialog_data.get(DD_KEY)
+    await callback.message.edit_text(f"Запаковывается {len(file_id_list)} фотографий...")
+    zip_file = await photos.get_zip_file(file_id_list, bot=callback.bot)
+    await callback.message.edit_text("Архив отправляется...")
+    await callback.message.answer_document(zip_file)
+    manager.show_mode = ShowMode.DELETE_AND_SEND
+    await manager.done()
 
 
-@pack_photos_router.message(
-    F.text == PackFinishKeyboard.Buttons.again,
-    ImagesZipFSM.finish
-)
-async def zip_again(message: types.Message,
-                    state: FSMContext):
-    await wait_photos(
-        message=message,
-        state=state
+pack_dialog = Dialog(
+    Window(
+        Const("Жду фотографий. Как отправлены все - нажать <b>Запаковать!</b>"),
+        Button(
+            Format("Запаковать {count} фотографий!"),
+            when="count",
+            on_click=send_photos,
+            id="send_photos"
+        ),
+        MessageInput(
+            func=photo_handler,
+            content_types=ContentType.PHOTO
+        ),
+        CANCEL_BUTTON,
+        getter=photos_count_getter,
+        state=ImagesZipFSM.state
     )
+)

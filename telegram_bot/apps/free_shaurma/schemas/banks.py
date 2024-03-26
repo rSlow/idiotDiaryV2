@@ -2,14 +2,14 @@ from abc import ABC
 from dataclasses import field, dataclass
 from typing import Callable, Iterable
 
+from common.dialogs import FormStatesGroup
 from .enums import BankNames
-from ..FSM import bank_forms
-from ..FSM.modified_state import BankStatesGroup
 
 
 @dataclass
 class ToBank(ABC):
     render_func: Callable
+    states_group: type[FormStatesGroup]
     name_enum: BankNames
 
 
@@ -26,7 +26,6 @@ class ToTinkoff(ToBank):
 @dataclass
 class FromBank(ABC):
     to_banks: Iterable[ToBank]
-    state_group: type[BankStatesGroup]
     name_enum: BankNames
 
     def __getitem__(self, bank_name: str):
@@ -40,10 +39,8 @@ class FromBank(ABC):
 @dataclass
 class FromSberbank(FromBank):
     name_enum: BankNames = field(default=BankNames.sberbank)
-    state_group: type[BankStatesGroup] = field(default=bank_forms.SberbankForm)
 
 
 @dataclass
 class FromTinkoff(FromBank):
     name_enum: BankNames = field(default=BankNames.tinkoff)
-    state_group: type[BankStatesGroup] = field(default=bank_forms.TinkoffForm)

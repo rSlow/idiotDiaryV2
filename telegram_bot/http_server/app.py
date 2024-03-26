@@ -1,11 +1,11 @@
 from aiogram.webhook.aiohttp_server import SimpleRequestHandler
-from aiohttp.web_app import Application
+from aiohttp import web
 
 from apps.birthdays.http_app.routers import birthdays_app
 from config import settings
 from config.bot import dp, bot
 
-app = Application()
+app = web.Application()
 
 webhook_requests_handler = SimpleRequestHandler(
     dispatcher=dp,

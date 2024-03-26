@@ -1,42 +1,18 @@
 import os.path
 
-from aiogram import types, Router, F
-from aiogram.fsm.context import FSMContext
+from aiogram import types
+from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
+from aiogram_dialog.widgets.kbd import Button
+from aiogram_dialog.widgets.text import Const
 
-from common.FSM import CommonFSM
-from common.filters import OwnerFilter, NoKeyboardFilter
-from common.keyboards.start import StartKeyboard
+from common.buttons import MAIN_MENU_BUTTON
 from config import settings
-from ..FSM.admin import AdminStates
-from ..keyboards.admin import AdminKeyboard
-
-admin_router = Router(name="admin")
+from ..FSM.admin import AdminFSM
 
 
-@admin_router.message(
-    AdminStates.confirm_delete_birthdays,
-    NoKeyboardFilter(),
-)
-@admin_router.message(
-    CommonFSM.start,
-    OwnerFilter(),
-    F.text == StartKeyboard.Buttons.admin,
-)
-async def start_admin(message: types.Message,
-                      state: FSMContext):
-    await state.set_state(AdminStates.start)
-
-    await message.answer(
-        text="Выберите действие:",
-        reply_markup=AdminKeyboard.build()
-    )
-
-
-@admin_router.message(
-    AdminStates.start,
-    F.text == AdminKeyboard.Buttons.get_logs,
-)
-async def get_logs(message: types.Message):
+async def get_logs(callback: types.CallbackQuery,
+                   _: Button,
+                   manager: DialogManager):
     files = [
         types.FSInputFile(
             path=filename,
@@ -45,4 +21,22 @@ async def get_logs(message: types.Message):
         if os.path.getsize(filename)  # check file is not empty
     ]
     media = [types.InputMediaDocument(media=file) for file in files]
-    await message.answer_media_group(media)
+    if not media:
+        await callback.answer("Нет файлов логов :(")
+    else:
+        await callback.message.answer_media_group(media)
+        manager.show_mode = ShowMode.DELETE_AND_SEND
+
+
+admin_main_dialog = Dialog(
+    Window(
+        Const("Выберите действие:"),
+        Button(
+            Const("Файлы логов"),
+            id="logs",
+            on_click=get_logs
+        ),
+        MAIN_MENU_BUTTON,
+        state=AdminFSM.state
+    )
+)

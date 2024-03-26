@@ -8,7 +8,7 @@ from selenium.webdriver.remote.webelement import WebElement
 
 from common.utils.decorators import set_async, coro_timer
 from .. import settings
-from ..filters.inn_filter import INNSchema
+from ..factory.inn import INNSchema
 
 
 class SeleniumTimeout(TimeoutError):

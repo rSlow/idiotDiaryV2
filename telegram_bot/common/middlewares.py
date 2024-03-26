@@ -1,10 +1,10 @@
 from typing import Any
 
-from aiogram import BaseMiddleware
-from aiogram.types import TelegramObject
+from aiogram import BaseMiddleware, Dispatcher
+from aiogram.types import TelegramObject, User
 from sqlalchemy.ext.asyncio import async_sessionmaker
 
-from config import types
+from common.types import HandlerType
 
 
 class DbSessionMiddleware(BaseMiddleware):
@@ -14,7 +14,7 @@ class DbSessionMiddleware(BaseMiddleware):
 
     async def __call__(
             self,
-            handler: types.HANDLER_TYPE,
+            handler: HandlerType,
             event: TelegramObject,
             data: dict[str, Any],
     ) -> Any:
@@ -30,11 +30,20 @@ class ContextMiddleware(BaseMiddleware):
 
     async def __call__(
             self,
-            handler: types.HANDLER_TYPE,
+            handler: HandlerType,
             event: TelegramObject,
             data: dict[str, Any],
     ) -> Any:
         data.update(self.context)
-        user_id = event.event.from_user.id
-        data["user_id"] = user_id
+
+        event_from_user: User = data.get("event_from_user")
+        data["user_id"] = event_from_user.id
+
         return await handler(event, data)
+
+
+def register_middlewares(middlewares: list[BaseMiddleware],
+                         dispatcher: Dispatcher):
+    for middleware in middlewares:
+        dispatcher.update.middleware(middleware)
+        dispatcher.error.middleware(middleware)

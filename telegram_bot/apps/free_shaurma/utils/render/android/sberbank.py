@@ -5,9 +5,12 @@ from .. import settings
 from ..image_io_context import ImageIOContext
 from ...main import grade
 
+X = 1080
+
 
 def sberbank_sberbank_phone_android(name: int,
-                                    transfer_sum: int | float):
+                                    transfer_sum: int | float,
+                                    **__):
     str_transfer_sum = f"{transfer_sum}".replace(".", ",")
 
     with ImageIOContext(settings.template_sberbank_android) as context:
@@ -15,7 +18,7 @@ def sberbank_sberbank_phone_android(name: int,
 
         # Имя
         draw.text(
-            xy=(540, 780),
+            xy=(X / 2, 780),
             text=f"{name}",
             font=ImageFont.truetype(
                 font=settings.font_android,
@@ -26,7 +29,7 @@ def sberbank_sberbank_phone_android(name: int,
 
         # Сумма перевода
         draw.text(
-            xy=(540, 660),
+            xy=(X / 2, 660),
             text=f"{grade(str_transfer_sum)} ₽",
             font=ImageFont.truetype(
                 font=settings.font_android,

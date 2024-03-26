@@ -1,38 +1,12 @@
-from abc import ABC
-from typing import Any, Iterable
+import re
+from re import Pattern
+from typing import Any
 
 from aiogram.filters import BaseFilter
-from aiogram.types import TelegramObject, Message
+from aiogram.types import TelegramObject
 
+from common.types import UserIDType
 from config import settings
-from .keyboards.base import YesNoKeyboard, BackKeyboard
-
-UserIDType = str | Iterable[str]
-
-
-class MessageTextFilter(BaseFilter, ABC):
-    def __init__(self, text: str):
-        self.text = text
-
-    async def __call__(self, message: Message):
-        if message.text == self.text:
-            return True
-        return False
-
-
-class YesKeyboardFilter(MessageTextFilter):
-    def __init__(self):
-        super().__init__(text=YesNoKeyboard.Buttons.yes)
-
-
-class NoKeyboardFilter(MessageTextFilter):
-    def __init__(self):
-        super().__init__(text=YesNoKeyboard.Buttons.no)
-
-
-class BackFilter(MessageTextFilter):
-    def __init__(self):
-        super().__init__(text=BackKeyboard.Buttons.back)
 
 
 class UserIDFilter(BaseFilter):
@@ -58,3 +32,13 @@ class OwnerFilter(UserIDFilter):
 class BirthdaysAllowedFilter(UserIDFilter):
     def __init__(self):
         super().__init__(settings.BIRTHDAYS_ALLOWED)
+
+
+def regexp_factory(pattern: str | Pattern[str]):
+    def _factory(value: str):
+        res = re.match(pattern, value)
+        if res is None:
+            raise ValueError
+        return value
+
+    return _factory

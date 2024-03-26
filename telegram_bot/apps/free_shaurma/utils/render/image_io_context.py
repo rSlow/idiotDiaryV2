@@ -8,7 +8,7 @@ from PIL import Image, ImageDraw
 
 @dataclass
 class EnterContext:
-    draw: ImageDraw.Draw
+    draw: ImageDraw
     io: BytesIO
     image: Image
 

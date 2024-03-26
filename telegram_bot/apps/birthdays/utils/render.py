@@ -7,7 +7,7 @@ from ..ORM.birthdays import Birthday
 from ..ORM.notifications import NotificationTime
 
 
-def render_check_birthdays(dates: dict[date, Sequence[Birthday]]) -> str:
+def render_check_birthdays(dates: dict[date, list[Birthday]]) -> str:
     return render_template(
         template_name="day_birthdays.jinja2",
         data={"dates": dates},
@@ -27,21 +27,5 @@ def render_schedule_birthdays(today: date,
             "today_birthdays": today_birthdays,
             "tomorrow_birthdays": tomorrow_birthdays
         },
-        templates_dir=birthdays_settings.TEMPLATES_DIR
-    )
-
-
-def render_notifications(notifications: Sequence[NotificationTime]) -> str:
-    times = [notification.time for notification in notifications]
-    return render_template(
-        template_name="notifications.jinja2",
-        data={"times": times},
-        templates_dir=birthdays_settings.TEMPLATES_DIR
-    )
-
-
-def render_time_correction() -> str:
-    return render_template(
-        template_name="time_correction.jinja2",
         templates_dir=birthdays_settings.TEMPLATES_DIR
     )

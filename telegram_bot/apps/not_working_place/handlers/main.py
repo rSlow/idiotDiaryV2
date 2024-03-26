@@ -1,45 +1,44 @@
-from aiogram import types, F, Router
-from aiogram.fsm.context import FSMContext
+from aiogram_dialog import Dialog, Window
+from aiogram_dialog.widgets.kbd import Start
+from aiogram_dialog.widgets.text import Const
 
-from common.FSM import CommonFSM
-from common.keyboards.start import StartKeyboard
-from ..FSM.start import NWPStartFSM
-from ..keyboards.main import NotWorkingPlaceKeyboard
+from common.buttons import MAIN_MENU_BUTTON
+from ..states import VoiceFSM
+from ..states import ImagesZipFSM
+from ..states import INNParserFSM
+from ..states import MorphFIOFSM
+from ..states import NWPStartFSM
+from ..states import VideoNoteFSM
 
-start_nwp_router = Router()
-
-
-@start_nwp_router.message(
-    CommonFSM.start,
-    F.text == StartKeyboard.Buttons.not_working_place,
+nwp_menu = Dialog(
+    Window(
+        Const("(не)рабочая площадка. Выберите действие:"),
+        Start(
+            Const("Запаковать 💼"),
+            id="pack",
+            state=ImagesZipFSM.state,
+        ),
+        Start(
+            Const("Склонения 💬"),
+            id="morph",
+            state=MorphFIOFSM.state,
+        ),
+        Start(
+            Const("Скачать кружочек 📹"),
+            id="download_video_note",
+            state=VideoNoteFSM.state,
+        ),
+        Start(
+            Const("Конвертировать голосовое 🎤"),
+            id="convert_voice",
+            state=VoiceFSM.state,
+        ),
+        Start(
+            Const("Узнать ИНН 📇"),
+            id="inn_parse",
+            state=INNParserFSM.state,
+        ),
+        MAIN_MENU_BUTTON,
+        state=NWPStartFSM.state,
+    )
 )
-async def start_nwp(message: types.Message,
-                    state: FSMContext,
-                    text: str | None = None):
-    await main(
-        message=message,
-        state=state,
-        text=text if text else "(не)рабочая площадка. Выберите действие:"
-    )
-
-
-async def back_to_main(message: types.Message,
-                       state: FSMContext):
-    await main(
-        message=message,
-        state=state,
-        text="Возвращаю в главное меню площадки..."
-    )
-
-
-async def main(message: types.Message,
-               state: FSMContext,
-               text: str):
-    await state.set_state(NWPStartFSM.main)
-
-    await message.answer(
-        text=text,
-        reply_markup=NotWorkingPlaceKeyboard.build(
-            validator_args={"user_id": message.from_user.id}
-        )
-    )

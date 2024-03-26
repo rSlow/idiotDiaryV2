@@ -6,12 +6,11 @@ _T = TypeVar('_T')
 
 
 def coro_timer(timeout: int | float, exc: Type[Exception] | Exception | None = None):
-    def decorator(func: Callable[[Any, Any], Coroutine[None, None, _T]]) -> _T:
-        @wraps(func)
+    def decorator(coro: Callable[[Any, Any], Coroutine[None, None, _T]]) -> _T:
+        @wraps(coro)
         async def wrapper(*args: Any, **kwargs: Any):
-            coro = func(*args, **kwargs)
             try:
-                return await asyncio.wait_for(coro, timeout=timeout)
+                return await asyncio.wait_for(coro(*args, **kwargs), timeout=timeout)
             except asyncio.TimeoutError:
                 if exc is not None:
                     raise exc

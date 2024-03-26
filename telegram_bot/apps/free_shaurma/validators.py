@@ -1,29 +1,24 @@
-from abc import ABC, abstractmethod
-from typing import Any
+from abc import abstractmethod
+from dataclasses import dataclass
+from typing import Any, Protocol, Optional
 
 
-class ValidationError(AssertionError):
-    pass
-
-
-class BaseStateValidator(ABC):
-    def __init__(self,
-                 error_text: str | None):
-        self.error_text = error_text
+@dataclass
+class BaseTypeFactory(Protocol):
+    error_text: Optional[str]
 
     @abstractmethod
-    def validate(self, value: Any) -> Any:
+    def __call__(self, text: str) -> Any:
         ...
 
 
-class NameValidator(BaseStateValidator):
-    def __init__(self):
-        super().__init__(error_text="Неправильный формат имени. Попробуйте еще раз...")
+class NameTypeFactory(BaseTypeFactory):
+    error_text = "Неправильный формат имени. Попробуйте еще раз..."
 
-    def validate(self, value: str) -> str:
-        list_initials = value.split()
+    def __call__(self, text: str) -> str:
+        list_initials = text.split()
         if len(list_initials) == 0:
-            raise ValidationError
+            raise ValueError
 
         last_initial = list_initials[-1]
         first_initials = list_initials[:-1]
@@ -40,30 +35,24 @@ class NameValidator(BaseStateValidator):
         return validated_name
 
 
-class SumValidator(BaseStateValidator):
-    def __init__(self):
-        super().__init__(error_text="Неправильная форма суммы. Попробуйте еще раз...")
+class SumTypeFactory(BaseTypeFactory):
+    error_text = "Неправильный формат суммы. Попробуйте еще раз..."
 
-    def validate(self,
-                 value: str) -> int | float:
-        transfer_sum_edited = value.replace(",", ".")
-        try:
-            float_transfer_sum = round(float(transfer_sum_edited), 2)
-            int_transfer_sum = int(float_transfer_sum)
-            if float_transfer_sum == int_transfer_sum:
-                return int_transfer_sum
-            else:
-                return float_transfer_sum
-        except ValueError:
-            raise ValidationError
+    def __call__(self, text: str) -> int | float:
+        transfer_sum_edited = text.replace(",", ".")
+        float_transfer_sum = round(float(transfer_sum_edited), 2)
+        int_transfer_sum = int(float_transfer_sum)
+        if float_transfer_sum == int_transfer_sum:
+            return int_transfer_sum
+        else:
+            return float_transfer_sum
 
 
-class PhoneValidator(BaseStateValidator):
-    def __init__(self):
-        super().__init__(error_text="Неправильный формат номера. Попробуйте еще раз...")
+class PhoneTypeFactory(BaseTypeFactory):
+    error_text = "Неправильный формат телефона. Попробуйте еще раз..."
 
-    def validate(self, value: str) -> str:
-        digits = list(filter(lambda v: v.isdigit(), value))
+    def __call__(self, text: str) -> str:
+        digits = list(filter(lambda v: v.isdigit(), text))
 
         try:
             if (digits[0] == "8" or digits[0] == "7") and len(digits) == 11:
@@ -71,9 +60,9 @@ class PhoneValidator(BaseStateValidator):
             elif digits[0] == "9" and len(digits) == 10:
                 digits.insert(0, "+7")
             else:
-                raise ValidationError
+                raise ValueError
         except IndexError:
-            raise ValidationError
+            raise ValueError
 
         return f"{digits[0]} " \
                f"({''.join(digits[1:4])})" \

@@ -1,73 +1,36 @@
-import asyncio
-from typing import Any
+from aiogram import types
+from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
+from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
+from aiogram_dialog.widgets.kbd import Button
+from aiogram_dialog.widgets.text import Const
 
-from aiogram import Router, F, types
-from aiogram.fsm.context import FSMContext
-from aiogram.types import BufferedInputFile
-
-from common.keyboards.base import CancelKeyboard
-from .main import music_start
+from common.filters import regexp_factory
+from common.buttons import MAIN_MENU_BUTTON, BACK_BUTTON, CANCEL_BUTTON
 from .. import settings
-from ..FSM.main import MusicState, YTDownloadState
-from ..keyboards.main import MusicMainKeyboard
-from ..keyboards.yt_downloader import TimecodeKeyboard
+from ..states import YTDownloadFSM
 from ..utils import audio
 
-music_yt_router = Router(name="music_yt")
+
+async def valid_link(_: types.Message,
+                     __: ManagedTextInput,
+                     manager: DialogManager,
+                     url: str):
+    manager.dialog_data.update({"url": url})
+    await manager.next()
 
 
-@music_yt_router.message(
-    MusicState.start,
-    F.text == MusicMainKeyboard.Buttons.download_from_yt,
-)
-async def start_download_audio(message: types.Message,
-                               state: FSMContext):
-    await state.set_state(YTDownloadState.url)
-    await state.update_data(yt_dlp={
-        "url": None,
-        "timecode": None
-    })
-    await message.answer(
-        text="Ожидаю ссылку на YouTube видео...",
-        reply_markup=CancelKeyboard.build()
-    )
+async def invalid_link(message: types.Message, *_):
+    await message.answer("Неверный формат ссылки.")
 
 
-@music_yt_router.message(
-    YTDownloadState.url,
-    F.text[F.regexp(settings.HTTPS_REGEXP)].as_("url"),
-)
-async def timecode_video(message: types.Message,
-                         state: FSMContext,
-                         url: str):
-    await state.set_state(YTDownloadState.timecode)
-    data = await state.get_data()
-    yt_data: dict[str, Any] = data["yt_dlp"]
-    yt_data.update(url=url)
-    await state.update_data(yt_dlp=yt_data)
-
-    await message.answer(
-        text="При необходимости отправьте таймкод в форматах:\n"
-             "  - ЧЧ:ММ:СС-ЧЧ:ММ:СС \n"
-             "  - ММ:СС-ММ:СС \n"
-             "или нажмите кнопку 'Полностью'",
-        reply_markup=TimecodeKeyboard.build()
-    )
-
-
-@music_yt_router.message(
-    YTDownloadState.timecode,
-    F.text[F.regexp(settings.FULL_TIMECODE_REGEXP)].as_("timecode"),
-)
-@music_yt_router.message(
-    YTDownloadState.timecode,
-    F.text == TimecodeKeyboard.Buttons.full,
-)
 async def download(message: types.Message,
-                   state: FSMContext,
-                   timecode: str | None = None):
-    await state.set_state(YTDownloadState.download)
-    url = (await state.get_data()).get("yt_dlp").get("url")
+                   manager: DialogManager):
+    data = manager.dialog_data
+    chat_id = message.chat.id
+    dialog_message_id: int = manager.current_stack().last_message_id
+
+    url = data.get("url")
+    timecode = data.get("timecode")
     if url is None:
         raise RuntimeError("url is None")
 
@@ -76,30 +39,76 @@ async def download(message: types.Message,
     else:
         from_time, to_time = None, None
 
-    service_message = await message.answer(
+    await message.bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=dialog_message_id,
         text="Начинаю скачивание..."
     )
     audio_io, filename = await audio.download_audio(url, from_time, to_time)
-    await service_message.edit_text(
+    await message.bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=dialog_message_id,
         text="Отправляю файл..."
     )
-    audio_file = BufferedInputFile(
+    audio_file = types.BufferedInputFile(
         file=audio_io,
         filename=filename
     )
     await message.answer_document(document=audio_file)
-    await service_message.delete()
-    await music_start(
-        message=message,
-        state=state
+
+    manager.show_mode = ShowMode.DELETE_AND_SEND
+    await manager.done()
+
+
+async def full_timecode(callback: types.CallbackQuery,
+                        _: Button,
+                        manager: DialogManager):
+    await download(callback.message, manager)
+
+
+async def valid_timecode(message: types.Message,
+                         __: ManagedTextInput,
+                         manager: DialogManager,
+                         timecode: str):
+    await message.delete()
+    manager.dialog_data.update({"timecode": timecode})
+    await download(message, manager)
+
+
+async def invalid_timecode(message: types.Message, *_):
+    await message.answer("Неверный формат таймкода.")
+
+
+music_yt_dialog = Dialog(
+    Window(
+        Const("Ожидаю ссылку на YouTube видео..."),
+        TextInput(
+            id="url",
+            on_success=valid_link,
+            on_error=invalid_link,
+            type_factory=regexp_factory(settings.HTTPS_REGEXP)
+        ),
+        CANCEL_BUTTON,
+        state=YTDownloadFSM.url
+    ),
+    Window(
+        Const("При необходимости отправьте таймкод в форматах:"),
+        Const("  - ЧЧ:ММ:СС-ЧЧ:ММ:СС"),
+        Const("  - ММ:СС-ММ:СС"),
+        Const("или нажмите кнопку 'Полностью'"),
+        Button(
+            Const("Полностью"),
+            id="full",
+            on_click=full_timecode
+        ),
+        TextInput(
+            id="timecode",
+            type_factory=regexp_factory(settings.FULL_TIMECODE_REGEXP),
+            on_success=valid_timecode,
+            on_error=invalid_timecode
+        ),
+        BACK_BUTTON,
+        MAIN_MENU_BUTTON,
+        state=YTDownloadFSM.timecode
     )
-
-
-@music_yt_router.message(
-    YTDownloadState.url,
-    ~(F.text.regexp(settings.HTTPS_REGEXP)),
 )
-async def invalid_link(message: types.Message):
-    service_message = await message.answer("Неверный формат ссылки.")
-    await asyncio.sleep(2)
-    await service_message.delete()

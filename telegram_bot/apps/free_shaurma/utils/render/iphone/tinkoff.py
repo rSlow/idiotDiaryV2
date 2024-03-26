@@ -12,7 +12,8 @@ y = 2436
 def tinkoff_tinkoff_phone_iphone(name: str,
                                  phone_num: str,
                                  start_sum: int | float,
-                                 transfer_sum: int | float):
+                                 transfer_sum: int | float,
+                                 **__):
     str_start_sum, str_transfer_sum, str_end_sum, changing_string = prepare_tinkoff_sums(
         start_sum=start_sum,
         transfer_sum=transfer_sum
@@ -53,7 +54,7 @@ def tinkoff_tinkoff_phone_iphone(name: str,
 
         # Номер телефона
         draw.text(
-            xy=(x / 2, 1290),
+            xy=(x / 2, 1300),
             text=f"{phone_num}",
             font=ImageFont.truetype(
                 font=settings.font_iphone_thin,

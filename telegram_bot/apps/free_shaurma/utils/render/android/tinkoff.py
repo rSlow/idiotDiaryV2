@@ -5,11 +5,14 @@ from .. import settings
 from ..image_io_context import ImageIOContext
 from ...prepare_data import prepare_tinkoff_sums
 
+X = 1080
+
 
 def tinkoff_tinkoff_phone_android(name: str,
                                   phone_num: str,
                                   start_sum: int,
-                                  transfer_sum: int | float):
+                                  transfer_sum: int | float,
+                                  **__):
     str_start_sum, str_transfer_sum, str_end_sum, changing_string = prepare_tinkoff_sums(
         start_sum=start_sum,
         transfer_sum=transfer_sum
@@ -20,9 +23,9 @@ def tinkoff_tinkoff_phone_android(name: str,
     )
     length_line = stroked_font.getlength(str_start_sum)
     length_full = stroked_font.getlength(changing_string)
-    start_changing_string = 1080 / 2 - length_full / 2
+    start_changing_string = X / 2 - length_full / 2
 
-    with ImageIOContext(settings.template_tinkoff_phone_iphone) as context:
+    with ImageIOContext(settings.template_tinkoff_phone_android) as context:
         draw = context.draw
 
         # Время
@@ -37,7 +40,7 @@ def tinkoff_tinkoff_phone_android(name: str,
 
         # Имя
         draw.text(
-            xy=(540, 920),
+            xy=(X / 2, 920),
             text=f"{name}",
             font=ImageFont.truetype(
                 font=settings.font_android,
@@ -49,7 +52,7 @@ def tinkoff_tinkoff_phone_android(name: str,
 
         # Номер телефона
         draw.text(
-            xy=(540, 1260),
+            xy=(X / 2, 1260),
             text=f"{phone_num}",
             font=ImageFont.truetype(
                 font=settings.font_android,
@@ -60,7 +63,7 @@ def tinkoff_tinkoff_phone_android(name: str,
         )
         # Сумма перевода
         draw.text(
-            xy=(540, 760),
+            xy=(X / 2, 760),
             text=f"- {str_transfer_sum}",
             font=ImageFont.truetype(
                 font=settings.font_android,
@@ -72,7 +75,7 @@ def tinkoff_tinkoff_phone_android(name: str,
 
         # Изменение суммы
         draw.text(
-            xy=(540, 640),
+            xy=(X / 2, 640),
             text=changing_string,
             font=stroked_font,
             anchor="mm",

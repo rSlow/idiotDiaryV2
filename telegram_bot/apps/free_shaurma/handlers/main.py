@@ -1,127 +1,149 @@
-from aiogram import types, Router, F
-from aiogram.filters import Command
-from aiogram.fsm.context import FSMContext
+from operator import itemgetter
 
-from common.FSM import CommonFSM
+from aiogram import types, Router
+from aiogram.filters import Command
+from aiogram_dialog import Dialog, Window, DialogManager
+from aiogram_dialog.api.entities import Context
+from aiogram_dialog.widgets.kbd import Select, Button, Row
+from aiogram_dialog.widgets.text import Const, Format
+
+from common.buttons import CANCEL_BUTTON, BACK_BUTTON, MAIN_MENU_BUTTON
 from common.filters import OwnerFilter
-from common.keyboards.start import StartKeyboard
-from .. import settings
-from ..FSM.bank_forms import ChooseBankParams
-from ..FSM.modified_state import BankStatesGroup
-from ..keyboards.bank_prepare import FromBanksKeyboard, ToBanksKeyboard, DeviceKeyboard
-from ..schemas import enums
+from ..FSM import FShStartFSM
+from ..schemas.banks import ToBank
+from ..schemas.enums import DeviceNames, BankNames
 from ..settings import FSSettings
 from ..utils import send_files
 
-start_fsh_router = Router(name="start_fsh")
+
+async def devices_getter(**__):
+    devices = [
+        (device.value.device_type.value, device.value.device_type.name)
+        for device in FSSettings
+    ]
+    return {"devices": devices}
 
 
-@start_fsh_router.message(
-    CommonFSM.start,
-    F.text == StartKeyboard.Buttons.free_shaurma,
+async def set_device(_: types.CallbackQuery,
+                     __: Button,
+                     manager: DialogManager,
+                     device_id: str):
+    manager.dialog_data.update({"device": device_id})
+    await manager.next()
+
+
+async def from_banks_getter(aiogd_context: Context, **__):
+    device = aiogd_context.dialog_data.get("device")
+    from_banks = [
+        (bank.name_enum.value, bank.name_enum.name)
+        for bank in
+        FSSettings[device].value.from_banks
+    ]
+    return {"from_banks": from_banks}
+
+
+async def set_from_bank(_: types.CallbackQuery,
+                        __: Button,
+                        manager: DialogManager,
+                        from_bank_id: str):
+    manager.dialog_data.update({"from_bank": from_bank_id})
+    await manager.next()
+
+
+async def to_banks_getter(aiogd_context: Context, **__):
+    device = aiogd_context.dialog_data.get("device")
+    from_bank = aiogd_context.dialog_data.get("from_bank")
+    to_banks = [
+        (bank.name_enum.value, bank.name_enum.name)
+        for bank in
+        FSSettings[device].value[from_bank].to_banks
+    ]
+    return {"to_banks": to_banks}
+
+
+async def set_to_bank(_: types.CallbackQuery,
+                      __: Button,
+                      manager: DialogManager,
+                      to_bank_id: str):
+    data = manager.dialog_data
+    data.update({"to_bank": to_bank_id})
+
+    device = data["device"]
+    from_bank = data["from_bank"]
+    to_bank = data["to_bank"]
+
+    bank_form: ToBank = FSSettings[device].value[from_bank][to_bank]
+    form_states = bank_form.states_group
+    await manager.start(form_states.first())
+
+
+start_fsh_dialog = Dialog(
+    Window(
+        Const("(бес)платная шаурма. Выберите тип устройства:"),
+        Select(
+            Format("{item[0]}"),
+            id="devices",
+            item_id_getter=itemgetter(1),
+            items="devices",
+            on_click=set_device
+        ),
+        CANCEL_BUTTON,
+        getter=devices_getter,
+        state=FShStartFSM.device
+    ),
+    Window(
+        Const("Выберите банк для перевода:"),
+        Select(
+            Format("{item[0]}"),
+            id="from_banks",
+            item_id_getter=itemgetter(1),
+            items="from_banks",
+            on_click=set_from_bank
+        ),
+        Row(BACK_BUTTON, MAIN_MENU_BUTTON),
+        getter=from_banks_getter,
+        state=FShStartFSM.from_bank
+    ),
+    Window(
+        Const("Выберите банк для перевода:"),
+        Select(
+            Format("{item[0]}"),
+            id="to_banks",
+            item_id_getter=itemgetter(1),
+            items="to_banks",
+            on_click=set_to_bank
+        ),
+        Row(BACK_BUTTON, MAIN_MENU_BUTTON),
+        getter=to_banks_getter,
+        state=FShStartFSM.to_bank
+    ),
 )
-async def choose_device(message: types.Message,
-                        state: FSMContext):
-    await state.set_state(ChooseBankParams.device)
-
-    await message.answer(
-        text="(бес)платная шаурма. Выберите тип устройства:",
-        reply_markup=DeviceKeyboard.build()
-    )
-
-
-@start_fsh_router.message(
-    ChooseBankParams.device,
-    F.text[F.in_(enums.DeviceNames.as_value_list())].as_("device_value"),
-)
-async def choose_from_bank(message: types.Message,
-                           state: FSMContext,
-                           device_value: str):
-    device_enum = enums.DeviceNames.find_from_value(device_value)
-    await state.update_data(device=device_enum.name)
-
-    await state.set_state(ChooseBankParams.from_bank)
-
-    await message.answer(
-        text="Выберите банк для перевода:",
-        reply_markup=FromBanksKeyboard.build(
-            device_name=device_enum.name
-        )
-    )
-
-
-@start_fsh_router.message(
-    ChooseBankParams.from_bank,
-    F.text[F.in_(enums.BankNames.as_value_list())].as_("from_bank_value"),
-)
-async def choose_to_bank(message: types.Message, state: FSMContext, from_bank_value: str):
-    storage_data = await state.get_data()
-    device = storage_data["device"]
-
-    from_bank_name = enums.BankNames.find_from_value(from_bank_value).name
-
-    await state.update_data(from_bank=from_bank_name)
-
-    await state.set_state(ChooseBankParams.to_bank)
-
-    await message.answer(
-        text="Куда переводим?",
-        reply_markup=ToBanksKeyboard.build(
-            device_name=device,
-            bank_name=from_bank_name,
-        )
-    )
-
-
-@start_fsh_router.message(
-    ChooseBankParams.to_bank,
-    F.text[F.in_(enums.BankNames.as_value_list())].as_("to_bank_value"),
-)
-async def start_bank_cycle(message: types.Message, state: FSMContext, to_bank_value: str):
-    storage_data = await state.get_data()
-
-    device_name: str = storage_data["device"]
-    from_bank_name: str = storage_data["from_bank"]
-    to_bank_name: str = enums.BankNames.find_from_value(to_bank_value).name
-    await state.update_data(to_bank=to_bank_name)
-
-    bank_state_group: BankStatesGroup = settings.FSSettings[device_name].value[from_bank_name].state_group
-
-    await state.update_data({"bank_values": {}})
-
-    start_bank_state = bank_state_group.first()
-    await state.set_state(start_bank_state)
-    await message.answer(
-        text=start_bank_state.start_text,
-        reply_markup=start_bank_state.keyboard.build()
-    )
-
 
 # ---------- TEST ---------- #
 
-@start_fsh_router.message(
-    ChooseBankParams.device,
+test_fsh_router = Router(name="test_fsh")
+
+
+@test_fsh_router.message(
     OwnerFilter(),
-    Command("test"),
+    Command("test_fsh"),
 )
 async def test(message: types.Message):
-    from_bank_name = "tinkoff"
-    to_bank_name = "tinkoff"
-    device_name = "iphone"
+    from_bank_name = BankNames.tinkoff.name
+    to_bank_name = BankNames.tinkoff.name
+    device_name = DeviceNames.iphone.name
 
     render_func = FSSettings[device_name].value[from_bank_name][to_bank_name].render_func
 
-    image_io = render_func(
-        name="Евгений П.",
-        phone_num="+7 (914) 665-64-93",
-        start_sum=25434.56,
-        transfer_sum=250
-    )
+    data = {
+        "name": "Максим М.",
+        "phone_num": "+7 (914) 665-64-93",
+        "start_sum": 25434.56,
+        "transfer_sum": 250
+    }
 
     await send_files.send_file(
-        image_io=image_io,
         message=message,
-        from_bank=from_bank_name,
-        to_bank=to_bank_name,
-        device=device_name
+        render_func=render_func,
+        data=data
     )

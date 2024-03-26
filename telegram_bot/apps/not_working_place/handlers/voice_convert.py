@@ -1,78 +1,73 @@
-from asyncio import sleep
 from datetime import datetime
 
-from aiogram import F, Router
-from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, BufferedInputFile
+from aiogram import types
+from aiogram.enums import ContentType
+from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
+from aiogram_dialog.api.entities import Context
+from aiogram_dialog.widgets.input import TextInput, ManagedTextInput, MessageInput
+from aiogram_dialog.widgets.text import Const, Format
 
+from common.buttons import CANCEL_BUTTON
 from config import settings
-from ..FSM.convert_voice import ConvertVoiceFSM
-from ..FSM.start import NWPStartFSM
-from ..keyboards.main import NotWorkingPlaceKeyboard
-from ..keyboards.voice_convert import ConvertVideoKeyboard, ConvertAgainVideoKeyboard
+from ..states import VoiceFSM
 
-voice_convert_router = Router()
+DD_KEY = "VOICE_NAME"
 
 
-@voice_convert_router.message(
-    F.text == ConvertAgainVideoKeyboard.Buttons.again,
-    ConvertVoiceFSM.convert
-)
-@voice_convert_router.message(
-    F.text == NotWorkingPlaceKeyboard.Buttons.convert_voice,
-    NWPStartFSM.main
-)
-async def convert_voice_message_start(message: Message,
-                                      state: FSMContext):
-    await state.set_data({})
-    await state.set_state(ConvertVoiceFSM.start)
+async def convert_voice_message(message: types.Message,
+                                _: MessageInput,
+                                manager: DialogManager):
+    await message.delete()
 
-    await message.answer(
-        text=f"Ожидаю голосовое сообщение...\n"
-             f"Можно отправить перед голосовым текст, который возьмется за название файла.",
-        reply_markup=ConvertVideoKeyboard.build()
+    chat_id = message.chat.id
+    dialog_message_id: int = manager.current_stack().last_message_id
+    await message.bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=dialog_message_id,
+        text="Конвертирую..."
     )
 
-
-@voice_convert_router.message(
-    F.text,
-    ConvertVoiceFSM.start,
-)
-async def set_voice_file_text(message: Message,
-                              state: FSMContext):
-    await state.update_data({"VOICE_NAME": message.text})
-
-    inf_msg = await message.answer(
-        text=f"Название <i>{message.text}</i> принято.",
-    )
-    await sleep(2)
-    await inf_msg.delete()
-
-
-@voice_convert_router.message(
-    F.voice,
-    ConvertVoiceFSM.start,
-)
-async def convert_voice_message(message: Message,
-                                state: FSMContext):
-    await state.set_state(ConvertVoiceFSM.convert)
-
-    data = await state.get_data()
-    filename = data.get("VOICE_NAME")
-    if filename is None:
-        filename = datetime.now().astimezone(settings.TIMEZONE).isoformat()
-
-    voice_file_io = await message.bot.download(
-        file=message.voice.file_id
-    )
-    voice_file = BufferedInputFile(
+    filename = manager.dialog_data.get(DD_KEY, datetime.now().astimezone(settings.TIMEZONE).isoformat())
+    voice_file_io = await message.bot.download(file=message.voice.file_id)
+    voice_file = types.BufferedInputFile(
         file=voice_file_io.read(),
         filename=f"{filename}.mp3"
     )
-    await message.answer_document(
-        document=voice_file
+    await message.answer_document(document=voice_file)
+
+    manager.dialog_data.clear()
+    manager.show_mode = ShowMode.DELETE_AND_SEND
+
+
+async def set_voice_file_text(message: types.Message,
+                              _: ManagedTextInput,
+                              manager: DialogManager,
+                              text: str):
+    await message.delete()
+    manager.show_mode = ShowMode.EDIT
+    await manager.update({DD_KEY: text})
+
+
+async def getter(aiogd_context: Context, **__):
+    filename = aiogd_context.dialog_data.get(DD_KEY, "")
+    placeholder = "Можно отправить перед голосовым текст, который возьмется за название файла."
+    return {"filename": f"Название файла: <u>{filename}</u>" if filename else placeholder}
+
+
+voice_convert_dialog = Dialog(
+    Window(
+        Const("Ожидаю голосовое сообщение..."),
+        Format("{filename}"),
+        MessageInput(
+            func=convert_voice_message,
+            content_types=ContentType.VOICE
+        ),
+        TextInput(
+            id="voice_name",
+            on_success=set_voice_file_text
+        ),
+        CANCEL_BUTTON,
+        state=VoiceFSM.state,
+        getter=getter
     )
-    await message.answer(
-        text="Что делаем дальше?",
-        reply_markup=ConvertAgainVideoKeyboard.build()
-    )
+)

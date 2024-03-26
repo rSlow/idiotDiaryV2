@@ -1,53 +1,52 @@
 from datetime import datetime
 
-from aiogram import F, Router
-from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, BufferedInputFile
+from aiogram import types
+from aiogram.enums import ContentType
+from aiogram_dialog.widgets.input import MessageInput
 
-from .main import back_to_main
-from ..FSM.start import NWPStartFSM
-from ..FSM.video_note import DownloadVideoNoteFSM
-from ..keyboards.main import NotWorkingPlaceKeyboard
-from ..keyboards.video_note import DownloadVideoKeyboard
-
-video_note_router = Router(name="video_note")
+from common.buttons import CANCEL_BUTTON
+from ..states import VideoNoteFSM
+from aiogram_dialog import Dialog, Window, DialogManager, ShowMode
+from aiogram_dialog.widgets.text import Const
 
 
-@video_note_router.message(
-    F.text == NotWorkingPlaceKeyboard.Buttons.download_video_note,
-    NWPStartFSM.main
-)
-async def download_video_note_start(message: Message,
-                                    state: FSMContext):
-    await state.set_state(DownloadVideoNoteFSM.main)
-    await message.answer(
-        text="Ожидаю кружочек...",
-        reply_markup=DownloadVideoKeyboard.build()
+async def download_video_note(message: types.Message,
+                              _: MessageInput,
+                              manager: DialogManager):
+    await message.delete()
+
+    chat_id = message.chat.id
+    dialog_message_id: int = manager.current_stack().last_message_id
+    await message.bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=dialog_message_id,
+        text="Видеосообщение принято, обработка..."
     )
 
-
-@video_note_router.message(
-    F.video_note,
-    DownloadVideoNoteFSM.main
-)
-async def download_video_note(message: Message,
-                              state: FSMContext):
-    await state.set_state(DownloadVideoNoteFSM.download)
-    receive_message = await message.answer("Видеосообщение принято, обработка...")
-    video_note_file_io = await message.bot.download(
-        file=message.video_note.file_id
-    )
-    video_note = BufferedInputFile(
+    video_note_file_io = await message.bot.download(file=message.video_note.file_id)
+    video_note = types.BufferedInputFile(
         file=video_note_file_io.read(),
         filename=f"{datetime.now().isoformat()}.mp4"
     )
-    await receive_message.delete()
-    send_message = await message.answer("Видео отправляется...")
-    await message.answer_document(
-        document=video_note
+
+    await message.bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=dialog_message_id,
+        text="Видео отправляется..."
     )
-    await send_message.delete()
-    await back_to_main(
-        message=message,
-        state=state
+
+    await message.answer_document(document=video_note)
+    manager.show_mode = ShowMode.DELETE_AND_SEND
+
+
+video_note_dialog = Dialog(
+    Window(
+        Const("Ожидаю кружочек..."),
+        MessageInput(
+            func=download_video_note,
+            content_types=ContentType.VIDEO_NOTE
+        ),
+        CANCEL_BUTTON,
+        state=VideoNoteFSM.state
     )
+)

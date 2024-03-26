@@ -1,6 +1,3 @@
-from aiogram.fsm.state import StatesGroup, State
+from common.FSM import FSMSingleFactory
 
-
-class AdminStates(StatesGroup):
-    start = State()
-    confirm_delete_birthdays = State()
+AdminFSM = FSMSingleFactory("AdminFSM", "main")

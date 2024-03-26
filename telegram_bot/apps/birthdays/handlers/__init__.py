@@ -1,15 +1,19 @@
 from aiogram import Router
 
 from common.filters import BirthdaysAllowedFilter
-from .check_birthdays import main_birthday_router
-from .notifications import notifications_router
-from .time_correction import time_correction_router
+from .clear import clear_dialog
+from .main import main_birthday_dialog
+from .notifications import notifications_dialog, clear_notifications_dialog, add_time_notification_dialog
+from .time_correction import time_correction_dialog
 
 birthdays_router = Router(name="birthdays")
 birthdays_router.message.filter(BirthdaysAllowedFilter())
 
 birthdays_router.include_routers(
-    main_birthday_router,
-    notifications_router,
-    time_correction_router,
+    main_birthday_dialog,
+    clear_dialog,
+    time_correction_dialog,
+    notifications_dialog,
+    clear_notifications_dialog,
+    add_time_notification_dialog,
 )
