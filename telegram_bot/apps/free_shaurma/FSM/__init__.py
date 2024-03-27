@@ -1,9 +1,11 @@
-from .sberbank import SberbankForm
-from .tinkoff import TinkoffForm
+from .sberbank import AndroidSberbankForm, IPhoneSberbankForm
+from .tinkoff import AndroidTinkoffForm, IPhoneTinkoffForm
 from .prepare import FShStartFSM
 
 __all__ = (
-    "SberbankForm",
-    "TinkoffForm",
-    "FShStartFSM"
+    "AndroidSberbankForm",
+    "IPhoneSberbankForm",
+    "AndroidTinkoffForm",
+    "AndroidTinkoffForm",
+    "IPhoneTinkoffForm"
 )

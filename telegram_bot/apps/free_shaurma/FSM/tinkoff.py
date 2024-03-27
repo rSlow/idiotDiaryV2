@@ -24,7 +24,7 @@ async def random_sum_click(_: CallbackQuery,
     await manager.next()
 
 
-class TinkoffForm(FormStatesGroup):
+class BaseTinkoffForm(FormStatesGroup):
     name = FormState(
         Const("Введите имя получателя:\n\n"
               "Поддерживаемый формат:\n"
@@ -51,3 +51,11 @@ class TinkoffForm(FormStatesGroup):
         Const("Введите сумму перевода:"),
         type_factory=validators.SumTypeFactory
     )
+
+
+class AndroidTinkoffForm(BaseTinkoffForm):
+    pass
+
+
+class IPhoneTinkoffForm(BaseTinkoffForm):
+    pass

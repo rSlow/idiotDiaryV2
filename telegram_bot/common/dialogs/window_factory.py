@@ -1,6 +1,7 @@
 import inspect
 from abc import abstractmethod
 from dataclasses import dataclass, field
+from functools import wraps
 from typing import Optional, no_type_check, Any, Callable, Protocol
 
 from aiogram import types
@@ -73,7 +74,7 @@ class FormState(State):
     def __init__(self,
                  *texts: Text,
                  keyboard: Optional[Keyboard] = None,
-                 type_factory: type[BaseTypeFactory] = str,
+                 type_factory: Optional[type[BaseTypeFactory]] = str,
                  on_success: Optional[OnSuccess] = None,
                  on_error: Optional[OnError] = None,
                  _filter: Optional[Callable[..., Any]] = None,
@@ -143,10 +144,17 @@ class FormStatesGroupMeta(StatesGroupMeta):
         states = []
         childs = []
 
+        base: mcs = bases[0]
+        for base_state in base:
+            if isinstance(base_state, FormState):
+                state_name = base_state.state_name
+                base_state.set_parent(cls)
+                namespace[state_name] = base_state
+
         for name, arg in namespace.items():
             if isinstance(arg, FormState):
                 states.append(arg)
-            elif inspect.isclass(arg) and issubclass(arg, StatesGroup):
+            elif inspect.isclass(arg) and issubclass(arg, FormStatesGroup):
                 childs.append(arg)
                 arg.__parent__ = cls
 
@@ -197,6 +205,7 @@ class WindowFactory:
     template: WindowTemplate = field(default_factory=WindowTemplate)
 
     def _on_click_last_state(self, on_success: OnSuccess) -> OnSuccess:
+        @wraps(self.on_finish)
         async def _on_success(message: types.Message,
                               text_input: ManagedTextInput,
                               manager: DialogManager,

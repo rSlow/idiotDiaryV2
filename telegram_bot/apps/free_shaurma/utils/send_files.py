@@ -1,3 +1,4 @@
+from functools import wraps
 from io import BytesIO
 from typing import Callable, Awaitable
 
@@ -14,6 +15,7 @@ OnFinish = Callable[[types.Message, DialogManager], Awaitable]
 
 
 def render_callback(func: RenderFunc) -> OnFinish:
+    @wraps(func)
     async def on_finish(message: types.Message,
                         manager: DialogManager):
         await send_file(

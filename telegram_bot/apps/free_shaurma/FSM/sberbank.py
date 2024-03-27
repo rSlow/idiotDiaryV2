@@ -4,7 +4,7 @@ from common.dialogs import FormStatesGroup, FormState
 from .. import validators
 
 
-class SberbankForm(FormStatesGroup):
+class BaseSberbankForm(FormStatesGroup, abstract=True):
     name = FormState(
         Const("Введите имя:\n\n"
               "Поддерживаемый формат:\n"
@@ -16,3 +16,11 @@ class SberbankForm(FormStatesGroup):
         Const("Введите сумму перевода:"),
         type_factory=validators.SumTypeFactory
     )
+
+
+class AndroidSberbankForm(BaseSberbankForm):
+    pass
+
+
+class IPhoneSberbankForm(BaseSberbankForm):
+    pass
