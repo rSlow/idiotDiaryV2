@@ -2,7 +2,7 @@ import inspect
 from abc import abstractmethod
 from dataclasses import dataclass, field
 from functools import wraps
-from typing import Optional, no_type_check, Any, Callable, Protocol
+from typing import Optional, no_type_check, Any, Callable, Protocol, Self
 
 from aiogram import types
 from aiogram.fsm.state import StatesGroup, State, StatesGroupMeta
@@ -133,6 +133,22 @@ class FormState(State):
         if type_factory.error_text is not None:
             await message.answer(type_factory.error_text)
 
+    def copy(self):
+        cls: type[Self] = type(self)
+        return cls(
+            *self.texts,
+            state=self._state,
+            group_name=self._group_name,
+            keyboard=self.keyboard,
+            type_factory=self.type_factory,
+            on_success=self._on_success,
+            on_error=self._on_error,
+            _filter=self.filter,
+            show_current_value=self.show_current_value,
+            current_value_text=self.current_value_text,
+            getter=self.getter
+        )
+
 
 class FormStatesGroupMeta(StatesGroupMeta):
     __states__: tuple[FormState, ...]
@@ -148,8 +164,9 @@ class FormStatesGroupMeta(StatesGroupMeta):
         for base_state in base:
             if isinstance(base_state, FormState):
                 state_name = base_state.state_name
-                base_state.set_parent(cls)
-                namespace[state_name] = base_state
+                state_copy = base_state.copy()
+                state_copy.set_parent(cls)
+                namespace[state_name] = state_copy
 
         for name, arg in namespace.items():
             if isinstance(arg, FormState):
