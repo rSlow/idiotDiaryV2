@@ -28,8 +28,8 @@ if __name__ == '__main__':
         )
 
     dp.include_routers(
-        start_router,
         error_router,
+        start_router,
         main_menu,
         apps_router,
     )

@@ -40,6 +40,7 @@ async def big_duration_audio_error(_: types.ErrorEvent,
                                    **__):
     await message.answer("Видео, на которое вы отправили ссылку, идет более 10 минут. По техническим причинам "
                          "на данный момент скачивание аудио более 10 минут невозможно.")
+    dialog_manager.show_mode = ShowMode.DELETE_AND_SEND
     await dialog_manager.done()
 
 
@@ -50,5 +51,5 @@ async def big_duration_audio_error(_: types.ErrorEvent,
 async def download_error(error: types.ErrorEvent,
                          message: types.Message,
                          dialog_manager: DialogManager):
-    dialog_manager.show_mode = ShowMode.SEND
+    dialog_manager.show_mode = ShowMode.DELETE_AND_SEND
     await message.answer(f"Ошибка скачивания видео: <b>{error.exception.args[0]}</b>.")
