@@ -1,26 +1,26 @@
 # Collection of Python Telegram [bots](https://t.me/idiotDiaryV2Bot) from [@rs1ow](https://t.me/rs1ow )
 
 ## Based on:
-
 ---
 
 1. [python 3.11](https://www.python.org/downloads/release/python-3110)
 2. [aiogram](https://aiogram.dev), `version: 3.1.1` - async Telegram bot app for Python
-3. [SQLAlchemy](https://www.sqlalchemy.org), `version: 2.0` - ORM for Postgres database
-4. [apscheduler](https://apscheduler.readthedocs.io/en/3.x/), `version: 3.10.4` - for scheduled tasks in birthdays app
-5. [alembic](https://alembic.sqlalchemy.org/en/latest), `version: 1.12.0` - applying migrations to SQLAlchemy
-6. [redis](https://redis.io/docs/connect/clients/python), `version: latest` - for using RedisStorage in aiogram
-7. [aiohttp](https://docs.aiohttp.org/en/stable), `version: 4.0` - web server for webhook, as well as for HTTP requests
-8. [nginx](https://hub.docker.com/_/nginx), `version: latest` - web server for aiohttp, + SSL
-9. [selenium](https://hub.docker.com/r/selenium/standalone-chrome), `version: standalone-chrome`, as a docker
-   container - for parsing sites
-10. [eyed3](https://eyed3.readthedocs.io/en/latest), `version: 0.9.7` - editing MP3 tags
-11. [yt-dlp](https://github.com/yt-dlp/yt-dlp), `version: 2023.10.13` - download videos from YouTube
-12. [ffmpeg](https://www.ffmpeg.org), `version: latest (apt)` - downloader for yt-dlp
-13. [Jinja2](https://jinja.palletsprojects.com), `version: 3.1.2` - generating template messages
+3. [aiogram-dialog](https://github.com/Tishka17/aiogram_dialog), `version: 2.2.0a3` - framework for developing
+   interactive telegram messages
+4. [SQLAlchemy](https://www.sqlalchemy.org), `version: 2.0` - ORM for Postgres database
+5. [apscheduler](https://apscheduler.readthedocs.io/en/3.x/), `version: 3.10.4` - for scheduled tasks in birthdays app
+6. [alembic](https://alembic.sqlalchemy.org/en/latest), `version: 1.12.0` - applying migrations to SQLAlchemy
+7. [redis](https://redis.io/docs/connect/clients/python), `version: latest` - for using RedisStorage in aiogram
+8. [aiohttp](https://docs.aiohttp.org/en/stable), `version: 4.0` - web server for webhook, as well as for HTTP requests
+9. [nginx](https://hub.docker.com/_/nginx), `version: latest` - web server for aiohttp, + SSL
+10. [selenium](https://hub.docker.com/r/selenium/standalone-chrome), `version: standalone-chrome`, as a docker
+    container - for parsing sites
+11. [eyed3](https://eyed3.readthedocs.io/en/latest), `version: 0.9.7` - editing MP3 tags
+12. [yt-dlp](https://github.com/yt-dlp/yt-dlp), `version: 2023.10.13` - download videos from YouTube
+13. [ffmpeg](https://www.ffmpeg.org), `version: latest (apt)` - downloader for yt-dlp
+14. [Jinja2](https://jinja.palletsprojects.com), `version: 3.1.2` - generating template messages
 
 ## Bot Applications:
-
 ---
 
 ### 1. not working place 😶‍🌫️
@@ -84,6 +84,7 @@
 
 | Env variable        | Mean                                                                                |
 |:--------------------|:------------------------------------------------------------------------------------|
+| `DEBUG`             | debug mode                                                                          |
 | `TIMEZONE`          | pytz timezone, required to send notifications using scheduler                       |
 | `WEBHOOK_SECRET`    | secret token for checking the telegram validity of a webhook request                |
 | `BASE_WEBHOOK_PORT` | port for telegram webhook. By default, `443`, but it is possible to use `8443` port |
@@ -198,7 +199,7 @@ chmod +x ./update.sh && ./update.sh
 | `404`  | row with this uuid was not found |
 | `422`  | in case of validation error      |
 
-## Features:
+## Python features:
 
 ---
 
@@ -225,95 +226,39 @@ chmod +x ./update.sh && ./update.sh
         ...
     ```
 
-- It is possible to use the modified aiogram storage `MemoryStorage` - `ModifiedMemoryStorage`
-    - the point is that redis in **pooling** mode does not have time to save data to storage, which is why some of the
-      data may get lost.
-    - MemoryStorage does not have such a problem, but at the same time it is impossible to save even the FSM state in
-      MemoryStorage.
-    - ModifiedMemoryStorage allows you to store states in SQL, in a separate states table - and load them pre
-      reboot the bot. However, the storage data will still be lost on reboot. However, such a way out is still
-      better than the possible loss of data when saving to redis.
-    - **BUT**: in the bot launch mode via webhook, this problem with redis is irrelevant.
-
-## Keyboard Builder:
+## Aiogram-dialog
 
 ---
 
-```python
-### Reply Keyboard Builder
+### 1. WindowFactory
 
-from common.keyboards.base import BaseReplyKeyboardBuilder, ButtonWithValidator
-from common.keyboards.base_validators import UserIDValidator
+#### allows you to generate a dialog consisting of several (unlimited number of) windows according to a template
 
+the number of windows is generated based on the transferred object `FormStatesGroup`, from which all `FormState` are
+taken in order
+it is possible to move back and forth through the data entry form
 
-class CustomKeyboard(BaseReplyKeyboardBuilder):
-    class Buttons:
-        button_1 = "Some Button"
-        button_2 = "Another Button"
-        button_3_with_valid = "Validation_button"
-
-    buttons_list = [
-        Buttons.button_1,
-        Buttons.button_2,
-        ButtonWithValidator(
-            text=Buttons.button_3_with_valid,
-            validator=UserIDValidator(
-                user_id="12345678"
-            )
-        ),
-    ]
-    add_on_main_button = False
-    validator_args = {"user_id": 12345678}
-    row_width = 1
-```
-
-### Possible params of BaseKeyboardBuilder:
-
-| Param                     | Type                | Explanation                                                                                                          |
-|:--------------------------|:--------------------|----------------------------------------------------------------------------------------------------------------------|
-| `buttons_list`            | `list`              | List of objects to be converted to buttons. `str`, `KeyboardButton`, `EnumType` or `ButtonWithValidator` are allowed |
-| `resize_keyboard`         | `bool`              | Adjusting the size of buttons by height                                                                              |
-| `input_field_placeholder` | `bool`              | Text with an empty input line                                                                                        |
-| `one_time_keyboard`       | `bool`              | Hiding the keyboard after pressing the button                                                                        |
-| `is_persistent`           | `bool`              | Always show the keyboard when the normal keyboard is hidden                                                          |
-| `selective`               | `bool`              | set keyboard as selective                                                                                            |
-| `row_width`               | `int or tuple[int]` | The number of buttons in the keyboard in width. Passed to `adjust()`                                                 |
-| `add_on_main_button`      | `bool`              | Adding the `Home` button                                                                                             |
-| `on_main_button_text`     | `str`               | text of the `Home` button                                                                                            |
-| `validator_args`          | `dict[str, Any]`    | dictionary consisting of keys and values for button validation                                                       |
-
-### Button with validator:
+to create a dialog, you need to call the `.create_dialog()` method on the `WindowFactory()` object
 
 ```python
-# Validator
-
-from common.keyboards.base_validators import BaseButtonValidator
-
-
-class IsOwnerValidator(BaseButtonValidator):
-    arg_name = "user_id"
-
-    def __init__(self, user_id: str):
-        super().__init__()
-        self.user_id = user_id
-
-    # in this method you set, how will work mathing values 
-    def validate(self, value: str) -> bool:
-        if str(value) != self.user_id:
-            return False
-        return True
+WindowFactory(
+    states_group=some_states_group,
+    on_finish=some_function_on_finish_form,
+    template=WindowTemplate(...)
+).create_dialog()
 ```
 
-The `arg_name` parameter of the validator determines which value the keyboard will compare with the desired value when
-assembling buttons.
+### 2. FormState
 
-### Build the keyboard (in handler)
+a modified State, to which the following has been added:
 
-```python
-keyboard = CustomKeyboard.build(
-    validator_args={"user_id": message.from_user.id}
-)
-```
+- additional buttons in the keyboard
+- displaying the current state value
+- binding an additional data getter
+- and all the other functions inherent in the standard `TextInput` from aiogram-dialog... 
+- (in future maybe i will add `MessageInput` support)
+
+#### it is important to add `FormState` exclusively to `FormStatesGroup` class!
 
 ## NGINX
 
