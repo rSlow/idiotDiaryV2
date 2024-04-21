@@ -3,7 +3,8 @@ from abc import ABC
 from datetime import datetime, date, time
 from typing import Optional, Literal
 
-from config import formats
+from common.filters import UserIDFilter
+from config import formats, settings
 
 
 class StrFTimeValidFactory(ABC):
@@ -54,3 +55,8 @@ class DateTimeValidFactory(StrFTimeValidFactory):
             re_format=formats.DATETIME_RE_FORMAT,
             ftime_format=formats.DATETIME_FORMAT
         )
+
+
+class BirthdaysAllowedFilter(UserIDFilter):
+    def __init__(self):
+        super().__init__(settings.BIRTHDAYS_ALLOWED)

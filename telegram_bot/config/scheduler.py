@@ -2,12 +2,10 @@ from datetime import time
 from typing import Sequence
 
 from aiogram import Bot
-from apscheduler.jobstores.redis import RedisJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 
 from apps.birthdays.ORM.notifications import NotificationUser, NotificationTime
 from apps.birthdays.scheduler import send_birthdays
-from config import settings
 
 
 class NotificationScheduler(AsyncIOScheduler):
@@ -73,8 +71,3 @@ class NotificationScheduler(AsyncIOScheduler):
         self.remove_job(
             job_id=self.get_birthday_job_id(user_id, t)
         )
-
-
-def get_scheduler():
-    scheduler = NotificationScheduler(timezone=settings.TIMEZONE)
-    return scheduler

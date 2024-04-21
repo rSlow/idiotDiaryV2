@@ -7,7 +7,7 @@ from aiogram_dialog import DialogManager, StartMode
 
 from common.FSM import CommonFSM
 from common.utils.functions import get_now
-from config.logger import logger
+from loguru import logger
 
 RenderFunc = Callable[..., BytesIO]
 OnFinish = Callable[[types.Message, DialogManager], Awaitable]
@@ -21,7 +21,7 @@ def render_callback(func: RenderFunc) -> OnFinish:
             data=manager.dialog_data,
             render_func=func
         )
-        await manager.start(state=CommonFSM.start, mode=StartMode.RESET_STACK)
+        await manager.start(state=CommonFSM.state, mode=StartMode.RESET_STACK)
 
     return on_finish
 

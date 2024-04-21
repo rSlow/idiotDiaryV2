@@ -5,8 +5,9 @@ from aiogram.utils.callback_answer import CallbackAnswerMiddleware
 
 from common.ORM.database import Session
 from common.middlewares import DbSessionMiddleware, ContextMiddleware, register_middlewares
+from config import settings
 from config.logger import init_logging
-from config.scheduler import get_scheduler
+from config.scheduler import NotificationScheduler
 from config.ui_config import set_ui_commands
 from http_server.webhook import init_webhook
 
@@ -16,7 +17,7 @@ async def on_startup(dispatcher: Dispatcher,
                      **__):
     init_logging()
 
-    scheduler = get_scheduler()
+    scheduler = NotificationScheduler(timezone=settings.TIMEZONE)
     scheduler.start()
     await scheduler.init(bot)
 

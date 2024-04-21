@@ -30,7 +30,7 @@ services:
     image: redis
     restart: always
     ports:
-      - "6379:6379"
+      - "${REDIS_PORT}:6379"
     command:
       - "redis-server"
       - "--loglevel ${REDIS_LOGLEVEL:-warning}"

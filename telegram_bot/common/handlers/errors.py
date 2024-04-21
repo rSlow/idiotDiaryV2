@@ -2,7 +2,7 @@ from aiogram import Router, types
 from aiogram_dialog import DialogManager, StartMode, ShowMode
 
 from common.FSM import CommonFSM
-from config.logger import logger
+from loguru import logger
 
 error_router = Router(name="errors")
 

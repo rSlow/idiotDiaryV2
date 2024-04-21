@@ -10,13 +10,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ENV_FILE: str = os.getenv("ENV_FILE", ".env")
 ENV = get_env(env_file=BASE_DIR / ENV_FILE)
 
-DEBUG: bool = ENV.bool("DEBUG", None)
+DEBUG: bool = ENV.bool("DEBUG", False)
 
 WEBHOOK_SECRET: str | None = ENV.str("WEBHOOK_SECRET", None)
 WEBHOOK_PATH: str = ENV.str("WEBHOOK_PATH")
-BASE_WEBHOOK_URL: str = ENV.str("BASE_WEBHOOK_URL")
-BASE_WEBHOOK_PORT: str = ENV.str("BASE_WEBHOOK_PORT", "443")
-WEB_SERVER_PORT: int = ENV.int("WEB_SERVER_PORT")
+BASE_WEBHOOK_HOST: str = ENV.str("BASE_WEBHOOK_HOST")
 
 TIMEZONE = pytz.timezone(ENV.str("TIMEZONE", "Asia/Vladivostok"))
 OWNER_ID: str = ENV.str("OWNER_ID")
