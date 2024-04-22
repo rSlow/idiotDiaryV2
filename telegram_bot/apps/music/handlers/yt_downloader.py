@@ -1,3 +1,8 @@
+from datetime import datetime
+from pathlib import Path
+
+import aiofiles
+from aiofiles import tempfile
 from aiogram import types
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
@@ -8,7 +13,7 @@ from common.filters import regexp_factory
 from common.buttons import MAIN_MENU_BUTTON, BACK_BUTTON, CANCEL_BUTTON
 from .. import settings
 from ..states import YTDownloadFSM
-from ..utils import audio
+from ..utils.audio import download_audio
 
 
 async def valid_link(_: types.Message,
@@ -35,7 +40,9 @@ async def download(message: types.Message,
         raise RuntimeError("url is None")
 
     if timecode is not None:
-        from_time, to_time = timecode.split("-")
+        string_from_time, string_to_time = timecode.split("-")
+        from_time = datetime.strptime(string_from_time, settings.STRFTIME_FORMAT)
+        to_time = datetime.strptime(string_to_time, settings.STRFTIME_FORMAT)
     else:
         from_time, to_time = None, None
 
@@ -44,17 +51,27 @@ async def download(message: types.Message,
         message_id=dialog_message_id,
         text="Начинаю скачивание..."
     )
-    audio_io, filename = await audio.download_audio(url, from_time, to_time)
-    await message.bot.edit_message_text(
-        chat_id=chat_id,
-        message_id=dialog_message_id,
-        text="Отправляю файл..."
-    )
-    audio_file = types.BufferedInputFile(
-        file=audio_io,
-        filename=filename
-    )
-    await message.answer_document(document=audio_file)
+    async with tempfile.TemporaryDirectory(dir=settings.TEMP_DIR) as temp_dir:
+        temp_path = Path(temp_dir)
+        file_path = await download_audio(
+            url=url,
+            dir_path=temp_path,
+            from_time=from_time,
+            to_time=to_time
+        )
+        async with aiofiles.open(file_path, "rb") as file:
+            file_data = await file.read()
+
+        await message.bot.edit_message_text(
+            chat_id=chat_id,
+            message_id=dialog_message_id,
+            text="Отправляю файл..."
+        )
+        audio_file = types.BufferedInputFile(
+            file=file_data,
+            filename=file_path.name
+        )
+        await message.answer_document(document=audio_file)
 
     manager.show_mode = ShowMode.DELETE_AND_SEND
     await manager.done()
