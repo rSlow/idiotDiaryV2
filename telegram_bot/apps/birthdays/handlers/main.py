@@ -13,13 +13,8 @@ from ..states import BirthdaysFSM, ClearBirthdaysFSM, TimeCorrectionFSM, Birthda
 from ..utils.render import render_check_birthdays
 
 
-async def check_birthdays(callback: types.CallbackQuery,
-                          _: Button,
-                          manager: DialogManager):
-    manager.show_mode = ShowMode.DELETE_AND_SEND
-    session: AsyncSession = manager.middleware_data["session"]
-    user_id: int = manager.middleware_data["user_id"]
-
+async def get_birthdays_text(session: AsyncSession,
+                             user_id: int):
     today = get_now().date()
     birthdays = await Birthday.get_birthdays_in_dates(
         session=session,
@@ -36,6 +31,19 @@ async def check_birthdays(callback: types.CallbackQuery,
         ), []).append(birthday)
 
     message_text = render_check_birthdays(dates)
+    return message_text
+
+
+async def check_birthdays_callback(callback: types.CallbackQuery,
+                                   _: Button,
+                                   manager: DialogManager):
+    manager.show_mode = ShowMode.DELETE_AND_SEND
+    session: AsyncSession = manager.middleware_data["session"]
+    user_id: int = manager.middleware_data["user_id"]
+    message_text = await get_birthdays_text(
+        session=session,
+        user_id=user_id
+    )
     await callback.message.answer(message_text)
 
 
@@ -46,7 +54,7 @@ main_birthday_dialog = Dialog(
             Button(
                 Const("Проверить ДР 🎈"),
                 id="check",
-                on_click=check_birthdays
+                on_click=check_birthdays_callback
             ),
             Start(
                 Const("Оповещения 🕓"),

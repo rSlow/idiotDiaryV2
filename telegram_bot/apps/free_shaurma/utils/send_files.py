@@ -8,7 +8,7 @@ from aiogram_dialog import DialogManager, StartMode
 
 from common.FSM import CommonFSM
 from common.utils.functions import get_now
-from config.logger import logger
+from loguru import logger
 
 RenderFunc = Callable[..., BytesIO]
 OnFinish = Callable[[types.Message, DialogManager], Awaitable]

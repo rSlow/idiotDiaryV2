@@ -79,13 +79,16 @@ class Birthday(Base):
             cls.user_id == user_id
         )
         res = await session.execute(q)
-        birthday: cls | None = res.scalars().one_or_none()
+        birthday: Self | None = res.scalars().one_or_none()
+        await session.close()
 
         if birthday is None:
             return False
         else:
-            q = delete(cls).filter(
-                cls.uuid == birthday.uuid
-            )
-            await session.execute(q)
+            async with session.begin():
+                q = delete(cls).filter(
+                    cls.uuid == birthday.uuid,
+                    cls.user_id == user_id
+                )
+                await session.execute(q)
             return True

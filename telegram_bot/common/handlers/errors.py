@@ -3,7 +3,7 @@ from aiogram_dialog import DialogManager, StartMode, ShowMode
 
 from apps.music.handlers.main import error_music_router
 from common.FSM import CommonFSM
-from config.logger import logger
+from loguru import logger
 
 error_router = Router(name="errors")
 common_error_router = Router(name="common_errors")

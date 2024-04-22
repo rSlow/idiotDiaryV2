@@ -1,0 +1,2 @@
+class BigDurationError(MemoryError):
+    pass

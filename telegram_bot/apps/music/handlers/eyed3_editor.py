@@ -58,8 +58,7 @@ async def initialize_audio_file(message: types.Message,
             await message.answer(
                 text="Невозможно распознать файл. Попробуйте загрузить другой файл."
             )
-            await manager.done()
-            return
+            return await manager.done()
 
         eyed3_tag: Tag = eyed3_audio.tag if eyed3_audio.tag is not None else Tag()
 

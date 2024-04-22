@@ -107,6 +107,7 @@ async def clear_notifications(callback: types.CallbackQuery,
         session=session,
         user_id=user_id
     )
+    await session.close()
     await NotificationTime.clear_notifications(
         user_id=user_id,
         session=session

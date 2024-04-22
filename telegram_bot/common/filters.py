@@ -29,11 +29,6 @@ class OwnerFilter(UserIDFilter):
         super().__init__(settings.OWNER_ID)
 
 
-class BirthdaysAllowedFilter(UserIDFilter):
-    def __init__(self):
-        super().__init__(settings.BIRTHDAYS_ALLOWED)
-
-
 def regexp_factory(pattern: str | Pattern[str]):
     def _factory(value: str):
         res = re.match(pattern, value)
