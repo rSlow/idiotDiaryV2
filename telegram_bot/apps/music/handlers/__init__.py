@@ -1,7 +1,8 @@
 from aiogram import Router
 
 from .eyed3_editor import music_eyed3_dialog
-from .main import error_music_router, start_music_dialog
+from .main import start_music_dialog
+from .error import error_music_router
 from .yt_downloader import music_yt_dialog
 
 music_router = Router(name="shazam")

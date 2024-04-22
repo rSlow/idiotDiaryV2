@@ -6,7 +6,7 @@ from typing import Optional
 
 from pytube import StreamQuery, Stream, YouTube
 
-import settings
+from .. import settings
 from ..exceptions import BigDurationError
 
 
@@ -55,9 +55,9 @@ async def download_audio(url: str,
 
     ffmpeg_command = ["ffmpeg", "-i", download_url, "-acodec", "libmp3lame"]
     if from_time:
-        ffmpeg_command.extend(["-ss", from_time.strftime(settings.TIME_FORMAT)])
+        ffmpeg_command.extend(["-ss", from_time.strftime(settings.STRFTIME_FORMAT)])
     if to_time:
-        ffmpeg_command.extend(["-to", to_time.strftime(settings.TIME_FORMAT)])
+        ffmpeg_command.extend(["-to", to_time.strftime(settings.STRFTIME_FORMAT)])
 
     ffmpeg_command.append(file_path.as_posix())
     process = await asyncio.subprocess.create_subprocess_exec(*ffmpeg_command)
