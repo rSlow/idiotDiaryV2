@@ -7,3 +7,8 @@ class SYoutube(BaseModel):
     url: AnyHttpUrl
     from_time: time
     to_time: time
+
+
+class DownloadResult(BaseModel):
+    data: bytes
+    filename: str

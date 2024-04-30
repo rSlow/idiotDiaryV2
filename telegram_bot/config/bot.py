@@ -2,20 +2,18 @@ from aiogram import Bot, Dispatcher
 from aiogram.fsm.storage.memory import SimpleEventIsolation
 from aiogram_dialog import setup_dialogs
 
-from apps.free_shaurma.handlers import test_fsh_router
-from common.handlers.errors import error_router
-from common.handlers.main import start_router, main_menu
-from common.storage import redis_storage
+from common.handlers.main import main_menu
+from .storage import redis_storage
 from . import settings
 from loguru import logger
-from .router import apps_router
-from .settings import ENV
-from .startup_shutdown import on_startup, on_shutdown
-
-token = ENV.str("BOT_TOKEN")
+from .routes.test import test_router
+from .routes.commands import commands_router
+from .routes.error import error_router
+from .on_events import on_startup, on_shutdown
+from apps.routes import apps_router
 
 bot = Bot(
-    token=token,
+    token=settings.BOT_TOKEN,
     parse_mode="HTML"
 )
 dp = Dispatcher(
@@ -30,16 +28,16 @@ def init_dispatcher(dispatcher: Dispatcher):
 
     setup_dialogs(dispatcher)
 
-    if settings.DEBUG:
-        logger.info("SET DEBUG MODE")
-
-        dispatcher.include_routers(
-            test_fsh_router,
-        )
-
     dispatcher.include_routers(
-        start_router,
+        commands_router,
         error_router,
         main_menu,
         apps_router,
     )
+
+    if settings.DEBUG:
+        logger.info("SET DEBUG MODE")
+
+        dispatcher.include_routers(
+            test_router,
+        )

@@ -1,4 +1,5 @@
 from datetime import timedelta, date
+from typing import Sequence
 
 from aiogram import types
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
@@ -16,19 +17,16 @@ from ..utils.render import render_check_birthdays
 async def get_birthdays_text(session: AsyncSession,
                              user_id: int):
     today = get_now().date()
-    birthdays = await Birthday.get_birthdays_in_dates(
-        session=session,
-        user_id=user_id,
-        start_date=today,
-        end_date=today + timedelta(days=4)
-    )
-    dates: dict[date, list[Birthday]] = {}
-    for birthday in birthdays:
-        dates.setdefault(date(
-            day=birthday.date.day,
-            month=birthday.date.month,
-            year=today.year
-        ), []).append(birthday)
+    dates: dict[date, Sequence[Birthday]] = {}
+    for i in range(4):
+        fetch_date = today + timedelta(days=i)
+        birthdays = await Birthday.get_birthdays_in_date(
+            session=session,
+            user_id=user_id,
+            d=fetch_date
+        )
+        if birthdays:
+            dates[fetch_date] = birthdays
 
     message_text = render_check_birthdays(dates)
     return message_text

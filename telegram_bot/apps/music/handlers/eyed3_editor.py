@@ -4,7 +4,6 @@ from operator import itemgetter
 import eyed3
 from aiogram import types, Bot
 from aiogram.enums import ContentType
-from aiogram.types import FSInputFile, BufferedInputFile
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import MessageInput, TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import Select, Button, Row, Group
@@ -14,7 +13,7 @@ from eyed3.id3 import Tag
 from common.dialogs.types import JinjaTemplate
 from common.filters import regexp_factory
 from common.buttons import CANCEL_BUTTON, BACK_BUTTON
-from common.utils.decorators import set_async
+from common.utils.decorators import to_async_thread
 from .. import settings
 from ..states import EyeD3FSM
 from ..enums import EyeD3ActionsEnum, EyeD3MessagesEnum
@@ -53,7 +52,7 @@ async def initialize_audio_file(message: types.Message,
     async with TempFileDownloader(file_path=file_path,
                                   bot=bot,
                                   file_id=file_id):
-        eyed3_audio = await set_async(eyed3.load)(file_path)
+        eyed3_audio = await to_async_thread(eyed3.load)(file_path)
         if eyed3_audio is None:
             await message.answer(
                 text="Невозможно распознать файл. Попробуйте загрузить другой файл."
@@ -101,10 +100,13 @@ async def url_handler(message: types.Message,
         message=message,
         text="Скачиваю..."
     )
-    audio_io, filename = await download_audio(url)
-    audio_file = BufferedInputFile(
-        file=audio_io,
-        filename=filename
+    result = await download_audio(
+        url=url,
+        root_temp_path=settings.TEMP_DIR
+    )
+    audio_file = types.BufferedInputFile(
+        file=result.data,
+        filename=result.filename
     )
     audio = await message.answer_document(document=audio_file)
     await initialize_audio_file(
@@ -181,7 +183,7 @@ async def eyed3_export(callback: types.CallbackQuery,
             processed_image_io = await process_image(image_io)
             eyed3_tag.images.set(
                 type_=3,
-                img_data=await set_async(processed_image_io.read)(),
+                img_data=await to_async_thread(processed_image_io.read)(),
                 mime_type="image/jpeg"
             )
 
@@ -190,7 +192,7 @@ async def eyed3_export(callback: types.CallbackQuery,
         if eyed3_tag.artist and eyed3_tag.title:
             filename = f"{eyed3_tag.artist} - {eyed3_tag.title}{settings.AUDIO_FILE_EXT}"
 
-        audio_file = FSInputFile(
+        audio_file = types.FSInputFile(
             path=file_path,
             filename=filename
         )

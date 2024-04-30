@@ -1,12 +1,13 @@
 from datetime import date
-from typing import Sequence, Self, Optional
+from typing import Sequence, Self
 from uuid import UUID
 
-from sqlalchemy import select, extract, and_, delete, BigInteger
+from sqlalchemy import select, and_, delete, BigInteger, extract
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import Mapped, mapped_column
 
 from common.ORM.database import Base
+from common.utils.functions import get_now
 from ..http_app.schemas import SBirthday
 
 
@@ -19,6 +20,18 @@ class Birthday(Base):
     date: Mapped[date]
     post: Mapped[str] = mapped_column(nullable=True)
     rank: Mapped[str] = mapped_column(nullable=True)
+
+    @property
+    def age(self):
+        return int(round((get_now().date() - self.date).days / 362.25))
+
+    def get_declension(self):
+        age = self.age
+        if age % 10 == 1 and age != 11:
+            return "год"
+        elif age % 10 in [2, 3, 4] and (age < 10 or age > 20):
+            return "года"
+        return "лет"
 
     @classmethod
     async def update_data(cls,
@@ -49,19 +62,14 @@ class Birthday(Base):
             await session.execute(q)
 
     @classmethod
-    async def get_birthdays_in_dates(cls,
-                                     user_id: int,
-                                     session: AsyncSession,
-                                     start_date: date,
-                                     end_date: Optional[date] = None) -> Sequence[Self]:
-        if end_date is None:
-            end_date = start_date
+    async def get_birthdays_in_date(cls,
+                                    user_id: int,
+                                    session: AsyncSession,
+                                    d: date) -> Sequence[Self]:
         q = select(cls).filter(
             and_(
-                extract('month', cls.date) >= start_date.month,
-                extract('day', cls.date) >= start_date.day,
-                extract('month', cls.date) <= end_date.month,
-                extract('day', cls.date) <= end_date.day,
+                extract('month', cls.date) == d.month,
+                extract('day', cls.date) == d.day,
                 cls.user_id == user_id
             ),
         )

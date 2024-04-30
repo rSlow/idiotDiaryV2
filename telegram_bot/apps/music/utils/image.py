@@ -5,10 +5,10 @@ from typing import BinaryIO
 from PIL import Image, ImageOps
 from aiogram.types import BufferedInputFile
 
-from common.utils.decorators import set_async
+from common.utils.decorators import to_async_thread
 
 
-@set_async
+@to_async_thread
 def process_image(image_io: BinaryIO) -> BytesIO:
     quality = 1024
     with Image.open(image_io) as image:
@@ -25,7 +25,7 @@ def process_image(image_io: BinaryIO) -> BytesIO:
     return new_image_io
 
 
-@set_async
+@to_async_thread
 def get_aiogram_thumbnail(image_io: BytesIO) -> BufferedInputFile:
     image_io.seek(0)
     return BufferedInputFile(

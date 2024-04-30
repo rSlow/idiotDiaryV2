@@ -1,8 +1,4 @@
 from datetime import datetime
-from pathlib import Path
-
-import aiofiles
-from aiofiles import tempfile
 from aiogram import types
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
@@ -28,8 +24,8 @@ async def invalid_link(message: types.Message, *_):
     await message.answer("Неверный формат ссылки.")
 
 
-async def download(message: types.Message,
-                   manager: DialogManager):
+async def download_and_send_file(message: types.Message,
+                                 manager: DialogManager):
     data = manager.dialog_data
     chat_id = message.chat.id
     dialog_message_id: int = manager.current_stack().last_message_id
@@ -51,27 +47,22 @@ async def download(message: types.Message,
         message_id=dialog_message_id,
         text="Начинаю скачивание..."
     )
-    async with tempfile.TemporaryDirectory(dir=settings.TEMP_DIR) as temp_dir:
-        temp_path = Path(temp_dir)
-        file_path = await download_audio(
-            url=url,
-            dir_path=temp_path,
-            from_time=from_time,
-            to_time=to_time
-        )
-        async with aiofiles.open(file_path, "rb") as file:
-            file_data = await file.read()
-
-        await message.bot.edit_message_text(
-            chat_id=chat_id,
-            message_id=dialog_message_id,
-            text="Отправляю файл..."
-        )
-        audio_file = types.BufferedInputFile(
-            file=file_data,
-            filename=file_path.name
-        )
-        await message.answer_document(document=audio_file)
+    result = await download_audio(
+        url=url,
+        root_temp_path=settings.TEMP_DIR,
+        from_time=from_time,
+        to_time=to_time
+    )
+    await message.bot.edit_message_text(
+        chat_id=chat_id,
+        message_id=dialog_message_id,
+        text="Отправляю файл..."
+    )
+    audio_file = types.BufferedInputFile(
+        file=result.data,
+        filename=result.filename
+    )
+    await message.answer_document(document=audio_file)
 
     manager.show_mode = ShowMode.DELETE_AND_SEND
     await manager.done()
@@ -80,7 +71,7 @@ async def download(message: types.Message,
 async def full_timecode(callback: types.CallbackQuery,
                         _: Button,
                         manager: DialogManager):
-    await download(callback.message, manager)
+    await download_and_send_file(callback.message, manager)
 
 
 async def valid_timecode(message: types.Message,
@@ -89,7 +80,7 @@ async def valid_timecode(message: types.Message,
                          timecode: str):
     await message.delete()
     manager.dialog_data.update({"timecode": timecode})
-    await download(message, manager)
+    await download_and_send_file(message, manager)
 
 
 async def invalid_timecode(message: types.Message, *_):
@@ -109,9 +100,7 @@ music_yt_dialog = Dialog(
         state=YTDownloadFSM.url
     ),
     Window(
-        Const("При необходимости отправьте таймкод в форматах:"),
-        Const("  - ЧЧ:ММ:СС-ЧЧ:ММ:СС"),
-        Const("  - ММ:СС-ММ:СС"),
+        Const("При необходимости отправьте таймкод в формате: ЧЧ:ММ:СС-ЧЧ:ММ:СС"),
         Const("или нажмите кнопку 'Полностью'"),
         Button(
             Const("Полностью"),
@@ -120,7 +109,7 @@ music_yt_dialog = Dialog(
         ),
         TextInput(
             id="timecode",
-            type_factory=regexp_factory(settings.FULL_TIMECODE_REGEXP),
+            type_factory=regexp_factory(settings.PAIR_TIMECODE_REGEXP),
             on_success=valid_timecode,
             on_error=invalid_timecode
         ),

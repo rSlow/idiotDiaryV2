@@ -1,4 +1,4 @@
-version: "3"
+version: "3.8"
 
 services:
   aiogram:
@@ -50,7 +50,7 @@ services:
     image: nginx
     restart: always
     ports:
-      - "${BASE_WEBHOOK_PORT}:443"
+      - "${WEBHOOK_PORT}:443"
       - "8444:80"
     volumes:
       - ${CERTS_DIR}:/data/certs/:ro

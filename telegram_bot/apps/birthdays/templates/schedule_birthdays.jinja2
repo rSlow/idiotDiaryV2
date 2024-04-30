@@ -2,12 +2,12 @@
 
 {% if today_birthdays %}
     <u><b>Сегодня день рождения:</b></u> <br>
-    {{ birthday_form(date=today, birthdays=today_birthdays) }}
+    {{ birthday_form(birthdays=today_birthdays) }}
 {% endif %}
 
     <br>
 
 {% if tomorrow_birthdays %}
     <u><b>Завтра день рождения:</b></u> <br>
-    {{ birthday_form(date=tomorrow, birthdays=tomorrow_birthdays) }}
+    {{ birthday_form(birthdays=tomorrow_birthdays) }}
 {% endif %}

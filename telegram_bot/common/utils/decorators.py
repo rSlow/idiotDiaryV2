@@ -1,15 +1,15 @@
 import asyncio
-from functools import wraps, partial
-from typing import TypeVar, Coroutine, Callable, Any, Type, ParamSpec
+from functools import wraps
+from typing import TypeVar, Coroutine, Callable, Type, ParamSpec, Optional, Awaitable
 
-_T = TypeVar('_T')
-_P = ParamSpec("_P")
+T = TypeVar('T', covariant=True)
+P = ParamSpec("P")
 
 
-def coro_timer(timeout: int | float, exc: Type[Exception] | Exception | None = None):
-    def decorator(coro: Callable[[Any, Any], Coroutine[None, None, _T]]) -> _T:
+def coro_timer(timeout: int | float, exc: Optional[Type[Exception] | Exception] = None):
+    def decorator(coro: Callable[P, Coroutine[None, None, T]]) -> T:
         @wraps(coro)
-        async def wrapper(*args: Any, **kwargs: Any):
+        async def wrapper(*args: P.args, **kwargs: P.kwargs):
             try:
                 return await asyncio.wait_for(coro(*args, **kwargs), timeout=timeout)
             except asyncio.TimeoutError:
@@ -21,12 +21,9 @@ def coro_timer(timeout: int | float, exc: Type[Exception] | Exception | None = N
     return decorator
 
 
-def set_async(func: Callable[_P, _T]) -> Callable[_P, Coroutine[Any, Any, _T]]:
+def to_async_thread(func: Callable[P, T]) -> Callable[P, Awaitable[T]]:
     @wraps(func)
-    async def wrapper(*args: _P.args, **kwargs: _P.kwargs):
-        loop = asyncio.get_event_loop()
-        return await loop.run_in_executor(
-            None, partial(func, *args, **kwargs)
-        )
+    async def wrapper(*args: P.args, **kwargs: P.kwargs):
+        return await asyncio.to_thread(func, *args, **kwargs)
 
     return wrapper

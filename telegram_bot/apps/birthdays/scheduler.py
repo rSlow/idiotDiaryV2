@@ -13,20 +13,18 @@ async def send_birthdays(bot: Bot,
     today = get_now().date()
     tomorrow = today + timedelta(days=1)
     async with Session() as session:
-        today_birthdays = await Birthday.get_birthdays_in_dates(
+        today_birthdays = await Birthday.get_birthdays_in_date(
             session=session,
             user_id=user_id,
-            start_date=today
+            d=today
         )
-        tomorrow_birthdays = await Birthday.get_birthdays_in_dates(
+        tomorrow_birthdays = await Birthday.get_birthdays_in_date(
             session=session,
             user_id=user_id,
-            start_date=tomorrow
+            d=tomorrow
         )
         if today_birthdays or tomorrow_birthdays:
             message_text = render_schedule_birthdays(
-                today=today,
-                tomorrow=tomorrow,
                 today_birthdays=today_birthdays,
                 tomorrow_birthdays=tomorrow_birthdays
             )
