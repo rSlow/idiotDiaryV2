@@ -1,3 +1,4 @@
+import os
 import tempfile
 import uuid
 from datetime import datetime, time
@@ -37,6 +38,9 @@ def download_audio(url: str,
                    root_temp_path: Path,
                    from_time: Optional[time] = None,
                    to_time: Optional[time] = None):
+    if not root_temp_path.is_dir():
+        os.mkdir(root_temp_path)
+
     req_dict: dict = YoutubeDL({"playlist_items": "1"}).extract_info(
         url=url,
         download=False
