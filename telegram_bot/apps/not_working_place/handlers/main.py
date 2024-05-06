@@ -3,7 +3,7 @@ from aiogram_dialog.widgets.kbd import Start
 from aiogram_dialog.widgets.text import Const
 
 from common.buttons import MAIN_MENU_BUTTON
-from ..states import VoiceFSM
+from ..states import VoiceFSM, StickersFSM
 from ..states import ImagesZipFSM
 from ..states import INNParserFSM
 from ..states import MorphFIOFSM
@@ -37,6 +37,11 @@ nwp_menu = Dialog(
             Const("Узнать ИНН 📇"),
             id="inn_parse",
             state=INNParserFSM.state,
+        ),
+        Start(
+            Const("Стикерная 📑"),
+            id="stickers",
+            state=StickersFSM.state
         ),
         MAIN_MENU_BUTTON,
         state=NWPStartFSM.state,
