@@ -8,6 +8,7 @@ from aiogram_dialog.widgets.input import TextInput, ManagedTextInput, MessageInp
 from aiogram_dialog.widgets.text import Const, Format
 
 from common.buttons import CANCEL_BUTTON
+from common.utils.functions import edit_dialog_message
 from config import settings
 from ..states import VoiceFSM
 
@@ -18,12 +19,8 @@ async def convert_voice_message(message: types.Message,
                                 _: MessageInput,
                                 manager: DialogManager):
     await message.delete()
-
-    chat_id = message.chat.id
-    dialog_message_id: int = manager.current_stack().last_message_id
-    await message.bot.edit_message_text(
-        chat_id=chat_id,
-        message_id=dialog_message_id,
+    await edit_dialog_message(
+        manager=manager,
         text="Конвертирую..."
     )
 

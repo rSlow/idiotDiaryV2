@@ -5,6 +5,7 @@ from aiogram.enums import ContentType
 from aiogram_dialog.widgets.input import MessageInput
 
 from common.buttons import CANCEL_BUTTON
+from common.utils.functions import edit_dialog_message
 from ..states import VideoNoteFSM
 from aiogram_dialog import Dialog, Window, DialogManager, ShowMode
 from aiogram_dialog.widgets.text import Const
@@ -14,12 +15,8 @@ async def download_video_note(message: types.Message,
                               _: MessageInput,
                               manager: DialogManager):
     await message.delete()
-
-    chat_id = message.chat.id
-    dialog_message_id: int = manager.current_stack().last_message_id
-    await message.bot.edit_message_text(
-        chat_id=chat_id,
-        message_id=dialog_message_id,
+    await edit_dialog_message(
+        manager=manager,
         text="Видеосообщение принято, обработка..."
     )
 
@@ -29,9 +26,8 @@ async def download_video_note(message: types.Message,
         filename=f"{datetime.now().isoformat()}.mp4"
     )
 
-    await message.bot.edit_message_text(
-        chat_id=chat_id,
-        message_id=dialog_message_id,
+    await edit_dialog_message(
+        manager=manager,
         text="Видео отправляется..."
     )
 

@@ -14,25 +14,13 @@ from common.dialogs.types import JinjaTemplate
 from common.filters import regexp_factory
 from common.buttons import CANCEL_BUTTON, BACK_BUTTON
 from common.utils.decorators import to_async_thread
+from common.utils.functions import edit_dialog_message
 from .. import settings
 from ..states import EyeD3FSM
 from ..enums import EyeD3ActionsEnum, EyeD3MessagesEnum
 from ..utils.audio import download_audio
 from ..utils.image import process_image, get_aiogram_thumbnail
 from ..utils.temp_dowlnoader import TempFileDownloader
-
-
-async def edit_dialog_message(manager: DialogManager,
-                              message: types.Message,
-                              text: str):
-    bot: Bot = manager.middleware_data["bot"]
-    chat_id = message.chat.id
-    dialog_message_id: int = manager.current_stack().last_message_id
-    return await bot.edit_message_text(
-        chat_id=chat_id,
-        message_id=dialog_message_id,
-        text=text
-    )
 
 
 async def initialize_audio_file(message: types.Message,
@@ -46,7 +34,6 @@ async def initialize_audio_file(message: types.Message,
 
     await edit_dialog_message(
         manager=manager,
-        message=message,
         text="Обработка..."
     )
     async with TempFileDownloader(file_path=file_path,
@@ -97,7 +84,6 @@ async def url_handler(message: types.Message,
     await message.delete()
     await edit_dialog_message(
         manager=manager,
-        message=message,
         text="Скачиваю..."
     )
     result = await download_audio(

@@ -7,6 +7,7 @@ from aiogram_dialog.widgets.text import Const
 
 from common.filters import regexp_factory
 from common.buttons import MAIN_MENU_BUTTON, BACK_BUTTON, CANCEL_BUTTON
+from common.utils.functions import edit_dialog_message
 from .. import settings
 from ..states import YTDownloadFSM
 from ..utils.audio import download_audio
@@ -27,11 +28,9 @@ async def invalid_link(message: types.Message, *_):
 async def download_and_send_file(message: types.Message,
                                  manager: DialogManager):
     data = manager.dialog_data
-    chat_id = message.chat.id
-    dialog_message_id: int = manager.current_stack().last_message_id
-
     url = data.get("url")
     timecode = data.get("timecode")
+
     if url is None:
         raise RuntimeError("url is None")
 
@@ -42,9 +41,8 @@ async def download_and_send_file(message: types.Message,
     else:
         from_time, to_time = None, None
 
-    await message.bot.edit_message_text(
-        chat_id=chat_id,
-        message_id=dialog_message_id,
+    await edit_dialog_message(
+        manager=manager,
         text="Начинаю скачивание..."
     )
     result = await download_audio(
@@ -53,9 +51,8 @@ async def download_and_send_file(message: types.Message,
         from_time=from_time,
         to_time=to_time
     )
-    await message.bot.edit_message_text(
-        chat_id=chat_id,
-        message_id=dialog_message_id,
+    await edit_dialog_message(
+        manager=manager,
         text="Отправляю файл..."
     )
     audio_file = types.BufferedInputFile(

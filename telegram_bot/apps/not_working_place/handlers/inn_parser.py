@@ -4,6 +4,7 @@ from aiogram_dialog.widgets.input import TextInput, ManagedTextInput
 
 from common.dialogs.types import JinjaTemplate
 from common.buttons import CANCEL_BUTTON
+from common.utils.functions import edit_dialog_message
 from .. import settings
 from ..states import INNParserFSM
 from ..factory.inn import inn_factory, INNSchema
@@ -16,11 +17,8 @@ async def inn_handler(message: types.Message,
                       data: INNSchema):
     manager.show_mode = ShowMode.DELETE_AND_SEND
     await manager.update({})
-    chat_id = message.chat.id
-    dialog_message_id: int = manager.current_stack().last_message_id
-    await message.bot.edit_message_text(
-        chat_id=chat_id,
-        message_id=dialog_message_id,
+    await edit_dialog_message(
+        manager=manager,
         text="Поиск..."
     )
 
@@ -32,9 +30,8 @@ async def inn_handler(message: types.Message,
         message_text = ("Запрос не может выполниться по независящим от бота причинам. "
                         "Возможно, причина в сайте налоговой. Задача отменена.")
     finally:
-        await message.bot.edit_message_text(
-            chat_id=chat_id,
-            message_id=dialog_message_id,
+        await edit_dialog_message(
+            manager=manager,
             text=message_text
         )
 
