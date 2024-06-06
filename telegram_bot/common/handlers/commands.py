@@ -19,3 +19,9 @@ async def command_start_process(message: types.Message,
         state=CommonFSM.state,
         mode=StartMode.RESET_STACK
     )
+
+
+@common_commands_router.message(Command("menu"))
+async def command_menu(_: types.Message,
+                       dialog_manager: DialogManager):
+    await dialog_manager.update({})
