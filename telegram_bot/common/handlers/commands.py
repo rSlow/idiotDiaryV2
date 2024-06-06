@@ -22,6 +22,7 @@ async def command_start_process(message: types.Message,
 
 
 @common_commands_router.message(Command("menu"))
-async def command_menu(_: types.Message,
+async def command_menu(message: types.Message,
                        dialog_manager: DialogManager):
+    await message.delete()
     await dialog_manager.update({})
