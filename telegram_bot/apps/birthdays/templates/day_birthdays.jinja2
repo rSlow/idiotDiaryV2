@@ -5,7 +5,7 @@
         {% if birthdays %}
             <u><b>{{ date.strftime('%d.%m.%Y') }} г. день рождения:</b></u> <br>
             {{ birthday_form(date=date, birthdays=birthdays) }}
-            <br><br>
+            <br>
         {% endif %}
     {% endfor %}
 {% else %}
