@@ -50,10 +50,10 @@ services:
     image: nginx
     restart: always
     ports:
-      - "${WEBHOOK_PORT}:443"
+      - "${WEBHOOK_PORT:-443}:443"
       - "8444:80"
     volumes:
-      - ${CERTS_DIR}:/data/certs/:ro
+      - ${CERTS_DIR:-./}:/data/certs/:ro
       - ./nginx/default.conf:/etc/nginx/templates/default.conf.template/:rw
     env_file:
       - ${ENV_FILE:-.env}

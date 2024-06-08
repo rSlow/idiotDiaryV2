@@ -10,7 +10,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from common.buttons import MAIN_MENU_BUTTON
 from common.utils.functions import get_now
 from ..ORM.birthdays import Birthday
-from ..states import BirthdaysFSM, ClearBirthdaysFSM, TimeCorrectionFSM, BirthdaysNotificationFSM
+from ..states import BirthdaysFSM, ClearBirthdaysFSM, TimeCorrectionFSM, BirthdaysNotificationFSM, CalendarFSM
 from ..utils.render import render_check_birthdays
 
 
@@ -53,6 +53,11 @@ main_birthday_dialog = Dialog(
                 Const("Проверить ДР 🎈"),
                 id="check",
                 on_click=check_birthdays_callback
+            ),
+            Start(
+                Const("Календарь 📆"),
+                id="calendar",
+                state=CalendarFSM.state
             ),
             Start(
                 Const("Оповещения 🕓"),

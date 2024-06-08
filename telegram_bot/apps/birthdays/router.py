@@ -1,5 +1,6 @@
 from aiogram import Router
 
+from .handlers.calendar import calendar_dialog
 from .handlers.clear import clear_dialog
 from .handlers.main import main_birthday_dialog
 from .handlers.notifications import notifications_dialog, clear_notifications_dialog, add_time_notification_dialog
@@ -16,4 +17,5 @@ birthdays_router.include_routers(
     notifications_dialog,
     clear_notifications_dialog,
     add_time_notification_dialog,
+    calendar_dialog,
 )
