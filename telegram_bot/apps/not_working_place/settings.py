@@ -4,6 +4,7 @@ from config.settings import ENV
 
 APP_DIR = Path(__file__).resolve().parent
 TEMPLATES_DIR = APP_DIR / "templates"
+APP_TEMP_ROOT = APP_DIR / "temp"
 
 MORPH_URL = ENV.str("MORPH_URL")
 MORPH_CASE_ALIASES = {
