@@ -7,6 +7,7 @@ from .handlers.pack_photos import pack_dialog
 from .handlers.video_note import video_note_dialog
 from .handlers.voice_convert import voice_convert_dialog
 from .handlers.stickers import stickers_dialog
+from .handlers.zip_pdf import zip_pdf_dialog
 
 nwp_router = Router(name="not_working_place")
 nwp_router.include_routers(
@@ -17,4 +18,5 @@ nwp_router.include_routers(
     voice_convert_dialog,
     inn_dialog,
     stickers_dialog,
+    zip_pdf_dialog,
 )
