@@ -8,7 +8,7 @@ from sqlalchemy.ext.asyncio import (
     AsyncEngine,
 )
 
-from idiotDiary.core.data.models.db import DBConfig
+from idiotDiary.core.data.db.config.models import DBConfig
 
 logger = logging.getLogger(__name__)
 
@@ -19,11 +19,16 @@ def create_pool(db_config: DBConfig) -> async_sessionmaker[AsyncSession]:
 
 
 def create_engine(db_config: DBConfig) -> AsyncEngine:
-    return create_async_engine(url=make_url(db_config.uri), echo=db_config.echo)
+    return create_async_engine(
+        url=make_url(db_config.uri),
+        echo=db_config.echo
+    )
 
 
 def create_session_maker(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
     pool: async_sessionmaker[AsyncSession] = async_sessionmaker(
-        bind=engine, expire_on_commit=False, autoflush=False
+        bind=engine,
+        expire_on_commit=False,
+        autoflush=False
     )
     return pool

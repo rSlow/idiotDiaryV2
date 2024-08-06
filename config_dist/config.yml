@@ -1,0 +1,59 @@
+app:
+  name: idiotDiary
+  version: 3
+
+bot:
+  token: "token"
+  # telegraph-token: "token"
+  log-chat: -1002226356147
+  superusers:
+    - 959148697
+  bot-api-server:
+    # type: nonlocal # ???
+    type: local
+    botapi-url: "http://telegram-bot-api:8081"
+    botapi-file-url: "http://nginx:80"
+  webhook:
+    web-url: https://example.org/context/path # ???
+    path: /webhook_path
+    secret: "secret"
+  storage:
+    # type: memory
+    type: redis
+    db: 1
+
+db:
+  type: postgresql
+  connector: asyncpg
+  host: localhost
+  port: 22222
+  login: some_login
+  password: some_password
+  name: some_db_mane
+
+redis:
+  url: localhost
+  port: 8646
+
+api:
+  context-path: ""
+  auth:
+    secret-key: "secret"
+    token-expire-minutes: 30
+    samesite: "none"
+    secure: false
+    httponly: false
+    # ----- #
+    bot-token: ""
+    bot-username: ""
+    auth-url: "https://example.org/sh/login/data"
+    domain: "example.org"
+
+file-storage-config:
+  path: ./local-storage/files
+  mkdir: true
+  exist-ok: true
+  parents: true
+
+web:
+  base-url: https://exmple.org

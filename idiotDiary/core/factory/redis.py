@@ -1,7 +1,7 @@
 import logging
 
 from redis.asyncio import Redis
-from idiotDiary.core.data.models.redis import RedisConfig
+from idiotDiary.core.data.redis.config.models import RedisConfig
 
 logger = logging.getLogger(__name__)
 
