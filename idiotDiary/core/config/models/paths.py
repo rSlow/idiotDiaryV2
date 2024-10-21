@@ -13,6 +13,10 @@ class Paths:
         return self.app_dir / "config"
 
     @property
+    def config_file(self) -> Path:
+        return self.config_path / "config.yml"
+
+    @property
     def logging_config_file(self) -> Path:
         return self.config_path / "logging.yml"
 
@@ -23,3 +27,31 @@ class Paths:
     @property
     def version_path(self) -> Path:
         return self.app_dir / "version.yaml"
+
+    @property
+    def src_path(self) -> Path:
+        return self.app_dir / "idiotDiary"
+
+    @property
+    def media_path(self) -> Path:
+        return self.app_dir / "media"
+
+    @property
+    def core_path(self) -> Path:
+        return self.src_path / "core"
+
+    @property
+    def bot_path(self) -> Path:
+        return self.src_path / "bot"
+
+    @property
+    def api_path(self) -> Path:
+        return self.src_path / "api"
+
+    @property
+    def admin_path(self) -> Path:
+        return self.src_path / "flaskadmin"
+
+    @property
+    def faststream_path(self) -> Path:
+        return self.src_path / "mq"

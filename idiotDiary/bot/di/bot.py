@@ -1,33 +1,46 @@
-from typing import AsyncIterable
+import logging
+from typing import AsyncIterable, NewType
 
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from dishka import Provider, Scope, provide
+from aiogram.types import BotCommand
+from dishka import Provider, Scope, provide, from_context
 
-from ..config.models.bot import BotConfig
-from ..views.bot_alert import BotAlert
-from ..views.jinja_filters import setup_jinja
+from idiotDiary.bot.config.models.bot import BotConfig
+from idiotDiary.bot.config.models.main import BotAppConfig
+from idiotDiary.bot.config.models.storage import StorageConfig
+from idiotDiary.bot.views.alert import BotAlert
+
+BotCommandsList = NewType('CommandsList', list[BotCommand])
+
+logger = logging.getLogger(__name__)
 
 
 class BotProvider(Provider):
     scope = Scope.APP
 
+    bot_config = from_context(BotAppConfig)
+
+    @provide
+    def get_bot_config(self, config: BotAppConfig) -> BotConfig:
+        return config.bot
+
+    @provide
+    def get_bot_storage_config(self, config: BotAppConfig) -> StorageConfig:
+        return config.storage
+
     @provide
     async def get_bot(self, bot_config: BotConfig) -> AsyncIterable[Bot]:
-        async with Bot(  # TODO ??? __aenter__ not exists
-                token=bot_config.token,
-                default=DefaultBotProperties(
-                    parse_mode=ParseMode.HTML,
-                    allow_sending_without_reply=True,
-                ),
-        ) as bot:
-            setup_jinja(bot)
-            yield bot
+        bot = Bot(
+            token=bot_config.token,
+            default=DefaultBotProperties(
+                parse_mode=ParseMode.HTML, allow_sending_without_reply=True
+            )
+        )
+        yield bot
+        await bot.session.close()
 
-    # TODO нужен ли alert?
     @provide
-    async def bot_alert(self,
-                        bot: Bot,
-                        bot_config: BotConfig) -> BotAlert:
+    async def bot_alert(self, bot: Bot, bot_config: BotConfig) -> BotAlert:
         return BotAlert(bot, bot_config.log_chat)

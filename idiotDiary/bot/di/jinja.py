@@ -1,14 +1,16 @@
 import logging
 
-from dishka import Provider, provide
+from dishka import Provider, provide, Scope
 from jinja2 import Environment, FileSystemLoader, BaseLoader
 
-from idiotDiary.bot.config.models.bot import BotConfig
+from idiotDiary.core.config import Paths
 
 logger = logging.getLogger(__name__)
 
 
 class JinjaProvider(Provider):
+    scope = Scope.APP
+
     @provide
     def get_environment(self, loader: BaseLoader) -> Environment:
         env = Environment(
@@ -17,11 +19,11 @@ class JinjaProvider(Provider):
             lstrip_blocks=True,
             autoescape=True
         )
-        logger.info("Jinja init:")  # TODO log init jinja, f.e. counting templates of s.e.
+        logger.info(f"Jinja init with loader <{loader.__class__.__name__}>")
         return env
 
     @provide
-    def get_loader(self, bot_config: BotConfig) -> BaseLoader:
+    def get_loader(self, paths: Paths) -> BaseLoader:
         return FileSystemLoader(
-            searchpath=bot_config.templates_dir  # TODO продумать папку с шаблонами
+            searchpath=paths.bot_path / "views" / "jinja" / "templates"
         )

@@ -1,21 +1,29 @@
-from sqlalchemy import Text, BigInteger, Boolean
-from sqlalchemy.orm import mapped_column
+from sqlalchemy import BigInteger, sql
+from sqlalchemy.orm import mapped_column, Mapped
 
-from idiotDiary.core import dto
-from .base import Base
+from idiotDiary.core.data.db import dto
+from idiotDiary.core.data.db.models import Base
+from idiotDiary.core.data.db.models.mixins.time import TimeMixin
 
 
-class User(Base):
+class User(TimeMixin, Base):
     __tablename__ = "users"
     __mapper_args__ = {"eager_defaults": True}  # TODO eager_defaults
 
-    id = mapped_column(BigInteger, primary_key=True)
-    tg_id = mapped_column(BigInteger, unique=True, nullable=False)
-    first_name = mapped_column(Text, nullable=True)
-    last_name = mapped_column(Text, nullable=True)
-    username = mapped_column(Text, nullable=True)
-    hashed_password = mapped_column(Text, nullable=True)
-    is_bot = mapped_column(Boolean, default=False)
+    tg_id: Mapped[int] = mapped_column(BigInteger, unique=True, nullable=False)
+    first_name: Mapped[str | None]
+    last_name: Mapped[str | None]
+    username: Mapped[str | None] = mapped_column(nullable=True, unique=True)
+    hashed_password: Mapped[str | None]
+    is_bot: Mapped[bool] = mapped_column(
+        default=False, server_default=sql.false()
+    )
+    is_superuser: Mapped[bool] = mapped_column(
+        default=False, server_default=sql.false()
+    )
+    is_active: Mapped[bool] = mapped_column(
+        default=True, server_default=sql.true()
+    )
 
     def __repr__(self) -> str:
         rez = (
@@ -30,10 +38,12 @@ class User(Base):
 
     def to_dto(self) -> dto.User:
         return dto.User(
-            db_id=self.id,
+            id_=self.id,
             tg_id=self.tg_id,
             username=self.username,
             first_name=self.first_name,
             last_name=self.last_name,
             is_bot=self.is_bot,
+            is_superuser=self.is_superuser,
+            is_active=self.is_active,
         )

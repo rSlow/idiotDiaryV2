@@ -1,36 +1,67 @@
-version: "3.8"
-
 services:
+
+  #####  SERVICES  #####
+
   aiogram:
-    build: ./telegram_bot
-    restart: always
-    environment:
-      - ENV_FILE=${ENV_FILE:-.env}
+    build: .
+    ports:
+      - "127.0.0.1:${EXPOSE_API:-8000}:8000"
     volumes:
-      - ./${ENV_FILE:-.env}/:/app/${ENV_FILE:-.env}/:ro
-      - ./telegram_bot/logs/:/app/logs/:rw
+      - type: "bind"
+        source: "./log/"
+        target: "/app/log/"
+      - type: "bind"
+        source: "./config/"
+        target: "/app/config/"
+        read_only: true
     depends_on:
       - postgres
       - redis
       - selenium
+      - rabbitmq
+      - migrations
+    restart: always
+    entrypoint:
+      [ "poetry", "run", "python", "-m", "idiotDiary" ]
+    profiles:
+      - services
+
+  faststream:
+    build: .
+    restart: always
+    volumes:
+      - type: "bind"
+        source: "./config/"
+        target: "/app/config/"
+        read_only: true
+    depends_on:
+      - rabbitmq
+    entrypoint:
+      [ "poetry", "run", "python", "-m", "idiotDiary.mq" ]
+    profiles:
+      - services
+
+  #####  RUNNERS  #####
 
   postgres:
     image: postgres
     restart: always
     env_file:
-      - ${ENV_FILE:-.env}
+      - ${DOCKER_ENV_FILE:-.env}
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "127.0.0.1:${EXPOSE_PG:-5432}:5432"
     volumes:
-      - pg_idv2:/var/lib/postgresql/data/pgdata/idiotDiaryV2
+      - type: "volume"
+        source: "postgres"
+        target: "/app/pgdata/idiotDiary/"
     environment:
-      PGDATA: /var/lib/postgresql/data/pgdata/idiotDiaryV2
+      PGDATA: /app/pgdata/idiotDiary/
+    profiles:
+      - runners
 
   redis:
     image: redis
     restart: always
-    ports:
-      - "${REDIS_PORT}:6379"
     command:
       - "redis-server"
       - "--loglevel ${REDIS_LOGLEVEL:-warning}"
@@ -40,35 +71,61 @@ services:
       - "--save 60 10000"
       - "--maxmemory ${REDIS_MAXMEM:-50mb}"
       - "--maxmemory-policy ${REDIS_POLICY:-noeviction}"
-      - "--requirepass ${REDIS_PASS}"
+      - "--requirepass ${REDIS_PASSWORD}"
     volumes:
-      - redis:/data
+      - type: "volume"
+        source: "redis"
+        target: "/data/"
     env_file:
-      - ${ENV_FILE:-.env}
+      - ${DOCKER_ENV_FILE:-.env}
+    profiles:
+      - runners
 
-  nginx:
-    image: nginx
+  rabbitmq:
+    image: rabbitmq:management
     restart: always
     ports:
-      - "${WEBHOOK_PORT:-443}:443"
-      - "8444:80"
+      - "127.0.0.1:${EXPOSE_RABBITMQ}:5672"
+      - "127.0.0.1:${EXPOSE_RABBITMQ_HTTP}:15672"
     volumes:
-      - ${CERTS_DIR:-./}:/data/certs/:ro
-      - ./nginx/default.conf:/etc/nginx/templates/default.conf.template/:rw
+      - type: "volume"
+        source: "rabbitmq"
+        target: "/var/lib/rabbitmq/"
     env_file:
-      - ${ENV_FILE:-.env}
-    depends_on:
-      - aiogram
+      - ${DOCKER_ENV_FILE:-.env}
+    environment:
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit log_levels [{connection,error},{default,error}] disk_free_limit 2147483648
+    profiles:
+      - runners
 
   selenium:
     image: selenium/standalone-chrome:latest
     restart: always
     shm_size: 500m
     ports:
-      - "${SELENIUM_PORT}:${SELENIUM_PORT}"
-      - "7900:7900"
+      - "127.0.0.1:${EXPOSE_SELENIUM:-4444}:4444"
     privileged: true
+    profiles:
+      - runners
+
+  #####  STARTERS  #####
+
+  migrations:
+    restart: "no"
+    build: .
+    volumes:
+      - type: "bind"
+        source: "./alembic.ini"
+        target: "/app/alembic.ini"
+        read_only: true
+    entrypoint: [ "poetry", "run", "alembic", "upgrade", "heads" ]
+    depends_on:
+      - postgres
+    profiles:
+      - starters
+      - migrations
 
 volumes:
   redis:
-  pg_idv2:
+  postgres:
+  rabbitmq:

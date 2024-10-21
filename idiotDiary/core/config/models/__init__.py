@@ -1,9 +1,19 @@
-
 __all__ = [
+    "AppConfig",
+    "SecurityConfig",
     "BaseConfig",
-    "FileStorageConfig",
-    "Paths"
+    "DBConfig",
+    "MQConfig",
+    "Paths",
+    "RedisConfig",
+    "WebConfig",
 ]
 
-from idiotDiary.core.config.models.main import BaseConfig
-from idiotDiary.core.config.models.paths import Paths
+from .app import AppConfig
+from .auth import SecurityConfig
+from .main import BaseConfig
+from .db import DBConfig
+from .mq import MQConfig
+from .paths import Paths
+from .redis import RedisConfig
+from .web import WebConfig

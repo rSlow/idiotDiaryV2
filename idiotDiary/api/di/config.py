@@ -1,20 +1,14 @@
-from adaptix import Retort
-from dishka import Provider, Scope, provide
+from dishka import Provider, Scope, provide, from_context
 
-from idiotDiary.api.config.models.main import ApiConfig
-from idiotDiary.api.config.parser.main import load_config
-from idiotDiary.common.config import Paths
+from idiotDiary.api.config.models import ApiAppConfig
+from idiotDiary.api.config.models.api import ApiConfig
 
 
-class ApiConfigProvider(Provider):
+class ApiProvider(Provider):
     scope = Scope.APP
 
-    @provide
-    def get_api_config(self,
-                       paths: Paths,
-                       base_retort: Retort) -> ApiConfig:
-        return load_config(paths, base_retort)
+    api_config = from_context(ApiAppConfig)
 
     @provide
-    def get_auth_config(self, config: ApiConfig) -> AuthConfig:
-        return config.auth
+    def get_api_config(self, api_app: ApiAppConfig) -> ApiConfig:
+        return api_app.api

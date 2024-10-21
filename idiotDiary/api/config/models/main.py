@@ -1,34 +1,19 @@
 from __future__ import annotations
 
-from abc import abstractmethod
 from dataclasses import dataclass
-from typing import Protocol, Self
 
-from shvatka.api.config.models.auth import AuthConfig
-from idiotDiary.common.config.models.main import BaseConfig
+from idiotDiary.core.config import BaseConfig
+from .api import ApiConfig
 
 
 @dataclass
-class ApiConfig(BaseConfig):
-    auth: AuthConfig
-    context_path: str = ""
-    enable_logging: bool = False
+class ApiAppConfig(BaseConfig):
+    api: ApiConfig
 
     @classmethod
-    def from_base(
-            cls,
-            base: BaseConfig,
-            auth: AuthConfig,
-            context_path: str = "",
-            enable_logging: bool = False,
-    ):
+    def from_base(cls, base: BaseConfig, api: ApiConfig):
         return cls(
-            paths=base.paths,
-            db=base.db,
-            redis=base.redis,
-            auth=auth,
-            context_path=context_path,
-            app=base.app,
-            enable_logging=enable_logging,
-            web=base.web,
+            paths=base.paths, db=base.db, redis=base.redis, app=base.app,
+            web=base.web, mq=base.mq,
+            api=api, auth=base.auth,
         )

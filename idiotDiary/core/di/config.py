@@ -1,48 +1,31 @@
-from dishka import Provider, provide, Scope
+from dishka import Provider, provide, Scope, from_context
 
-from idiotDiary.core.config.models.main import Paths, BaseConfig
-from idiotDiary.core.config.models.main import WebConfig
-from idiotDiary.core.config.parser.paths import get_paths
-from idiotDiary.core.data.storage.config.models import StorageConfig
-
-from idiotDiary.tgbot.config.models.bot import BotConfig, TgClientConfig
-from idiotDiary.tgbot.config.models.main import TgBotConfig
-from idiotDiary.tgbot.config.parser.main import load_config as load_bot_config
+from idiotDiary.core.config.models import (
+    Paths, BaseConfig, WebConfig, MQConfig, SecurityConfig, AppConfig,
+)
 
 
 class BaseConfigProvider(Provider):
     scope = Scope.APP
 
-    def __init__(self, path_env: str = "SHVATKA_PATH"):
-        super().__init__()
-        self.path_env = path_env
+    config = from_context(BaseConfig)
 
     @provide
-    def get_paths(self) -> Paths:
-        return get_paths(self.path_env)
-
-    # TODO посмотреть конфиги
+    def get_paths(self, config: BaseConfig) -> Paths:
+        return config.paths
 
     @provide
-    def get_tgbot_config(self, paths: Paths) -> TgBotConfig:
-        return load_bot_config(paths)
-
-    @provide
-    def get_base_config(self, config: TgBotConfig) -> BaseConfig:
-        return config
-
-    @provide
-    def get_bot_config(self, config: TgBotConfig) -> BotConfig:
-        return config.bot
-
-    @provide
-    def get_bot_storage_config(self, config: TgBotConfig) -> StorageConfig:
-        return config.storage
-
-    @provide
-    def get_tg_client_config(self, config: TgBotConfig) -> TgClientConfig:
-        return config.tg_client
-
-    @provide
-    def get_web_app_config(self, config: TgBotConfig) -> WebConfig:
+    def get_web_config(self, config: BaseConfig) -> WebConfig:
         return config.web
+
+    @provide
+    def get_mq_config(self, config: BaseConfig) -> MQConfig:
+        return config.mq
+
+    @provide
+    def get_auth_config(self, config: BaseConfig) -> SecurityConfig:
+        return config.auth
+
+    @provide
+    def get_app_config(self, config: BaseConfig) -> AppConfig:
+        return config.app

@@ -3,10 +3,9 @@ from typing import AsyncIterable
 from dishka import Provider, Scope, provide
 from sqlalchemy.ext.asyncio import async_sessionmaker, AsyncSession, AsyncEngine
 
-from idiotDiary.core.data.models.db import DBConfig
-
 from idiotDiary.core.config.models import BaseConfig
-from idiotDiary.core.factory.db import create_engine, create_session_maker
+from idiotDiary.core.config.models.db import DBConfig
+from idiotDiary.core.factory.db.a_sync import create_engine, create_session_maker
 
 
 class DbProvider(Provider):
@@ -17,7 +16,9 @@ class DbProvider(Provider):
         return base_config.db
 
     @provide
-    async def get_engine(self, db_config: DBConfig) -> AsyncIterable[AsyncEngine]:
+    async def get_engine(
+            self, db_config: DBConfig
+    ) -> AsyncIterable[AsyncEngine]:
         engine = create_engine(db_config)
         yield engine
         await engine.dispose(True)
