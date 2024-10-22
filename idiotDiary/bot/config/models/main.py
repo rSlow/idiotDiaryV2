@@ -16,6 +16,6 @@ class BotAppConfig(BaseConfig):
     ):
         return cls(
             paths=base.paths, db=base.db, redis=base.redis, app=base.app,
-            web=base.web, media=base.media, mq=base.mq, auth=base.auth,
+            web=base.web, mq=base.mq, auth=base.auth,
             bot=bot, storage=storage
         )

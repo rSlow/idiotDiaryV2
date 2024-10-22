@@ -4,6 +4,7 @@ from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 from aiogram_dialog.api.entities import DialogUpdateEvent
 
+from idiotDiary.bot.config.models import BotConfig
 from idiotDiary.bot.middlewares.config import MiddlewareData
 from idiotDiary.bot.views.alert import BotAlert
 from idiotDiary.core.data.db import dto
@@ -21,6 +22,7 @@ class ContextDataMiddleware(BaseMiddleware):
     ) -> Any:
         dishka = data["dishka_container"]
         dao_holder: DaoHolder = await dishka.get(DaoHolder)
+        data["bot_config"] = await dishka.get(BotConfig)
         data["locker"] = await dishka.get(LockFactory)
         data["scheduler"] = await dishka.get(Scheduler)
         data["alert"] = await dishka.get(BotAlert)

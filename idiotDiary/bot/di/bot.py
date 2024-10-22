@@ -1,18 +1,15 @@
 import logging
-from typing import AsyncIterable, NewType
+from typing import AsyncIterable
 
 from aiogram import Bot
 from aiogram.client.default import DefaultBotProperties
 from aiogram.enums import ParseMode
-from aiogram.types import BotCommand
 from dishka import Provider, Scope, provide, from_context
 
 from idiotDiary.bot.config.models.bot import BotConfig
 from idiotDiary.bot.config.models.main import BotAppConfig
 from idiotDiary.bot.config.models.storage import StorageConfig
 from idiotDiary.bot.views.alert import BotAlert
-
-BotCommandsList = NewType('CommandsList', list[BotCommand])
 
 logger = logging.getLogger(__name__)
 

@@ -11,7 +11,6 @@ from dishka import Provider, Scope, provide, AsyncContainer
 from dishka.integrations.aiogram import setup_dishka as setup_aiogram_dishka
 from redis.asyncio import Redis
 
-from idiotDiary.bot.config.models.bot import BotConfig
 from idiotDiary.bot.config.models.storage import StorageConfig, StorageType
 from idiotDiary.bot.dialogs import setup_dialogs
 from idiotDiary.bot.handlers import setup_handlers
@@ -30,12 +29,11 @@ class DpProvider(Provider):
             self,
             dishka: AsyncContainer,
             event_isolation: BaseEventIsolation,
-            bot_config: BotConfig,
             storage: BaseStorage,
     ) -> Dispatcher:
         dp = Dispatcher(storage=storage, events_isolation=event_isolation)
         setup_aiogram_dishka(container=dishka, router=dp)
-        setup_handlers(dp, bot_config)
+        setup_handlers(dp)
         setup_dialogs(dp)
         setup_middlewares(dp)
 
@@ -77,7 +75,7 @@ class DpProvider(Provider):
 
     @provide
     def get_bg_manager_factory(self, dp: Dispatcher) -> BgManagerFactory:
-        return BgManagerFactoryImpl(dp)
+        return BgManagerFactoryImpl(dp).bg()
 
 
 def resolve_update_types(dp: Dispatcher) -> list[str]:

@@ -2,7 +2,6 @@ from sqlalchemy import ScalarResult, select, Result, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import MultipleResultsFound, NoResultFound
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
 
 from idiotDiary.core.data.db import models as db, dto
 from idiotDiary.core.data.db.dao.base import BaseDao
@@ -18,7 +17,6 @@ class UserDao(BaseDao[db.User]):
         result: ScalarResult[db.User] = await self.session.scalars(
             select(self.model)
             .where(self.model.tg_id == tg_id)
-            .options(*get_user_options())
         )
         user = result.one()
         return user.to_dto()
@@ -27,7 +25,6 @@ class UserDao(BaseDao[db.User]):
         result = await self.session.scalars(
             select(self.model)
             .where(self.model.id == id_)
-            .options(*get_user_options())
         )
         return result.one().to_dto()
 
@@ -35,7 +32,6 @@ class UserDao(BaseDao[db.User]):
         result: Result[tuple[db.User]] = await self.session.execute(
             select(self.model)
             .where(self.model.username == username)
-            .options(*get_user_options())
         )
 
         try:
@@ -104,9 +100,3 @@ class UserDao(BaseDao[db.User]):
             .values(is_active=False)
         )
         await self.commit()
-
-
-def get_user_options():
-    return (
-        joinedload(db.User.region),
-    )
