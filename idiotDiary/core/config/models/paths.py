@@ -37,6 +37,10 @@ class Paths:
         return self.app_dir / "media"
 
     @property
+    def temp_folder_path(self) -> Path:
+        return self.app_dir / "temp"
+
+    @property
     def core_path(self) -> Path:
         return self.src_path / "core"
 

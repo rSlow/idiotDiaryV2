@@ -1,14 +1,16 @@
 from io import BytesIO
 from pathlib import Path
 
-from PIL import Image
 from aiogram import types, Bot
 from aiogram.enums import ContentType
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.text import Const
+
 from apps.not_working_place.states import StickersFSM
 from common.buttons import CANCEL_BUTTON
+from PIL import Image
+
 from common.utils.functions import edit_dialog_message
 
 
@@ -29,15 +31,16 @@ async def image_handler(message: types.Message,
         file_id = document.file_id
         if "image" not in document.mime_type:
             ext = Path(document.file_name).suffix.lower()
-            return await message.answer(
-                f"Неверный тип отправленного файла - {ext}")
+            return await message.answer(f"Неверный тип отправленного файла - {ext}")
     else:
         return await message.answer("Не было получено нужного объекта.")
 
     await message.delete()
 
-    file_io = await bot.download(file=file_id)
-
+    file_io = await bot.download(
+        file=file_id,
+        destination=BytesIO(),
+    )
     with Image.open(file_io) as image:
         image_size = image.size
         new_image_size = get_new_image_size(
@@ -71,8 +74,7 @@ def get_new_image_size(size: tuple[int, int],
 
 stickers_dialog = Dialog(
     Window(
-        Const(
-            "Ожидаю фото или картинку документом в формате PNG, JPG или BMP..."),
+        Const("Ожидаю фото или картинку документом в формате PNG, JPG или BMP..."),
         MessageInput(
             func=image_handler,
             content_types=[ContentType.PHOTO, ContentType.DOCUMENT]

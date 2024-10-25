@@ -27,6 +27,10 @@ passlib = "^1.7.4"
 asgi-monitor = "^0.5.0"
 pyyaml = "^6.0.2"
 sqlalchemy-utils = "^0.41.2"
+taskiq = "^0.11.7"
+taskiq-aio-pika = "^0.4.1"
+taskiq-redis = "^1.0.2"
+faststream = "^0.5.28"
 
 
 [build-system]

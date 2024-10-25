@@ -19,7 +19,7 @@ class BaseInjectContext(ABC):
     container: Container | AsyncContainer | None = None
 
     @classmethod
-    def _check_container(cls, is_async: bool) -> None:
+    def _check_container_init(cls) -> None:
         if cls.container is None:
             raise RuntimeError(
                 "Inject context container has not been initialized"
@@ -28,16 +28,6 @@ class BaseInjectContext(ABC):
             raise TypeError(
                 f"{cls.container} is {cls.container.__class__.__name__}, "
                 "not Container or AsyncContainer"
-            )
-        if isinstance(cls.container, Container) and is_async:
-            raise AttributeError(
-                "For `@inject` decorator you have to use AsyncContainer. "
-                "Use `@sync_inject` decorator instead."
-            )
-        if isinstance(cls.container, AsyncContainer) and not is_async:
-            raise AttributeError(
-                "For `@sync_inject` decorator you have to use Container (sync)."
-                " Use `@inject` decorator instead."
             )
 
     @classmethod
@@ -49,7 +39,7 @@ class BaseInjectContext(ABC):
             )
 
         async def wrapper(*args, **kwargs):
-            cls._check_container(is_async=True)
+            cls._check_container_init()
 
             async with cls.container() as request_container:
                 wrapped = wrap_injection(
@@ -71,7 +61,7 @@ class BaseInjectContext(ABC):
             )
 
         def wrapper(*args, **kwargs):
-            cls._check_container(is_async=False)
+            cls._check_container_init()
 
             with cls.container() as request_container:
                 wrapped = wrap_injection(

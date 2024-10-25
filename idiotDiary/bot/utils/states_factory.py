@@ -1,8 +1,12 @@
+import hashlib
+
 from aiogram.fsm.state import StatesGroup, State
 
 
 class FSMSingleFactory:
-    def __init__(self, group_name: str, state_name: str):
+    def __init__(self, group_name: str):
+        state_hash = hashlib.md5(group_name.encode())
+        state_name = state_hash.hexdigest()[:9]
         _states_group: StatesGroup = type(  # type:ignore
             group_name,
             (StatesGroup,),

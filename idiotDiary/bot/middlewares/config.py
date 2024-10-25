@@ -8,8 +8,10 @@ from aiogram_dialog import DialogManager
 from aiogram_dialog.api.entities import Stack, Context
 from aiogram_dialog.context.storage import StorageProxy
 from dishka import AsyncContainer
+from faststream.broker.core.abc import ABCBroker
 
 from idiotDiary.bot.config.models import BotConfig
+from idiotDiary.bot.di.jinja import JinjaRenderer
 from idiotDiary.bot.views.alert import BotAlert
 from idiotDiary.core.data.db import dto
 from idiotDiary.core.data.db.dao import DaoHolder
@@ -42,6 +44,8 @@ class MiddlewareData(DialogMiddlewareData, total=False):
     locker: LockFactory
     alert: BotAlert
     scheduler: Scheduler
+    jinja_renderer: JinjaRenderer
+    mq: ABCBroker
 
     bot_config: BotConfig
 

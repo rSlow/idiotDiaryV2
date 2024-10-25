@@ -2,6 +2,7 @@ from .config import BaseConfigProvider
 from .dao import DaoProvider
 from .db import DbProvider
 from .lock import LockProvider
+from .mq import MQProvider
 from .redis import RedisProvider
 from .scheduler import SchedulerProvider
 from .security import SecurityProvider
@@ -22,4 +23,5 @@ def get_common_providers():
         RedisProvider(),
         LockProvider(),
         SchedulerProvider(),
+        MQProvider(),
     ]

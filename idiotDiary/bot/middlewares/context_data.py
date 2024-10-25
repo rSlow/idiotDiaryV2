@@ -3,8 +3,10 @@ from typing import Callable, Any, Awaitable
 from aiogram import BaseMiddleware
 from aiogram.types import TelegramObject
 from aiogram_dialog.api.entities import DialogUpdateEvent
+from faststream.broker.core.abc import ABCBroker
 
 from idiotDiary.bot.config.models import BotConfig
+from idiotDiary.bot.di.jinja import JinjaRenderer
 from idiotDiary.bot.middlewares.config import MiddlewareData
 from idiotDiary.bot.views.alert import BotAlert
 from idiotDiary.core.data.db import dto
@@ -25,7 +27,9 @@ class ContextDataMiddleware(BaseMiddleware):
         data["bot_config"] = await dishka.get(BotConfig)
         data["locker"] = await dishka.get(LockFactory)
         data["scheduler"] = await dishka.get(Scheduler)
+        data["jinja_renderer"] = await dishka.get(JinjaRenderer)
         data["alert"] = await dishka.get(BotAlert)
+        data["mq"] = await dishka.get(ABCBroker)
         data["dao"] = dao_holder
 
         user_tg = data.get("event_from_user", None)
