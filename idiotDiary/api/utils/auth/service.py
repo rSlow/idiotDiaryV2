@@ -1,18 +1,29 @@
-import base64
 import logging
-import typing
+import typing as t
+from functools import wraps
 
 import jwt
+from dishka import FromDishka
 from fastapi import HTTPException, Request
 from starlette import status
 
-from idiotDiary.core.data.db import dto
-from idiotDiary.core.data.db.dao import DaoHolder
+from idiotDiary.core.db import dto
+from idiotDiary.core.db.dao import DaoHolder
 from idiotDiary.core.utils.auth.security import SecurityProps
 from idiotDiary.core.utils.auth.token import Token
 from idiotDiary.core.utils.exceptions.user import NoUsernameFound
 
 logger = logging.getLogger(__name__)
+T = t.TypeVar("T")
+P = t.ParamSpec("P")
+
+
+def auth_required(func: t.Callable[P, T]):
+    @wraps(func)
+    async def decorated(*args, user: FromDishka[dto.User], **kwargs):
+        return await func(*args, user=user, **kwargs)
+
+    return decorated
 
 
 class AuthService:
@@ -67,7 +78,7 @@ class AuthService:
             if payload.get("sub") is None:
                 logger.warning("valid jwt contains no user id")
                 raise credentials_exception
-            user_db_id = int(typing.cast(str, payload.get("sub")))
+            user_db_id = int(t.cast(str, payload.get("sub")))
 
         except jwt.PyJWTError as e:
             logger.info("invalid jwt", exc_info=e)
@@ -94,6 +105,5 @@ class AuthService:
         schema, token = header.split(" ", maxsplit=1)
         if schema.lower() != "basic":
             return None
-        decoded = base64.urlsafe_b64decode(token).decode("utf-8")
-        username, password = decoded.split(":", maxsplit=1)
+        username, password = self.security.decode_basic_auth(header)
         return await self.authenticate_user(username, password, dao)

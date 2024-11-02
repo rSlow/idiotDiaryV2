@@ -2,12 +2,14 @@ import logging
 from asyncio import Protocol
 
 from apscheduler.executors.asyncio import AsyncIOExecutor
+from apscheduler.jobstores.base import JobLookupError
 from apscheduler.jobstores.redis import RedisJobStore
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from dishka import AsyncContainer
 from redis import Redis
 
 from idiotDiary.core.config.models.redis import RedisConfig
+from idiotDiary.core.db import dto
 from idiotDiary.core.scheduler.context import SchedulerInjectContext
 
 logger = logging.getLogger(__name__)
@@ -31,6 +33,7 @@ class Scheduler(Protocol):
 
 class ApScheduler(Scheduler):
     def __init__(self, dishka: AsyncContainer, redis_config: RedisConfig):
+        # TODO move to di
         SchedulerInjectContext.container = dishka
         self.job_store = RedisJobStore(
             host=redis_config.host,
@@ -52,86 +55,6 @@ class ApScheduler(Scheduler):
             executors={"default": self.executor},
         )
 
-    # TODO create jobs
-
-    # async def plain_prepare(self, game: dto.Game):
-    #     self.scheduler.add_job(
-    #         func="shvatka.infrastructure.scheduler.wrappers:prepare_game_wrapper",
-    #         kwargs={"game_id": game.id, "author_id": game.author.id},
-    #         trigger="date",
-    #         run_date=game.prepared_at.astimezone(tz=tz_utc),
-    #         timezone=tz_utc,
-    #         id=_prepare_game_key(game),
-    #     )
-    #
-    # async def plain_start(self, game: dto.Game):
-    #     assert game.start_at
-    #     self.scheduler.add_job(
-    #         func="shvatka.infrastructure.scheduler.wrappers:start_game_wrapper",
-    #         kwargs={"game_id": game.id, "author_id": game.author.id},
-    #         trigger="date",
-    #         run_date=game.start_at.astimezone(tz=tz_utc),
-    #         timezone=tz_utc,
-    #         id=_start_game_key(game),
-    #     )
-    #
-    # async def cancel_scheduled_game(self, game: dto.Game):
-    #     try:
-    #         self.scheduler.remove_job(job_id=_prepare_game_key(game))
-    #     except JobLookupError as e:
-    #         logger.error(
-    #             "can't remove job %s for preparing game %s",
-    #             _prepare_game_key(game),
-    #             game.id,
-    #             exc_info=e,
-    #         )
-    #     try:
-    #         self.scheduler.remove_job(job_id=_start_game_key(game))
-    #     except JobLookupError as e:
-    #         logger.error(
-    #             "can't remove job %s for start game %s",
-    #             _start_game_key(game), game.id,
-    #             exc_info=e
-    #         )
-    #
-    # async def plain_hint(
-    #         self,
-    #         level: dto.Level,
-    #         team: dto.Team,
-    #         hint_number: int,
-    #         run_at: datetime,
-    # ):
-    #     self.scheduler.add_job(
-    #         func="shvatka.infrastructure.scheduler.wrappers:send_hint_wrapper",
-    #         kwargs={
-    #             "level_id": level.db_id,
-    #             "team_id": team.id,
-    #             "hint_number": hint_number
-    #         },
-    #         trigger="date",
-    #         run_date=run_at,
-    #         timezone=tz_utc,
-    #     )
-    #
-    # async def plain_test_hint(
-    #         self,
-    #         suite: dto.LevelTestSuite,
-    #         hint_number: int,
-    #         run_at: datetime,
-    # ):
-    #     self.scheduler.add_job(
-    #         func="shvatka.infrastructure.scheduler.wrappers:send_hint_for_testing_wrapper",
-    #         kwargs={
-    #             "level_id": suite.level.db_id,
-    #             "game_id": suite.level.game_id,
-    #             "player_id": suite.tester.player.id,
-    #             "hint_number": hint_number,
-    #         },
-    #         trigger="date",
-    #         run_date=run_at,
-    #         timezone=tz_utc,
-    #     )
-
     async def start(self):
         # TODO scheduler не стартует (выдается только в middleware data,
         #  нужно запускать самостоятельно)
@@ -141,3 +64,45 @@ class ApScheduler(Scheduler):
         self.scheduler.shutdown()
         self.executor.shutdown()
         self.job_store.shutdown()
+
+    # ----- TASKS -----#
+    def remove_birthday_notification(
+            self, notification: dto.NotificationTime
+    ):
+        job_id = _prepare_notification_key(notification)
+        try:
+            self.scheduler.remove_job(job_id=job_id)
+        except JobLookupError as e:
+            logger.error(
+                "can't remove job %s for preparing game %s",
+                job_id,
+                notification.id_,
+                exc_info=e,
+            )
+
+    def add_birthday_notification(
+            self, notification: dto.NotificationTime,
+            state: dto.NotificationState
+    ):
+
+        self.scheduler.add_job(
+            func="idiotDiary.core.scheduler.tasks:"
+                 "send_birthdays",
+            id=_prepare_notification_key(notification),
+            trigger="cron",
+            hour=(notification.time.hour + state.timeshift.hour) % 24,
+            minute=(notification.time.minute + state.timeshift.minute) % 60,
+            kwargs={"user_id": state.user_id}
+        )
+
+    def update_user_birthdays(
+            self, state: dto.NotificationState,
+            notifications: list[dto.NotificationTime]
+    ):
+        for notification in notifications:
+            self.remove_birthday_notification(notification)
+            self.add_birthday_notification(notification, state)
+
+
+def _prepare_notification_key(notification: dto.NotificationTime) -> str:
+    return f"notification-{notification.id_}"

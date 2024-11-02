@@ -10,8 +10,11 @@ from idiotDiary.bot.config.models.bot import BotConfig
 from idiotDiary.bot.config.models.main import BotAppConfig
 from idiotDiary.bot.config.models.storage import StorageConfig
 from idiotDiary.bot.views.alert import BotAlert
+from idiotDiary.core.config import BaseConfig
 
 logger = logging.getLogger(__name__)
+
+
 
 
 class BotProvider(Provider):

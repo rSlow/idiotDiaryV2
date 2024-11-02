@@ -3,7 +3,7 @@ from typing import AsyncIterable
 from dishka import Provider, Scope, provide, AsyncContainer
 
 from idiotDiary.core.config.models.redis import RedisConfig
-from idiotDiary.core.scheduler.scheduler import Scheduler, ApScheduler
+from idiotDiary.core.scheduler.scheduler import ApScheduler
 
 
 class SchedulerProvider(Provider):
@@ -12,7 +12,7 @@ class SchedulerProvider(Provider):
     @provide
     async def create_scheduler(
             self, dishka: AsyncContainer, redis_config: RedisConfig
-    ) -> AsyncIterable[Scheduler]:
+    ) -> AsyncIterable[ApScheduler]:
         async with ApScheduler(
                 dishka=dishka,
                 redis_config=redis_config

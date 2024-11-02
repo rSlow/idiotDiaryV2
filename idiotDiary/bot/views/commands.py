@@ -16,3 +16,7 @@ UPDATE = BotCommand(
     command="update",
     description="обновить"
 )
+BIRTHDAYS = BotCommand(
+    command="birthdays",
+    description="check дни рождений"
+)

@@ -2,20 +2,7 @@ from datetime import datetime
 
 from pydantic import BaseModel, Field
 
-from idiotDiary.core.data.db import dto
-
-
-class FlaskLoginMixin:
-    @property
-    def is_authenticated(self):
-        return True
-
-    @property
-    def is_anonymous(self):
-        return False
-
-    def get_id(self):
-        return self.id_  # type:ignore
+from idiotDiary.core.db import dto
 
 
 class WebAppUser(BaseModel):

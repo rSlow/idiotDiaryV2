@@ -3,8 +3,7 @@ from abc import ABC
 from datetime import datetime, date, time
 from typing import Optional, Literal
 
-from common.filters import UserIDFilter
-from config import formats, settings
+from config import formats
 
 
 class StrFTimeValidFactory(ABC):
@@ -29,7 +28,8 @@ class StrFTimeValidFactory(ABC):
                 case "time":
                     valid_dt = valid_dt.time()
                 case _:
-                    raise RuntimeError("method can be only '.date()' or '.time()'")
+                    raise RuntimeError(
+                        "method can be only '.date()' or '.time()'")
         return valid_dt
 
 
@@ -55,8 +55,3 @@ class DateTimeValidFactory(StrFTimeValidFactory):
             re_format=formats.DATETIME_RE_FORMAT,
             ftime_format=formats.DATETIME_FORMAT
         )
-
-
-class BirthdaysAllowedFilter(UserIDFilter):
-    def __init__(self):
-        super().__init__(settings.BIRTHDAYS_ALLOWED)

@@ -6,15 +6,14 @@ from aiogram.exceptions import AiogramError
 from aiogram.exceptions import TelegramForbiddenError
 from aiogram.filters import ExceptionTypeFilter
 from aiogram.types.error_event import ErrorEvent
-from aiogram.utils.markdown import html_decoration as hd
 from aiogram_dialog import BgManagerFactory
 from dishka import FromDishka
 from dishka.integrations.aiogram import inject
 
 from idiotDiary.bot.utils.exceptions import UserNotifyException
-from idiotDiary.bot.utils.markdown import get_update_text
+from idiotDiary.bot.utils.logging import log_bot_error, send_alert
 from idiotDiary.bot.views.alert import BotAlert
-from idiotDiary.core.data.db.dao import DaoHolder
+from idiotDiary.core.db.dao import DaoHolder
 from idiotDiary.core.utils.exceptions.base import BaseError
 
 logger = logging.getLogger(__name__)
@@ -89,27 +88,16 @@ async def handle_base_error(
                 )
 
     if exception.log:
-        await handle(error=error, bot=bot, alert=alert)
+        bot_name = (await bot.get_my_name()).name
+        log_bot_error(error, logger, bot_name)
+        await send_alert(alert, error.update, error.exception, bot_name)
 
 
 @inject
 async def handle(error: ErrorEvent, bot: Bot, alert: FromDishka[BotAlert]):
-    bot_name = await bot.get_my_name()
-    update = error.update
-    exception = error.exception
-
-    logger.exception(
-        f"Получено исключение в боте {bot_name.name}: {str(exception)}, "
-        f"во время обработки апдейта {update.model_dump(exclude_none=True)}",
-        exc_info=exception,
-    )
-    await alert(
-        f"Получено исключение в боте <u>{bot_name.name}</u>:\n"
-        f"-----\n"
-        f"{hd.quote(str(exception))}\n"
-        f"-----\n"
-        f"во время обработки апдейта: {get_update_text(update)}",
-    )
+    bot_name = (await bot.get_my_name()).name
+    log_bot_error(error, logger, bot_name)
+    await send_alert(alert, error.update, error.exception, bot_name)
 
 
 def setup(dp):

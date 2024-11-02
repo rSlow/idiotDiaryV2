@@ -47,5 +47,5 @@ GENERATED_TYPE_MATCHING = {
 def as_aiogram_content_type(file_content_type: str) -> ContentType:
     matched_content_type = GENERATED_TYPE_MATCHING.get(file_content_type)
     if matched_content_type is None:
-        raise UnknownContentTypeError(file_content_type)
+        raise UnknownContentTypeError(file_content_type=file_content_type)
     return matched_content_type

@@ -1,20 +1,24 @@
-import itertools
-import tempfile
+import asyncio
 from dataclasses import dataclass
 from pathlib import Path
 
-import aiofiles.tempfile
-from aiogram import types, Bot, F
+import aiofiles.tempfile as atf
+from adaptix import Retort
+from aiogram import types, F, Bot
 from aiogram.enums import ContentType
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button
 from aiogram_dialog.widgets.text import Const, Format
+from dishka import FromDishka
+from dishka.integrations.aiogram_dialog import inject
+from taskiq import AsyncTaskiqTask, TaskiqResult, TaskiqResultTimeoutError
 
-from apps.not_working_place.settings import APP_TEMP_ROOT
-from apps.not_working_place.states import ZipPdfFSM
-from common.buttons import CANCEL_BUTTON
-from PyPDF2 import PdfWriter, PdfReader, PageObject
+from idiotDiary.bot.states.not_working_place import ZipPdfSG
+from idiotDiary.bot.utils.exceptions import TaskiqTaskError
+from idiotDiary.bot.views import buttons as b
+from idiotDiary.core.config import Paths
+from idiotDiary.mq.tasks.pdf import pack_pdf_file
 
 DD_KEY = "files"
 
@@ -25,64 +29,65 @@ class File:
     filename: str
 
 
-async def file_handler(message: types.Message,
-                       _: MessageInput,
-                       manager: DialogManager):
+file_retort = Retort()
+
+
+async def file_handler(message: types.Message, _, manager: DialogManager):
     manager.show_mode = ShowMode.DELETE_AND_SEND
     document = message.document
 
-    files: list[File] = manager.dialog_data.setdefault(DD_KEY, [])
-    file = File(
-        file_id=document.file_id,
-        filename=document.file_name
-    )
-    files.append(file)
+    files = manager.dialog_data.setdefault(DD_KEY, [])
+    files.append({
+        "file_id": document.file_id,
+        "filename": document.file_name
+    })
 
 
-async def on_zip_ready(callback: types.CallbackQuery,
-                       _: Button,
-                       manager: DialogManager):
-    bot: Bot = manager.middleware_data["bot"]
+@inject
+async def on_zip_ready(
+        callback: types.CallbackQuery, _, manager: DialogManager,
+        paths: FromDishka[Paths], bot: FromDishka[Bot]
+):
     message = callback.message
-    files: list[File] = manager.dialog_data.get(DD_KEY, [])
-
+    files_data = manager.dialog_data.get(DD_KEY, [])
+    files = [file_retort.load(file_data, File) for file_data in files_data]
     await message.edit_text(text="Обработка...")
 
-    async with aiofiles.tempfile.TemporaryDirectory(dir=APP_TEMP_ROOT) as tmp:
-        temp_dir = Path(tmp)
-        for file_id in files:
-            await bot.download(
-                file=file_id.file_id,
-                destination=temp_dir / file_id.filename
-            )
+    try:
+        async with atf.TemporaryDirectory(dir=paths.temp_folder_path) as tmp:
+            temp_dir = Path(tmp)
+            file_paths: list[Path] = []
+            for file in files:
+                file_path = temp_dir / file.filename
+                file_paths.append(file_path)
+                await bot.download(
+                    file=file.file_id,
+                    destination=file_path
+                )
+                await asyncio.sleep(0.1)  # flood control
 
-        page_lists: list[list[PageObject]] = []
-        for file in temp_dir.glob("*.*"):
-            page_lists.append(PdfReader(file).pages)
+            task: AsyncTaskiqTask = await pack_pdf_file.kiq(file_paths)
+            zip_pdf_result: TaskiqResult = await task.wait_result(timeout=120)
+            if error := zip_pdf_result.error:
+                await message.answer(
+                    "Произошла ошибка генерации PDF. Задача отменена."
+                )
+                raise TaskiqTaskError(
+                    message="Ошибка генерации PDF файла:", error=error
+                )
 
-        max_pages: int = len(max(page_lists, key=lambda x: len(x)))
-        page_cycles: list[itertools.islice[PageObject]] = [
-            itertools.islice(itertools.cycle(iterable), max_pages)
-            for iterable in page_lists
-        ]
-        writer = PdfWriter()
-        page_groups = zip(*page_cycles)
-        for page_group in page_groups:
-            for page in page_group:
-                writer.add_page(page)
+            pdf_file = types.FSInputFile(zip_pdf_result.return_value)
+            await callback.message.answer_document(pdf_file)
 
-        with tempfile.TemporaryFile(mode="rb") as result_file:
-            writer.write(result_file)
-            pdf_document = types.BufferedInputFile(
-                file=result_file.read(),
-                filename=files[0].filename
-            )
-            await message.answer_document(document=pdf_document)
+    except TaskiqResultTimeoutError:
+        await message.answer("Тайм-аут запроса. Задача отменена.")
 
-    await manager.done()
+    finally:
+        manager.show_mode = ShowMode.DELETE_AND_SEND
+        await manager.done()
 
 
-async def getter(dialog_manager: DialogManager):
+async def getter(dialog_manager: DialogManager, **__):
     return {"files_count": len(dialog_manager.dialog_data.get(DD_KEY, []))}
 
 
@@ -95,12 +100,12 @@ zip_pdf_dialog = Dialog(
         ),
         Button(
             text=Format("Склеить {files_count} файл(ов)"),
-            id="zip",
-            # when=WhenDialogKey(DD_KEY),
-            when=F.dialog_manager.dialog_data[DD_KEY],
-            on_click=on_zip_ready
+            when=F["files_count"] > 0,
+            id="run_zip",
+            on_click=on_zip_ready  # noqa
         ),
-        CANCEL_BUTTON,
-        state=ZipPdfFSM.state
+        b.CANCEL,
+        getter=getter,
+        state=ZipPdfSG.state
     )
 )

@@ -8,12 +8,23 @@ from dishka.integrations.aiogram import inject
 from idiotDiary.bot.di.jinja import JinjaRenderer
 from idiotDiary.bot.states.start import MainMenuSG
 from idiotDiary.bot.views import commands
+from idiotDiary.core.db import dto
+from idiotDiary.core.db.dao import DaoHolder
 
 
-async def cmd_start(message: types.Message, dialog_manager: DialogManager):
-    await message.answer("тут будет стартовый текст")
+@inject
+async def cmd_start(
+        message: types.Message, dialog_manager: DialogManager,
+        user: dto.User, dao: FromDishka[DaoHolder],
+        jinja: FromDishka[JinjaRenderer]
+):
+    start_event = await dao.log.get_last_by_user(user.tg_id, "/start")
+    if start_event is None:
+        welcome_message = jinja.render_template("commands/start.jinja2")
+        await message.answer(welcome_message)
+
     await dialog_manager.start(
-        state=MainMenuSG.state, mode=StartMode.RESET_STACK
+        state=MainMenuSG.state, mode=StartMode.RESET_STACK,
     )
 
 
@@ -22,7 +33,7 @@ async def cmd_help(
         message: types.Message, dialog_manager: DialogManager,
         jinja: FromDishka[JinjaRenderer]
 ):
-    help_message = jinja.render_template("help.jinja2")
+    help_message = jinja.render_template("commands/help.jinja2")
     await message.answer(help_message)
     await dialog_manager.update({}, show_mode=ShowMode.DELETE_AND_SEND)
 

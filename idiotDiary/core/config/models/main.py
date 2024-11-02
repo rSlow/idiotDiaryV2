@@ -7,7 +7,7 @@ from typing import final
 from .app import AppConfig
 from .auth import SecurityConfig
 from .db import DBConfig
-from .mq import MQConfig
+from .taskiq import MQConfig
 from .paths import Paths
 from .redis import RedisConfig
 from .web import WebConfig

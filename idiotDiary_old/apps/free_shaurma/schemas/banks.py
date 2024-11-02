@@ -3,7 +3,7 @@ from dataclasses import field, dataclass
 from io import BytesIO
 from typing import Iterable, Callable, ParamSpec
 
-from common.dialogs import FormStatesGroup
+from idiotDiary_old.common.dialogs.window_factory import FormStatesGroup
 from .enums import BankNames
 
 P = ParamSpec("P")

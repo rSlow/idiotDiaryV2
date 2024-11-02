@@ -1,6 +1,6 @@
 from adaptix import Retort
 
-from ..models.mq import MQConfig
+from ..models.taskiq import MQConfig
 
 
 def load_mq_config(config_dct: dict, retort: Retort) -> MQConfig:

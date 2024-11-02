@@ -1,7 +1,7 @@
 from aiogram import Bot
 from aiogram.enums import ChatType
 
-from idiotDiary.core.data.db import dto
+from idiotDiary.core.db import dto
 
 
 # TODO check

@@ -9,7 +9,7 @@ from idiotDiary.bot.middlewares.config import MiddlewareData
 from idiotDiary.bot.utils import events as get_event
 from idiotDiary.bot.utils.exceptions import (UnknownEventTypeError,
                                             PassEventException)
-from idiotDiary.core.data.db import dto
+from idiotDiary.core.db import dto
 
 logger = logging.getLogger(__name__)
 

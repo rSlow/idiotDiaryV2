@@ -4,8 +4,8 @@ from jwt import PyJWTError
 
 from idiotDiary.api.utils.auth import AuthService
 from idiotDiary.api.utils.auth.cookie import OAuth2PasswordBearerWithCookie
-from idiotDiary.core.data.db import dto
-from idiotDiary.core.data.db.dao import DaoHolder
+from idiotDiary.core.db import dto
+from idiotDiary.core.db.dao import DaoHolder
 
 
 class AuthProvider(Provider):

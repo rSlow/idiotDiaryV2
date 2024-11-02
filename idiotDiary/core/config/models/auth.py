@@ -16,6 +16,7 @@ class SecurityConfig:
     algorythm: str = "HS256"
     samesite: Literal["lax", "strict", "none"] | None = None
     disable_cors: bool = False
+    encoding: str = "utf-8"
 
     @property
     def host(self):

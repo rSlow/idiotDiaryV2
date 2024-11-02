@@ -26,5 +26,5 @@ BACK = Back(
     text=Const("Назад ◀")
 )
 NEXT = Next(
-    text=Const("Вперед ◀")
+    text=Const("Вперед ▶")
 )

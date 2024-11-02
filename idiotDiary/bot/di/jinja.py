@@ -4,7 +4,10 @@ from dishka import Provider, provide, Scope
 from jinja2 import Environment, FileSystemLoader, BaseLoader, Template
 
 from idiotDiary.bot.views import jinja
+from idiotDiary.bot.views.jinja.filters import datetime_filter, timedelta_filter
 from idiotDiary.core.config import Paths
+from idiotDiary.core.utils import dates
+from idiotDiary.core.utils.dates import get_now
 
 logger = logging.getLogger(__name__)
 
@@ -14,10 +17,18 @@ class JinjaRenderer:
         self.environment = environment
 
     def render_template(
-            self, template_name: str | Template, context: dict | None = None
+            self, template_name: str | Template, context: dict | None = None,
+            **kwargs
     ):
+        _context = (context or {}) | kwargs
+        _context.update({
+            "now": get_now(),
+            "TIME_FORMAT_USER": dates.TIME_FORMAT_USER,
+            "DATE_FORMAT_USER": dates.DATE_FORMAT_USER,
+            "DATETIME_FORMAT_USER": dates.DATETIME_FORMAT_USER
+        })
         template = self.environment.get_template(template_name)
-        return jinja.render_template(template, context)
+        return jinja.render_template(template, _context)
 
 
 class JinjaProvider(Provider):
@@ -27,12 +38,17 @@ class JinjaProvider(Provider):
 
     @provide
     def get_environment(self, loader: BaseLoader) -> Environment:
+        filters = {
+            "datetime": datetime_filter,
+            "time": lambda x: datetime_filter(x, dates.TIME_FORMAT),
+            "date": lambda x: datetime_filter(x, dates.DATE_FORMAT),
+            "timedelta": timedelta_filter,
+        }
         env = Environment(
-            loader=loader,
-            trim_blocks=True,
-            lstrip_blocks=True,
-            autoescape=True
+            loader=loader, trim_blocks=True,
+            lstrip_blocks=True, autoescape=True
         )
+        env.filters.update(filters)
         logger.info(f"Jinja init with loader <{loader.__class__.__name__}>")
         return env
 

@@ -1,36 +1,44 @@
 from aiogram import types
 from aiogram_dialog import Dialog, Window, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import TextInput
+from taskiq import AsyncTaskiqTask, TaskiqResultTimeoutError, TaskiqResult
 
-from idiotDiary_old.apps.not_working_place.utils.inn_selenuim import \
-    get_inn_selenium
-from ...models.inn import INNSchema, inn_factory
-from ...states.not_working_place import INNParserSG
-from ...utils.message import edit_dialog_message
-from ...views import buttons as b
-from ...views.types import JinjaTemplate
+from idiotDiary.bot.models.inn import INNSchema, inn_factory
+from idiotDiary.bot.states.not_working_place import INNParserSG
+from idiotDiary.bot.utils.exceptions import TaskiqTaskError
+from idiotDiary.bot.utils.message import edit_dialog_message
+from idiotDiary.bot.views import buttons as b
+from idiotDiary.bot.views.types import JinjaTemplate
+from idiotDiary.mq.tasks.inn import get_inn
 
 
-async def inn_handler(_, __, manager: DialogManager, data: INNSchema):
-    mq: ABCBroker = manager.middleware_data["mq"]
+async def inn_handler(
+        message: types.Message, __, manager: DialogManager, data: INNSchema
+):
     await edit_dialog_message(manager=manager, text="Поиск...")
 
     try:
-        result_inn = await get_inn_selenium(data=data)
-        if result_inn is not None:
-            message_text = f"ИНН - <code>{result_inn}</code>"
+        task: AsyncTaskiqTask = await get_inn.kiq(data)
+        inn: TaskiqResult = await task.wait_result(timeout=120)
+        if error := inn.error:
+            await message.answer(
+                "Произошла ошибка поиска ИНН. Задача отменена."
+            )
+            raise TaskiqTaskError(
+                message="Ошибка поиска ИНН:", error=error
+            )
+
+        if result_inn := inn.return_value:
+            await message.answer(f"ИНН - <code>{result_inn}</code>")
         else:
-            message_text = "Не найдено."
+            await message.answer("Не найдено.")
 
-    except SeleniumTimeout:
-        message_text = (
-            "Запрос не может выполниться по независящим от бота причинам. "
-            "Возможно, причина в сайте налоговой. Задача отменена."
-        )
+    except TaskiqResultTimeoutError:
+        await message.answer("Тайм-аут запроса. Задача отменена.")
 
-    await edit_dialog_message(manager=manager, text=message_text)
-
-    manager.show_mode = ShowMode.SEND
+    finally:
+        manager.show_mode = ShowMode.DELETE_AND_SEND
+        await manager.done()
 
 
 async def error_handler(message: types.Message, _, manager: DialogManager, __):

@@ -18,13 +18,13 @@ from idiotDiary.bot.config.parser.main import load_config as load_bot_config
 from idiotDiary.bot.di import get_bot_providers
 from idiotDiary.bot.di.dp import resolve_update_types
 from idiotDiary.bot.utils import ui
-from idiotDiary.core.config import BaseConfig
 from idiotDiary.core.config.models import WebConfig
 from idiotDiary.core.config.parser.config_logging import setup_logging
 from idiotDiary.core.config.parser.paths import get_paths
 from idiotDiary.core.config.parser.retort import get_base_retort
 from idiotDiary.core.di import get_common_providers
 from idiotDiary.core.utils import di_visual
+from idiotDiary.mq.broker import broker
 
 logger = logging.getLogger(__name__)
 
@@ -39,11 +39,10 @@ def main():
     webhook_config = bot_config.bot.webhook
 
     di_container = make_async_container(
-        *get_common_providers(),
+        *get_common_providers(bot_config),
         *get_bot_providers(),
         *get_api_providers(),
         context={
-            BaseConfig: api_config.as_base(),
             ApiAppConfig: api_config,
             BotAppConfig: bot_config,
         }
@@ -94,6 +93,7 @@ async def on_startup(
     logger.info("as webhook url used %s", webhook_url)
 
     await ui.setup(bot)
+    await broker.startup()
 
 
 async def on_shutdown(dishka: AsyncContainer):

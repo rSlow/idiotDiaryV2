@@ -1,5 +1,6 @@
 import typing as t
 from abc import ABC
+from functools import wraps
 from inspect import iscoroutinefunction
 
 from dishka import AsyncContainer, Container
@@ -38,6 +39,7 @@ class BaseInjectContext(ABC):
                 f"For sync functions, use `@sync_inject` decorator instead."
             )
 
+        @wraps(func)
         async def wrapper(*args, **kwargs):
             cls._check_container_init()
 
@@ -60,6 +62,7 @@ class BaseInjectContext(ABC):
                 f"For async functions, use `@inject` decorator instead."
             )
 
+        @wraps(func)
         def wrapper(*args, **kwargs):
             cls._check_container_init()
 

@@ -1,17 +1,14 @@
 from .base import BaseError
 
 
-class NoUsernameFound(BaseError):
-    log_message = "По этому username ничего не найдено"
+class NoUserFound(BaseError):
+    log_message = "Пользователь не найден."
 
-    def __init__(self, username: str | None = None, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.username = username
+
+class NoUsernameFound(NoUserFound):
+    log_message = "По имени пользователя {username} пользователь не найден."
 
 
 class MultipleUsernameFound(BaseError):
-    log_message = "По этому username найдено несколько пользователей!"
-
-    def __init__(self, username: str | None = None, **kwargs) -> None:
-        super().__init__(**kwargs)
-        self.username = username
+    log_message = ("По имени пользователя {username} "
+                   "найдено несколько пользователей!")

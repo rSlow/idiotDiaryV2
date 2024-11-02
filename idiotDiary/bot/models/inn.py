@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import Annotated
 
-from pydantic import BaseModel, ValidationError, AfterValidator, BeforeValidator
+from pydantic import BaseModel, AfterValidator, BeforeValidator
+from pydantic_core import ValidationError
 
 
 def validate_fio(fio: str):
@@ -16,7 +17,7 @@ def validate_passport(passport: str):
     series, number = passport_list
     assert len(series) == 4, f"series of passport {series} is not valid"
     assert len(number) == 6, f"number of passport {number} is not valid"
-    return series + number
+    return series + " " + number
 
 
 def validate_date(raw_date: str | None):

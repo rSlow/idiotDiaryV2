@@ -4,7 +4,7 @@ import pytz
 from aiogram import types as t
 from aiogram_dialog.utils import CB_SEP
 
-from idiotDiary.core.data.db import dto
+from idiotDiary.core.db import dto
 
 
 def from_message(message: t.Message):

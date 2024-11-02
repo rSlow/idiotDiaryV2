@@ -10,5 +10,6 @@ class BotConfig:
     token: str
     log_chat: int
     """tech chat for tech logs"""
-    superusers: list[int]
+    superusers: list[int]  # TODO check
+    morph_service_url: str
     webhook: WebhookConfig | None = None

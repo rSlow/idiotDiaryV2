@@ -1,7 +1,6 @@
 from aiogram import Dispatcher, BaseMiddleware
 from aiogram_dialog.api.entities import DIALOG_EVENT_NAME
 
-from .additional_message import AdditionalMessageMiddleware
 from .context_data import ContextDataMiddleware
 from .logging import EventLoggingMiddleware
 

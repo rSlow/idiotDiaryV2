@@ -13,8 +13,8 @@ from faststream.broker.core.abc import ABCBroker
 from idiotDiary.bot.config.models import BotConfig
 from idiotDiary.bot.di.jinja import JinjaRenderer
 from idiotDiary.bot.views.alert import BotAlert
-from idiotDiary.core.data.db import dto
-from idiotDiary.core.data.db.dao import DaoHolder
+from idiotDiary.core.db import dto
+from idiotDiary.core.db.dao import DaoHolder
 from idiotDiary.core.scheduler.scheduler import Scheduler
 from idiotDiary.core.utils.lock_factory import LockFactory
 

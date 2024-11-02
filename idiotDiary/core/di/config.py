@@ -1,4 +1,4 @@
-from dishka import Provider, provide, Scope, from_context
+from dishka import Provider, provide, Scope
 
 from idiotDiary.core.config.models import (
     Paths, BaseConfig, WebConfig, MQConfig, SecurityConfig, AppConfig,
@@ -8,7 +8,13 @@ from idiotDiary.core.config.models import (
 class BaseConfigProvider(Provider):
     scope = Scope.APP
 
-    config = from_context(BaseConfig)
+    def __init__(self, config: BaseConfig):
+        super().__init__()
+        self.base_config = config.as_base()
+
+    @provide
+    def get_base_config(self) -> BaseConfig:
+        return self.base_config
 
     @provide
     def get_paths(self, config: BaseConfig) -> Paths:

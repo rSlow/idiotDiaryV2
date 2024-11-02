@@ -39,3 +39,14 @@ class PassEventException(EventTypeError):
 
 class UnknownContentTypeError(BaseError):
     log_message = "Неизвестный тип контента: {file_content_type}"
+
+
+class TaskiqTaskError(BaseError):
+    log_message = "Ошибка выполнения задачи: {message}: {error}"
+
+    def __init__(self, message: str, error: BaseException):
+        super().__init__()
+        self.map_kwargs = {
+            "message": message,
+            "error": repr(error)
+        }

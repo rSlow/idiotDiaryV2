@@ -1,14 +1,6 @@
-from datetime import datetime
-
 from aiogram import Bot
 from aiogram.types import InlineKeyboardMarkup, Chat
 from aiogram_dialog import DialogManager
-
-from config import settings
-
-
-def get_now():
-    return datetime.now().astimezone(tz=settings.TIMEZONE)
 
 
 async def edit_dialog_message(
