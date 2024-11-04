@@ -1,6 +1,7 @@
 from aiogram_dialog.widgets.text import Const
 
-from common.dialogs import FormStatesGroup, FormState
+from idiotDiary_old.common.dialogs.window_factory import FormState, \
+    FormStatesGroup
 from .. import validators
 
 

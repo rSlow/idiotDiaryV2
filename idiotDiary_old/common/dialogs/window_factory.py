@@ -9,7 +9,6 @@ from aiogram.fsm.state import StatesGroup, State, StatesGroupMeta
 from aiogram.types import UNSET_PARSE_MODE
 from aiogram.types.base import UNSET_DISABLE_WEB_PAGE_PREVIEW
 from aiogram_dialog import Dialog, Window, LaunchMode, DialogManager, ShowMode
-from aiogram_dialog.api.entities import Context
 from aiogram_dialog.api.internal.widgets import MarkupFactory
 from aiogram_dialog.dialog import OnResultEvent, OnDialogEvent
 from aiogram_dialog.widgets.common import WhenCondition
@@ -20,7 +19,6 @@ from aiogram_dialog.widgets.kbd.button import OnClick
 from aiogram_dialog.widgets.markup.inline_keyboard import InlineKeyboardFactory
 from aiogram_dialog.widgets.text import Const, Text, Format
 from aiogram_dialog.widgets.utils import GetterVariant
-
 from apps.free_shaurma.utils.send_files import OnFinish
 from apps.free_shaurma.validators import BaseTypeFactory
 from common.buttons import MAIN_MENU_BUTTON
@@ -33,17 +31,15 @@ class DialogGetter(Protocol):
 
 
 class DefaultDialogGetter(DialogGetter):
-    async def __call__(self,
-                       aiogd_context: Context,
-                       **kwargs):
-        return aiogd_context.dialog_data
+    async def __call__(self, dialog_manager: DialogManager, **kwargs):
+        return dialog_manager.dialog_data
 
 
-def _get_cancel_button(text: Text = Const("Назад ◀"),
-                       _id: str = "__cancel__",
-                       result: Any | None = None,
-                       on_click: Optional[OnClick] = None,
-                       when: WhenCondition = None):
+def _get_cancel_button(
+        text: Text = Const("Назад ◀"), _id: str = "__cancel__",
+        result: Any | None = None, on_click: Optional[OnClick] = None,
+        when: WhenCondition = None
+):
     return Cancel(
         text=text, id=_id,
         result=result, on_click=on_click,
@@ -51,20 +47,20 @@ def _get_cancel_button(text: Text = Const("Назад ◀"),
     )
 
 
-def _get_back_button(text: Text = Const("Назад ◀"),
-                     _id: str = "__back__",
-                     on_click: Optional[OnClick] = None,
-                     when: WhenCondition = None):
+def _get_back_button(
+        text: Text = Const("Назад ◀"), _id: str = "__back__",
+        on_click: Optional[OnClick] = None, when: WhenCondition = None
+):
     return Back(
         text=text, id=_id,
         on_click=on_click, when=when
     )
 
 
-def _get_next_button(text: Text = Const("Вперед ▶"),
-                     _id: str = "__next__",
-                     on_click: Optional[OnClick] = None,
-                     when: WhenCondition = None):
+def _get_next_button(
+        text: Text = Const("Вперед ▶"), _id: str = "__next__",
+        on_click: Optional[OnClick] = None, when: WhenCondition = None
+):
     return Next(
         text=text, id=_id,
         on_click=on_click, when=when
@@ -79,7 +75,7 @@ class FormState(State):
             type_factory: Optional[type[BaseTypeFactory]] = str,
             on_success: Optional[OnSuccess] = None,
             on_error: Optional[OnError] = None,
-            filter_: Optional[Callable[..., Any]] = None,
+            filter_: Optional[Callable[[Any], Any]] = None,
             show_current_value: Optional[bool] = True,
             current_value_text: Optional[Text] = None,
             getter: GetterVariant = None,
@@ -249,13 +245,13 @@ class WindowFactory:
 
     def create_dialog(
             self,
-                      on_start: Optional[OnDialogEvent] = None,
-                      on_close: Optional[OnDialogEvent] = None,
-                      on_process_result: Optional[OnResultEvent] = None,
-                      launch_mode: LaunchMode = LaunchMode.STANDARD,
-                      getter: GetterVariant = DefaultDialogGetter(),
-                      preview_data: GetterVariant = None,
-                      name: Optional[str] = None
+            on_start: Optional[OnDialogEvent] = None,
+            on_close: Optional[OnDialogEvent] = None,
+            on_process_result: Optional[OnResultEvent] = None,
+            launch_mode: LaunchMode = LaunchMode.STANDARD,
+            getter: GetterVariant = DefaultDialogGetter(),
+            preview_data: GetterVariant = None,
+            name: Optional[str] = None
     ):
         windows = []
         for i, state in enumerate(self.states_group.get_states(), 1):
