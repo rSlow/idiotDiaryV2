@@ -9,7 +9,7 @@ from idiotDiary.core.db.dao.base import BaseDao
 
 
 class BirthdayDao(BaseDao[db.Birthday]):
-    async def update(self, birthdays: list[dto.Birthday], user: dto.User):
+    async def update(self, birthdays: list[dto.Birthday], user_id: int):
         await self.session.execute(
             delete(self.model)
             .filter(
@@ -19,7 +19,7 @@ class BirthdayDao(BaseDao[db.Birthday]):
         models = [
             self.model(
                 fio=birthday.fio, date=birthday.date, uuid=birthday.uuid,
-                post=birthday.post, rank=birthday.rank, user_id=user.tg_id
+                post=birthday.post, rank=birthday.rank, user_id=user_id
             )
             for birthday in birthdays
         ]

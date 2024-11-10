@@ -21,7 +21,7 @@ async def update_birthdays(
         user: FromDishka[dto.User], dao: FromDishka[DaoHolder]
 ):
     try:
-        await dao.birthdays.update(birthdays, user)
+        await dao.birthdays.update(birthdays, user.tg_id)
         return 200
     except IntegrityError:  # TODO
         logger.exception("Already existed UUID!")
@@ -32,7 +32,7 @@ async def update_birthdays(
 async def delete_birthdays(
         user: FromDishka[dto.User], dao: FromDishka[DaoHolder]
 ):
-    await dao.birthdays.delete_all_from_user(user)
+    await dao.birthdays.delete_all_from_user(user.tg_id)
     return 200
 
 

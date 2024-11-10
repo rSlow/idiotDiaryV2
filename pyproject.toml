@@ -10,7 +10,6 @@ python = "^3.11"
 fastapi = "0.103.2"
 uvicorn = "^0.30.6"
 aiogram = "^3.12.0"
-aiogram-dialog = "^2.1.0"
 alembic = "^1.13.2"
 apscheduler = "^3.10.4"
 asyncpg = "^0.29.0"
@@ -33,7 +32,8 @@ taskiq-redis = "^1.0.2"
 faststream = "^0.5.28"
 selenium = "^4.25.0"
 pypdf2 = "^3.0.1"
-b = "^1.0.0"
+pillow = "^11.0.0"
+aiogram-dialog = "^2.2.0"
 
 
 [build-system]

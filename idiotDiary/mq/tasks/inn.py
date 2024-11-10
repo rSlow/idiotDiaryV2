@@ -7,7 +7,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.remote.webdriver import WebDriver
 from selenium.webdriver.remote.webelement import WebElement
 
-from idiotDiary.bot.models.inn import INNSchema
+from idiotDiary.bot.schemas.inn import INNSchema
 from idiotDiary.mq.broker import broker
 from idiotDiary.mq.di.inject import inject
 

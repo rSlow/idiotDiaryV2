@@ -3,7 +3,7 @@ from aiogram_dialog import Dialog, Window, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import TextInput
 from taskiq import AsyncTaskiqTask, TaskiqResultTimeoutError, TaskiqResult
 
-from idiotDiary.bot.models.inn import INNSchema, inn_factory
+from idiotDiary.bot.schemas.inn import INNSchema, inn_factory
 from idiotDiary.bot.states.not_working_place import INNParserSG
 from idiotDiary.bot.utils.exceptions import TaskiqTaskError
 from idiotDiary.bot.utils.message import edit_dialog_message
@@ -15,6 +15,7 @@ from idiotDiary.mq.tasks.inn import get_inn
 async def inn_handler(
         message: types.Message, __, manager: DialogManager, data: INNSchema
 ):
+    await manager.show(show_mode=ShowMode.DELETE_AND_SEND)
     await edit_dialog_message(manager=manager, text="Поиск...")
 
     try:

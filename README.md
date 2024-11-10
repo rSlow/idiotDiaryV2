@@ -245,7 +245,7 @@ WindowFactory(
     states_group=some_states_group,
     on_finish=some_function_on_finish_form,
     template=WindowTemplate(...)
-).create_dialog()
+).dialog()
 ```
 
 ### 2. FormState

@@ -16,16 +16,16 @@ tz_utc = tz.gettz("UTC")
 tz_local = typing.cast(tzinfo, tz.gettz())
 
 
-def get_now():
-    return datetime.now().astimezone(tz=tz_local)
+def get_now(_tz: tzinfo | None = None) -> datetime:
+    return datetime.now().astimezone(tz=_tz or tz_local)
 
 
-def get_now_isoformat():
-    return get_now().isoformat()
+def get_now_isoformat(_tz: tzinfo | None = None):
+    return get_now(_tz).isoformat()
 
 
-def get_timeshift(user_time: time) -> time:
-    now = get_now().replace(tzinfo=None)
+def get_timeshift(user_time: time, _tz: tzinfo | None = None) -> time:
+    now = get_now(_tz).replace(tzinfo=None)
     td = now - datetime(
         hour=user_time.hour,
         minute=user_time.minute,

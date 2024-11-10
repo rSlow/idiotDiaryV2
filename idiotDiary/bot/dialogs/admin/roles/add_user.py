@@ -10,7 +10,7 @@ from idiotDiary.bot.states.admin import AddUserToRoleSG
 from idiotDiary.bot.views import buttons as b
 from idiotDiary.core.db.dao.role import RoleDao
 from idiotDiary.core.db.dao.user import UserDao
-from idiotDiary.core.utils.exceptions.user import NoUserFound
+from idiotDiary.core.utils.exceptions.user import UnknownUserError
 from .getters import user_role_getter
 
 
@@ -20,16 +20,17 @@ async def handle_user_input(
         dao: FromDishka[UserDao],
 
 ):
+    manager.show_mode = ShowMode.DELETE_AND_SEND
+
     try:
 
         try:
             user_id = int(input_)
             user = await dao.get_by_tg_id(user_id)
-        except ValueError:
+        except ValueError:  # `input_` is not `int`
             user = await dao.get_by_username(input_)
 
-    except NoUserFound:
-        manager.show_mode = ShowMode.DELETE_AND_SEND
+    except UnknownUserError:
         return await message.answer("Пользователь не найден, проверьте данные.")
 
     manager.dialog_data["user_id"] = user.id_

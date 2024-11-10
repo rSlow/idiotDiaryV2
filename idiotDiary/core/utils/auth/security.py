@@ -7,7 +7,6 @@ from passlib.context import CryptContext
 
 from idiotDiary.core.config.models.auth import SecurityConfig
 from idiotDiary.core.utils.dates import tz_utc
-from .token import Token
 
 logger = logging.getLogger(__name__)
 
@@ -29,24 +28,21 @@ class SecurityProps:
     def get_password_hash(self, password: str) -> str:
         return self.pwd_context.hash(password)
 
-    def create_token(self, data: dict) -> Token:
+    def create_bearer_token(self, data: dict) -> str:
         to_encode = data.copy()
         expire = datetime.now(tz=tz_utc) + self.access_token_expire
         to_encode.update({"exp": expire})
         encoded_jwt = jwt.encode(
             to_encode, self.secret_key, algorithm=self.algorythm
         )
-        return Token(value=encoded_jwt, type_="bearer")
+        return f"bearer {encoded_jwt}"
 
-    def create_basic_auth(self, login: str, password: str) -> str:
-        creds = f"{login}:{password}".encode(self.encoding)
+    def create_basic_auth(self, tg_id: int, hashed_password: str) -> str:
+        creds = f"{tg_id}:{hashed_password}".encode(self.encoding)
         basic = base64.b64encode(creds).decode(self.encoding)
-        return f"Basic {basic}"
+        return f"basic {basic}"
 
-    def decode_basic_auth(self, basic: str) -> tuple[str, str] | None:
-        schema, basic = basic.split(" ", maxsplit=1)
-        if schema.lower() != "basic":
-            return None
+    def decode_basic_auth(self, basic: str) -> tuple[int, str] | None:
         decoded = base64.urlsafe_b64decode(basic).decode(self.encoding)
-        username, password = decoded.split(":", maxsplit=1)
-        return username, password
+        tg_id, hashed_password = decoded.split(":", maxsplit=1)
+        return int(tg_id), hashed_password

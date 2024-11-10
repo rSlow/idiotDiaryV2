@@ -1,6 +1,5 @@
 from PIL import ImageFont
 
-from common.utils.functions import get_now
 from .. import settings
 from ..image_io_context import ImageIOContext
 from ...main import grade
@@ -8,9 +7,7 @@ from ...main import grade
 X = 1080
 
 
-def sberbank_sberbank_phone_android(name: int,
-                                    transfer_sum: int | float,
-                                    **__):
+def sberbank_sberbank_phone_android(name: int, transfer_sum: int | float):
     str_transfer_sum = f"{transfer_sum}".replace(".", ",")
 
     with ImageIOContext(settings.template_sberbank_android) as context:

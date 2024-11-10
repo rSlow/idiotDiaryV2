@@ -1,8 +1,8 @@
 __all__ = [
     "BaseError",
-    "NoUsernameFound", "MultipleUsernameFound",
+    "UnknownUsernameFound", "MultipleUsernameFound",
 
 ]
 
 from .base import BaseError
-from .user import NoUsernameFound, MultipleUsernameFound
+from .user import UnknownUsernameFound, MultipleUsernameFound

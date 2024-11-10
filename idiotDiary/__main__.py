@@ -108,7 +108,8 @@ def run():
     uvicorn.run(
         app="idiotDiary.__main__:main",
         host="0.0.0.0",
-        port=8000
+        port=8000,
+        factory=True
     )
 
 

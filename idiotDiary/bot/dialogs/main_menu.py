@@ -8,7 +8,9 @@ from idiotDiary.bot.filters.user import F_User
 from idiotDiary.bot.states.admin import AdminMainSG
 from idiotDiary.bot.states.birthdays import BirthdaysMenuSG
 from idiotDiary.bot.states.not_working_place import NwpMainSG
+from idiotDiary.bot.states.shaurma import FshPickFormSG
 from idiotDiary.bot.states.start import MainMenuSG
+from idiotDiary.bot.states.users import UserMainSG
 
 
 @inject
@@ -27,11 +29,11 @@ main_menu = Dialog(
                 state=NwpMainSG.state,
                 when=F_User.roles.contains("nwp")
             ),
-            # Start(
-            #     Const("(бес)платная шаурма 🌯"),
-            #     id="free_shaurma",
-            #     state=FShStartSG.device
-            # ),
+            Start(
+                Const("(бес)платная шаурма 🌯"),
+                id="free_shaurma",
+                state=FshPickFormSG.device
+            ),
             Start(
                 Const("напоминальщик ДР 🎂"),
                 id="birthdays",
@@ -43,6 +45,11 @@ main_menu = Dialog(
             #     id="music",
             #     state=MusicMainSG.state
             # ),
+            Start(
+                Const("Профиль 👤"),
+                id="user_profile",
+                state=UserMainSG.state,
+            ),
             Start(
                 Const("Админка ⚙️"),
                 id="admin",

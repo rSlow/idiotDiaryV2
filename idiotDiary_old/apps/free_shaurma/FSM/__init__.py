@@ -7,6 +7,5 @@ __all__ = (
     "AndroidSberbankForm",
     "IPhoneSberbankForm",
     "AndroidTinkoffForm",
-    "AndroidTinkoffForm",
     "IPhoneTinkoffForm"
 )

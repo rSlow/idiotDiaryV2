@@ -1,9 +1,9 @@
 def grade(number: str):
-    found = number.find(",")
+    comma_index = number.find(",")
 
-    if ~found:  # found
-        integer = number[:found]
-        fractional = number[found:]
+    if comma_index != -1:  # comma found
+        integer = number[:comma_index]
+        fractional = number[comma_index:]
     else:
         integer = number
         fractional = ""

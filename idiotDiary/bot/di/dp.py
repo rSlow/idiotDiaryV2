@@ -75,7 +75,7 @@ class DpProvider(Provider):
 
     @provide
     def get_bg_manager_factory(self, dp: Dispatcher) -> BgManagerFactory:
-        return BgManagerFactoryImpl(dp).bg()
+        return BgManagerFactoryImpl(dp)
 
 
 def resolve_update_types(dp: Dispatcher) -> list[str]:

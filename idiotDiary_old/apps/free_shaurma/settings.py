@@ -13,7 +13,7 @@ class FSSettings(Enum):
                 to_banks=[
                     ToSberbank(
                         render_func=render.android.sberbank.sberbank_sberbank_phone_android,
-                        states_group=AndroidSberbankForm
+                        form=AndroidSberbankForm
                     )
                 ],
             ),
@@ -21,7 +21,7 @@ class FSSettings(Enum):
                 to_banks=[
                     ToTinkoff(
                         render_func=render.android.tinkoff.tinkoff_tinkoff_phone_android,
-                        states_group=AndroidTinkoffForm
+                        form=AndroidTinkoffForm
                     )
                 ],
             ),
@@ -34,7 +34,7 @@ class FSSettings(Enum):
                 to_banks=[
                     ToSberbank(
                         render_func=render.iphone.sberbank.sberbank_sberbank_phone_iphone,
-                        states_group=IPhoneSberbankForm
+                        form=IPhoneSberbankForm
                     )
                 ],
             ),
@@ -42,7 +42,7 @@ class FSSettings(Enum):
                 to_banks=[
                     ToTinkoff(
                         render_func=render.iphone.tinkoff.tinkoff_tinkoff_phone_iphone,
-                        states_group=IPhoneTinkoffForm
+                        form=IPhoneTinkoffForm
                     )
                 ],
             ),

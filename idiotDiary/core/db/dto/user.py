@@ -2,10 +2,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
-from adaptix import Retort
 from aiogram import types as tg
-
-user_retort = Retort()
 
 
 @dataclass
@@ -48,9 +45,13 @@ class User:
         )
 
     def with_password(self, hashed_password: str) -> UserWithCreds:
-        user_data = user_retort.dump(self, User)
-        user_data["hashed_password"] = hashed_password
-        return user_retort.load(user_data, UserWithCreds)
+        return UserWithCreds(
+            id_=self.id_, tg_id=self.tg_id, username=self.username,
+            first_name=self.first_name, last_name=self.last_name,
+            is_bot=self.is_bot, is_superuser=self.is_superuser,
+            is_active=self.is_active, roles=self.roles,
+            hashed_password=hashed_password
+        )
 
 
 @dataclass
@@ -58,8 +59,12 @@ class UserWithCreds(User):
     hashed_password: str | None = None
 
     def without_password(self) -> User:
-        user_data = user_retort.dump(self, UserWithCreds)
-        return user_retort.load(user_data, User)
+        return User(
+            id_=self.id_, tg_id=self.tg_id, username=self.username,
+            first_name=self.first_name, last_name=self.last_name,
+            is_bot=self.is_bot, is_superuser=self.is_superuser,
+            is_active=self.is_active, roles=self.roles,
+        )
 
 
 @dataclass

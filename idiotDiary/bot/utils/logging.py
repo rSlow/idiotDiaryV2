@@ -15,7 +15,7 @@ async def send_alert(
     await alert(
         f"Получено исключение в боте <u>{bot_name}</u>:\n"
         f"-----\n"
-        f"{exception.__class__.__name__}: {hd.quote(repr(exception))}\n"
+        f"{hd.quote(repr(exception))}\n"
         f"-----\n"
         f"во время обработки апдейта: {get_update_text(update)}",
     )

@@ -6,19 +6,11 @@ from sqlalchemy.orm import selectinload
 from idiotDiary.core.db import dto
 from idiotDiary.core.db import models as db
 from idiotDiary.core.db.dao.base import BaseDao
-from idiotDiary.core.utils.exceptions.user import NoUsernameFound, \
+from idiotDiary.core.utils.exceptions.user import UnknownUsernameFound, \
     MultipleUsernameFound
 
 
 class UserDao(BaseDao[db.User]):
-    async def get_by_tg_id(self, tg_id: int) -> dto.User:
-        result: ScalarResult[db.User] = await self.session.scalars(
-            select(self.model)
-            .where(self.model.tg_id == tg_id)
-            .options(*user_options())
-        )
-        user = result.one()
-        return user.to_dto()
 
     async def get_by_id(self, id_: int) -> dto.User:
         result = await self.session.scalars(
@@ -40,9 +32,17 @@ class UserDao(BaseDao[db.User]):
         except MultipleResultsFound as e:
             raise MultipleUsernameFound(username=username) from e
         except NoResultFound as e:
-            raise NoUsernameFound(username=username) from e
+            raise UnknownUsernameFound(username=username) from e
 
         return user
+
+    async def _get_by_tg_id(self, tg_id: int) -> db.User:
+        result: ScalarResult[db.User] = await self.session.scalars(
+            select(self.model)
+            .where(self.model.tg_id == tg_id)
+            .options(*user_options())
+        )
+        return result.one()
 
     async def upsert_user(self, user: dto.User) -> dto.User:
         kwargs = {
@@ -69,8 +69,12 @@ class UserDao(BaseDao[db.User]):
         user = await self._get_by_username(username)
         return user.to_dto()
 
-    async def get_by_username_with_password(self, username: str):
-        user = await self._get_by_username(username)
+    async def get_by_tg_id(self, tg_id: int) -> dto.User:
+        user = await self._get_by_tg_id(tg_id)
+        return user.to_dto()
+
+    async def get_by_tg_id_with_password(self, tg_id: int):
+        user = await self._get_by_tg_id(tg_id)
         return user.to_dto().with_password(user.hashed_password)
 
     async def set_password(self, user: dto.User, hashed_password: str):
