@@ -11,6 +11,9 @@ services:
         source: "./log/"
         target: "/app/log/"
       - type: "bind"
+        source: "./temp/"
+        target: "/app/temp/"
+      - type: "bind"
         source: "./config/"
         target: "/app/config/"
         read_only: true
@@ -31,13 +34,16 @@ services:
     restart: always
     volumes:
       - type: "bind"
+        source: "./temp/"
+        target: "/app/temp/"
+      - type: "bind"
         source: "./config/"
         target: "/app/config/"
         read_only: true
     depends_on:
       - rabbitmq
     entrypoint:
-      [ "poetry", "run", "taskiq", "worker", "--tasks-pattern ['**/tasks']", "idiotDiary.mq.run:broker" ]
+      [ "poetry", "run", "taskiq", "worker", "--tasks-pattern", "['**/tasks']", "idiotDiary.mq.run:broker" ]
     profiles:
       - services
 
