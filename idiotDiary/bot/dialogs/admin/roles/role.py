@@ -6,12 +6,11 @@ from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
 
 from idiotDiary.bot.states.admin import RoleSG, AddUserToRoleSG
+from idiotDiary.bot.utils.dialog_factory import choice_window_factory
 from idiotDiary.bot.views import buttons as b
 from idiotDiary.core.db.dao.role import RoleDao
 from idiotDiary.core.db.dao.user import UserDao
 from idiotDiary.core.db.dto import id_getter
-from idiotDiary_old.common.dialogs.yes_no_dialog_factory import \
-    choice_window_factory
 from .getters import user_role_getter, role_getter, users_role_getter
 
 

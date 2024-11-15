@@ -20,7 +20,7 @@ async def check_birthdays(
 ):
     user: dto.User = dialog_manager.middleware_data["user"]
     message_text = await get_birthdays_message(dao, user.id_, jinja)
-    await message.answer(message_text)
+    await message.answer(message_text, disable_notification=True)
     await dialog_manager.update({}, ShowMode.DELETE_AND_SEND)
 
 

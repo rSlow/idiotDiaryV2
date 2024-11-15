@@ -26,7 +26,7 @@ services:
     profiles:
       - services
 
-  faststream:
+  taskiq:
     build: .
     restart: always
     volumes:
@@ -37,7 +37,7 @@ services:
     depends_on:
       - rabbitmq
     entrypoint:
-      [ "poetry", "run", "python", "-m", "idiotDiary.mq" ]
+      [ "poetry", "run", "taskiq", "worker", "--tasks-pattern ['**/tasks']", "idiotDiary.mq.run:broker" ]
     profiles:
       - services
 

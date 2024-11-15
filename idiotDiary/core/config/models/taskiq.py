@@ -11,12 +11,14 @@ class ResultBackendConfig(RedisConfig):
 @dataclass
 class MQConfig:
     host: str
-    port: int
     user: str
     password: str
+    port: int | None = None
     backend: ResultBackendConfig | None = None
 
     @property
     def uri(self):
-        url = f"amqp://{self.user}:{self.password}@{self.host}:{self.port}/"
+        url = f"amqp://{self.user}:{self.password}@{self.host}"
+        if self.port:
+            url += f":{self.port}"
         return url

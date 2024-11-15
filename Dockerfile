@@ -17,6 +17,9 @@ ENV PATH="${PATH}:${POETRY_VENV}/bin"
 ENV CODE_PATH=/app
 WORKDIR ${CODE_PATH}
 
+# install ffmpeg
+RUN apt-get -y update && apt-get -y upgrade && apt-get install -y --no-install-recommends ffmpeg
+
 # Install dependencies
 COPY poetry.lock pyproject.toml ./
 RUN poetry install

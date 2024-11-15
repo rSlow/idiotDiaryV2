@@ -10,6 +10,7 @@ from dishka.integrations.aiogram_dialog import inject
 
 from idiotDiary.bot.states.birthdays import AddNotificationTimeSG, \
     ClearNotificationSG, BirthdaysNotificationSG
+from idiotDiary.bot.utils.dialog_factory import choice_dialog_factory
 from idiotDiary.bot.utils.input_validation import error_dt_input_handler, \
     time_from_text
 from idiotDiary.bot.views import buttons as b
@@ -19,8 +20,6 @@ from idiotDiary.core.db.dao.notification import UserNotificationDao
 from idiotDiary.core.scheduler.scheduler import ApScheduler
 from idiotDiary.core.utils import dates
 from idiotDiary.core.utils.dates import get_now
-from idiotDiary_old.common.dialogs.yes_no_dialog_factory import \
-    choice_dialog_factory
 
 
 @inject

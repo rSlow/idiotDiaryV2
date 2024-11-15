@@ -1,2 +1,0 @@
-class BigDurationError(MemoryError):
-    pass
