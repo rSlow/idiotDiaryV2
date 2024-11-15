@@ -1,1 +1,1 @@
-docker compose down --remove-orphans
+docker compose --profile services --profile runners --profile starters down --remove-orphans
