@@ -33,7 +33,7 @@ class AuthProvider(Provider):
         try:
             token = await cookie_auth.get_token(request)
             return await auth_service.get_user_from_bearer(token, dao)
-        except (PyJWTError, AuthError):
+        except (PyJWTError, AuthError, HTTPException):
             try:
                 return await auth_service.get_user_from_basic(request, dao)
             except (binascii.Error, AuthError, ValueError):

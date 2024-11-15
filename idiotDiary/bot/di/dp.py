@@ -11,6 +11,7 @@ from dishka import Provider, Scope, provide, AsyncContainer
 from dishka.integrations.aiogram import setup_dishka as setup_aiogram_dishka
 from redis.asyncio import Redis
 
+from idiotDiary.bot.config.models import BotConfig
 from idiotDiary.bot.config.models.storage import StorageConfig, StorageType
 from idiotDiary.bot.dialogs import setup_dialogs
 from idiotDiary.bot.handlers import setup_handlers
@@ -30,10 +31,11 @@ class DpProvider(Provider):
             dishka: AsyncContainer,
             event_isolation: BaseEventIsolation,
             storage: BaseStorage,
+            bot_config: BotConfig
     ) -> Dispatcher:
         dp = Dispatcher(storage=storage, events_isolation=event_isolation)
         setup_aiogram_dishka(container=dishka, router=dp)
-        setup_handlers(dp)
+        setup_handlers(dp, bot_config.log_chat)
         setup_dialogs(dp)
         setup_middlewares(dp)
 

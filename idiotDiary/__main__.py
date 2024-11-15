@@ -23,6 +23,7 @@ from idiotDiary.core.config.parser.config_logging import setup_logging
 from idiotDiary.core.config.parser.paths import get_paths
 from idiotDiary.core.config.parser.retort import get_base_retort
 from idiotDiary.core.di import get_common_providers
+from idiotDiary.core.scheduler.scheduler import ApScheduler
 from idiotDiary.core.utils import di_visual
 from idiotDiary.mq.broker import broker
 
@@ -94,6 +95,8 @@ async def on_startup(
 
     await ui.setup(bot)
     await broker.startup()
+
+    await dishka.get(ApScheduler)  # run scheduler
 
 
 async def on_shutdown(dishka: AsyncContainer):

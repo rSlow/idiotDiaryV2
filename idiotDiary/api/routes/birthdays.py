@@ -5,7 +5,7 @@ from uuid import UUID
 from aiohttp import web
 from dishka import FromDishka
 from dishka.integrations.fastapi import inject
-from fastapi import APIRouter, Body, Path
+from fastapi import APIRouter, Body, Path, Response
 from sqlalchemy.exc import IntegrityError
 
 from idiotDiary.api.utils.auth.service import auth_required
@@ -21,8 +21,8 @@ async def update_birthdays(
         user: FromDishka[dto.User], dao: FromDishka[DaoHolder]
 ):
     try:
-        await dao.birthdays.update(birthdays, user.tg_id)
-        return 200
+        await dao.birthdays.update(birthdays, user.id_)
+        return {"detail": "ok"}
     except IntegrityError:  # TODO
         logger.exception("Already existed UUID!")
         return web.Response(status=409)
@@ -32,19 +32,19 @@ async def update_birthdays(
 async def delete_birthdays(
         user: FromDishka[dto.User], dao: FromDishka[DaoHolder]
 ):
-    await dao.birthdays.delete_all_from_user(user.tg_id)
-    return 200
+    await dao.birthdays.delete_all_from_user(user.id_)
+    return {"detail": "ok"}
 
 
+@auth_required
 @inject
-@auth_required  # TODO check
 async def delete_birthday(
         birthday_uuid: Annotated[UUID, Path()], dao: FromDishka[DaoHolder],
 ):
     deleted = await dao.birthdays.delete(birthday_uuid)
     if not deleted:
-        return 404
-    return 200
+        return Response(status_code=404)
+    return {"detail": "ok"}
 
 
 def setup():
@@ -52,6 +52,7 @@ def setup():
 
     router.add_api_route("/", update_birthdays, methods=["PUT"])
     router.add_api_route("/", delete_birthdays, methods=["DELETE"])
-    router.add_api_route("/{uuid}/", delete_birthday, methods=["DELETE"])
+    router.add_api_route("/{birthday_uuid}/", delete_birthday,
+                         methods=["DELETE"])
 
     return router

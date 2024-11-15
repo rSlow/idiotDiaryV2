@@ -3,7 +3,8 @@ import typing as t
 from functools import wraps
 
 import jwt
-from dishka import FromDishka
+from dishka import AsyncContainer
+from dishka.integrations.fastapi import inject
 from fastapi import HTTPException, Request
 from sqlalchemy.exc import NoResultFound
 from starlette import status
@@ -25,9 +26,21 @@ P = t.ParamSpec("P")
 
 
 def auth_required(func: t.Callable[P, T]) -> t.Callable[P, T]:
+    @inject
     @wraps(func)
-    async def decorated(*args, user: FromDishka[dto.User], **kwargs):
-        return await func(*args, user=user, **kwargs)
+    async def decorated(*args, **kwargs):
+        for kwarg in kwargs.values():
+            if isinstance(kwarg, Request):
+                dishka: AsyncContainer = kwarg.state.dishka_container
+                if dishka is not None:
+                    user = await dishka.get(dto.User)
+                    if user is not None:
+                        return await func(*args, **kwargs)
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
 
     return decorated
 
@@ -41,7 +54,7 @@ class AuthService:
     ) -> dto.User:
         http_status_401 = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Incorrect username or password",
+            detail="Incorrect TG ID or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -109,5 +122,5 @@ class AuthService:
         schema, token = header.split(" ", maxsplit=1)
         if schema.lower() != "basic":
             raise UnknownSchemaError(schema=schema)
-        tg_id, password = self.security.decode_basic_auth(token)
-        return await self.authenticate_user(tg_id, password, dao)
+        tg_id, _ = self.security.decode_basic_auth(token)
+        return await dao.user.get_by_tg_id_with_password(tg_id)

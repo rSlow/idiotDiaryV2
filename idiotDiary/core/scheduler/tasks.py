@@ -1,9 +1,11 @@
 from datetime import timedelta
 
 from aiogram import Bot
+from aiogram_dialog import BgManagerFactory, ShowMode
 from dishka import FromDishka
 
 from idiotDiary.bot.di.jinja import JinjaRenderer
+from idiotDiary.core.db.dao.user import UserDao
 from idiotDiary.core.db.dao.birthday import BirthdayDao
 from idiotDiary.core.db.dao.notification import UserNotificationDao
 from idiotDiary.core.scheduler.context import SchedulerInjectContext
@@ -15,10 +17,13 @@ async def send_birthdays(
         user_id: int,
         birthdays_dao: FromDishka[BirthdayDao],
         notification_dao: FromDishka[UserNotificationDao],
+        user_dao: FromDishka[UserDao],
         jinja: FromDishka[JinjaRenderer],
-        bot: FromDishka[Bot]
+        bot: FromDishka[Bot],
+        bg: FromDishka[BgManagerFactory]
 ):
     user_state = await notification_dao.get_user_state(user_id)
+    user = await user_dao.get_by_id(user_id)
     if user_state is None:
         user_state = await notification_dao.add_or_update_user_state(user_id)
     timeshift = timedelta(
@@ -37,4 +42,7 @@ async def send_birthdays(
             today_birthdays=today_birthdays,
             tomorrow_birthdays=tomorrow_birthdays
         )
-        await bot.send_message(chat_id=user_id, text=message_text)
+        await bot.send_message(chat_id=user.tg_id, text=message_text)
+        await bg.bg(bot, user.tg_id, user.tg_id).update(
+            {}, show_mode=ShowMode.DELETE_AND_SEND
+        )

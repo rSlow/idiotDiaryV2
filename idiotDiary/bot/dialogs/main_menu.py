@@ -7,6 +7,7 @@ from dishka.integrations.aiogram_dialog import inject
 from idiotDiary.bot.filters.user import F_User
 from idiotDiary.bot.states.admin import AdminMainSG
 from idiotDiary.bot.states.birthdays import BirthdaysMenuSG
+from idiotDiary.bot.states.music import MusicMainSG
 from idiotDiary.bot.states.not_working_place import NwpMainSG
 from idiotDiary.bot.states.shaurma import FshPickFormSG
 from idiotDiary.bot.states.start import MainMenuSG
@@ -32,7 +33,8 @@ main_menu = Dialog(
             Start(
                 Const("(бес)платная шаурма 🌯"),
                 id="free_shaurma",
-                state=FshPickFormSG.device
+                state=FshPickFormSG.device,
+                when=F_User.roles.contains("shaurma")
             ),
             Start(
                 Const("напоминальщик ДР 🎂"),
@@ -40,11 +42,11 @@ main_menu = Dialog(
                 state=BirthdaysMenuSG.state,
                 when=F_User.roles.contains("birthdays")
             ),
-            # Start(
-            #     Const("Музыка 🎧"),
-            #     id="music",
-            #     state=MusicMainSG.state
-            # ),
+            Start(
+                Const("Музыка 🎧"),
+                id="music",
+                state=MusicMainSG.state
+            ),
             Start(
                 Const("Профиль 👤"),
                 id="user_profile",

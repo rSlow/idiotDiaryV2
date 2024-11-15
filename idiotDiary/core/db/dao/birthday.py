@@ -1,7 +1,7 @@
 from datetime import date
 from uuid import UUID
 
-from sqlalchemy import delete, select
+from sqlalchemy import delete, select, and_, extract
 
 from idiotDiary.core.db import dto
 from idiotDiary.core.db import models as db
@@ -53,17 +53,12 @@ class BirthdayDao(BaseDao[db.Birthday]):
     async def get_by_date(self, d: date, user_id: int):
         res = await self.session.scalars(
             select(self.model)
-            .where(self.model.date == d)
-            .where(self.model.user_id == user_id)
-        )
-        return [birthday.to_dto() for birthday in res.all()]
-
-    async def get_between_dates(
-            self, start_d: date, end_d: date, user_id: int
-    ):
-        res = await self.session.scalars(
-            select(self.model)
-            .where(self.model.date.between(start_d, end_d))
-            .where(self.model.user_id == user_id)
+            .where(
+                and_(
+                    extract('month', self.model.date) == d.month,
+                    extract('day', self.model.date) == d.day,
+                    self.model.user_id == user_id
+                ),
+            )
         )
         return [birthday.to_dto() for birthday in res.all()]

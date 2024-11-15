@@ -1,13 +1,12 @@
-import os
 import tempfile
 import uuid
 from datetime import datetime, time
 from pathlib import Path
 from typing import Optional
 
+from common.utils.decorators import to_async_thread
 from yt_dlp import YoutubeDL
 
-from common.utils.decorators import to_async_thread
 from .. import settings
 from ..exceptions import BigDurationError
 from ..schemas import DownloadResult
@@ -38,8 +37,7 @@ def download_audio(url: str,
                    root_temp_path: Path,
                    from_time: Optional[time] = None,
                    to_time: Optional[time] = None):
-    if not root_temp_path.is_dir():
-        os.mkdir(root_temp_path)
+    root_temp_path.mkdir(exist_ok=True)
 
     req_dict: dict = YoutubeDL({"playlist_items": "1"}).extract_info(
         url=url,
@@ -72,13 +70,17 @@ def download_audio(url: str,
         else:
             duration = url_duration
         if duration > 600:
-            raise BigDurationError(f"duration of audio {duration} seconds too long")
+            raise BigDurationError(
+                f"duration of audio {duration} seconds too long")
 
-        ffmpeg_options = ydl_opts.setdefault("external_downloader_args", {}).setdefault("ffmpeg", [])
+        ffmpeg_options = ydl_opts.setdefault("external_downloader_args",
+                                             {}).setdefault("ffmpeg", [])
         if from_time:
-            ffmpeg_options.extend(["-ss", from_time.strftime(settings.STRFTIME_FORMAT)])
+            ffmpeg_options.extend(
+                ["-ss", from_time.strftime(settings.STRFTIME_FORMAT)])
         if to_time:
-            ffmpeg_options.extend(["-to", to_time.strftime(settings.STRFTIME_FORMAT)])
+            ffmpeg_options.extend(
+                ["-to", to_time.strftime(settings.STRFTIME_FORMAT)])
 
         ffmpeg_options.extend(["-acodec", "libmp3lame"])
 

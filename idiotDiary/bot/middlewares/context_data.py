@@ -8,6 +8,7 @@ from idiotDiary.bot.config.models import BotConfig
 from idiotDiary.bot.di.jinja import JinjaRenderer
 from idiotDiary.bot.middlewares.config import MiddlewareData
 from idiotDiary.bot.views.alert import BotAlert
+from idiotDiary.core.config import Paths
 from idiotDiary.core.db import dto
 from idiotDiary.core.db.dao import DaoHolder
 from idiotDiary.core.scheduler.scheduler import ApScheduler
@@ -28,6 +29,7 @@ class ContextDataMiddleware(BaseMiddleware):
         data["scheduler"] = await dishka.get(ApScheduler)
         data["jinja_renderer"] = await dishka.get(JinjaRenderer)
         data["alert"] = await dishka.get(BotAlert)
+        data["paths"] = await dishka.get(Paths)
         data["dao"] = dao_holder
 
         user_tg = data.get("event_from_user", None)

@@ -5,10 +5,10 @@ from taskiq import AsyncTaskiqTask, TaskiqResultTimeoutError, TaskiqResult
 
 from idiotDiary.bot.schemas.inn import INNSchema, inn_factory
 from idiotDiary.bot.states.not_working_place import INNParserSG
-from idiotDiary.bot.utils.exceptions import TaskiqTaskError
 from idiotDiary.bot.utils.message import edit_dialog_message
 from idiotDiary.bot.views import buttons as b
 from idiotDiary.bot.views.types import JinjaTemplate
+from idiotDiary.core.utils.exceptions.taskiq import TaskiqTaskError
 from idiotDiary.mq.tasks.inn import get_inn
 
 
@@ -22,11 +22,9 @@ async def inn_handler(
         task: AsyncTaskiqTask = await get_inn.kiq(data)
         inn: TaskiqResult = await task.wait_result(timeout=120)
         if error := inn.error:
-            await message.answer(
-                "Произошла ошибка поиска ИНН. Задача отменена."
-            )
             raise TaskiqTaskError(
-                message="Ошибка поиска ИНН:", error=error
+                "Ошибка поиска ИНН:", error,
+                user_message="Произошла ошибка поиска ИНН. Задача отменена."
             )
 
         if result_inn := inn.return_value:
@@ -49,7 +47,7 @@ async def error_handler(message: types.Message, _, manager: DialogManager, __):
 
 inn_dialog = Dialog(
     Window(
-        JinjaTemplate(template_name="inn_parser_message.jinja2"),
+        JinjaTemplate("nwp/inn_parser_message.jinja2"),
         TextInput(
             id="inn_text_data",
             on_success=inn_handler,

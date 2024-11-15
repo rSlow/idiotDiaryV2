@@ -17,7 +17,7 @@ async def clear_birthdays(
         dao: FromDishka[BirthdayDao]
 ):
     user: dto.User = manager.middleware_data["user"]
-    await dao.delete_all_from_user(user.tg_id)
+    await dao.delete_all_from_user(user.id_)
     await callback.message.answer("Все дни рождения удалены.")
     manager.show_mode = ShowMode.DELETE_AND_SEND
     await manager.done()

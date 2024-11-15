@@ -15,9 +15,9 @@ from dishka.integrations.aiogram_dialog import inject
 from taskiq import AsyncTaskiqTask, TaskiqResult, TaskiqResultTimeoutError
 
 from idiotDiary.bot.states.not_working_place import ZipPdfSG
-from idiotDiary.bot.utils.exceptions import TaskiqTaskError
 from idiotDiary.bot.views import buttons as b
 from idiotDiary.core.config import Paths
+from idiotDiary.core.utils.exceptions.taskiq import TaskiqTaskError
 from idiotDiary.mq.tasks.pdf import pack_pdf_file
 
 DD_KEY = "files"
@@ -72,9 +72,7 @@ async def on_zip_ready(
                 await message.answer(
                     "Произошла ошибка генерации PDF. Задача отменена."
                 )
-                raise TaskiqTaskError(
-                    message="Ошибка генерации PDF файла:", error=error
-                )
+                raise TaskiqTaskError("Ошибка генерации PDF файла:", error)
 
             pdf_file = types.FSInputFile(zip_pdf_result.return_value)
             await callback.message.answer_document(pdf_file)

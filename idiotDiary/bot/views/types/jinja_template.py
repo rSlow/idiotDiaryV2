@@ -10,11 +10,11 @@ from idiotDiary.bot.middlewares.config import MiddlewareData
 
 class JinjaTemplate(Text):
     def __init__(
-            self, template_name: str,
+            self, template_path: str,
             template_data: Optional[dict] = None, when: WhenCondition = None
     ):
         super().__init__(when=when)
-        self._template_name = template_name
+        self._template_path = template_path
         if template_data is None:
             self._template_data = {}
         else:
@@ -25,6 +25,6 @@ class JinjaTemplate(Text):
         renderer = middleware_data["jinja_renderer"]
         self._template_data.update(data)
         return renderer.render_template(
-            template_name=self._template_name,
+            template_path=self._template_path,
             context=self._template_data
         )

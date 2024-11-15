@@ -28,7 +28,7 @@ class JinjaTemplate(Text):
         template_data = self._template_data.copy()
         template_data.update(data)
         rendered = jinja.render_template(
-            template_name=self._template_name,
+            template_path=self._template_name,
             templates_dir=self._templates_dir,
             data=template_data
         )

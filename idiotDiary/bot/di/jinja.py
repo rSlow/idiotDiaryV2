@@ -17,7 +17,7 @@ class JinjaRenderer:
         self.environment = environment
 
     def render_template(
-            self, template_name: str | Template, context: dict | None = None,
+            self, template_path: str | Template, context: dict | None = None,
             **kwargs
     ):
         _context = (context or {}) | kwargs
@@ -27,7 +27,7 @@ class JinjaRenderer:
             "DATE_FORMAT_USER": dates.DATE_FORMAT_USER,
             "DATETIME_FORMAT_USER": dates.DATETIME_FORMAT_USER
         })
-        template = self.environment.get_template(template_name)
+        template = self.environment.get_template(template_path)
         return jinja.render_template(template, _context)
 
 

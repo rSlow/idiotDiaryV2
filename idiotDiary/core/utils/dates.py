@@ -1,4 +1,3 @@
-import typing
 from datetime import tzinfo, time, datetime
 
 from dateutil import tz
@@ -13,7 +12,7 @@ DATETIME_FORMAT = f"{DATE_FORMAT} {TIME_FORMAT}"
 DATETIME_FORMAT_USER = f"{DATE_FORMAT_USER} {TIME_FORMAT_USER}"
 
 tz_utc = tz.gettz("UTC")
-tz_local = typing.cast(tzinfo, tz.gettz())
+tz_local = tz.gettz("Asia/Vladivostok")
 
 
 def get_now(_tz: tzinfo | None = None) -> datetime:

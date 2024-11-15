@@ -1,17 +1,19 @@
 import logging
 import typing as t
+from functools import partial
 
 from aiogram import Bot
 from aiogram.exceptions import AiogramError
 from aiogram.exceptions import TelegramForbiddenError
 from aiogram.filters import ExceptionTypeFilter
 from aiogram.types.error_event import ErrorEvent
+from aiogram.utils.markdown import html_decoration as hd
 from aiogram_dialog import BgManagerFactory
 from dishka import FromDishka
 from dishka.integrations.aiogram import inject
 
 from idiotDiary.bot.utils.exceptions import UserNotifyException
-from idiotDiary.bot.utils.logging import log_bot_error, send_alert
+from idiotDiary.bot.utils.markdown import get_update_text
 from idiotDiary.bot.views.alert import BotAlert
 from idiotDiary.core.db.dao import DaoHolder
 from idiotDiary.core.utils.exceptions.base import BaseError
@@ -88,19 +90,30 @@ async def handle_base_error(
                 )
 
     if exception.log:
-        bot_name = (await bot.get_my_name()).name
-        log_bot_error(error, logger, bot_name)
-        await send_alert(alert, error.update, error.exception, bot_name)
+        await handle(error, bot, alert.log_chat_id)
 
 
-@inject
-async def handle(error: ErrorEvent, bot: Bot, alert: FromDishka[BotAlert]):
+async def handle(error: ErrorEvent, bot: Bot, log_chat_id: int):
     bot_name = (await bot.get_my_name()).name
-    log_bot_error(error, logger, bot_name)
-    await send_alert(alert, error.update, error.exception, bot_name)
+    update = error.update
+    exception = error.exception
+    logger.exception(
+        f"Получено исключение в боте {bot_name}: {repr(exception)}, "
+        f"во время обработки апдейта {update.model_dump(exclude_none=True)}",
+        exc_info=exception,
+    )
+
+    await bot.send_message(
+        log_chat_id,
+        f"Получено исключение в боте <u>{bot_name}</u>:\n"
+        f"-----\n"
+        f"{hd.quote(repr(exception))}\n"
+        f"-----\n"
+        f"во время обработки апдейта: {get_update_text(update)}",
+    )
 
 
-def setup(dp):
+def setup(dp, log_chat_id):
     dp.errors.register(
         bot_blocked,
         ExceptionTypeFilter(TelegramForbiddenError)
@@ -115,4 +128,4 @@ def setup(dp):
     )
 
     # common handler
-    dp.errors.register(handle)
+    dp.errors.register(partial(handle, log_chat_id=log_chat_id))

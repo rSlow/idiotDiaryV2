@@ -20,7 +20,6 @@ class Birthday(Base):
 
     def to_dto(self):
         return dto.Birthday(
-            user_id=self.user_id,
             fio=self.fio,
             date=self.date,
             uuid=self.uuid,

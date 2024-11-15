@@ -56,7 +56,7 @@ async def delete_notification(
 
 notifications_dialog = Dialog(
     Window(
-        JinjaTemplate(template_name="birthdays/notifications.jinja2"),
+        JinjaTemplate("birthdays/notifications.jinja2"),
         Select(
             Format("{item[1]}"),
             id="notifications",

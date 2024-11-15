@@ -8,9 +8,6 @@ from idiotDiary.core.db.dao.base import BaseDao
 
 
 class UserNotificationDao(BaseDao[db.NotificationState]):
-    async def get_all(self):
-        return  # TODO check needing
-
     async def get_user_state(self, user_id: int):
         res = await self.session.scalars(
             select(self.model)

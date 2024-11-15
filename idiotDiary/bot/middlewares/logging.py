@@ -6,9 +6,9 @@ from aiogram import types as t
 from aiogram_dialog.api.entities import DialogUpdateEvent
 
 from idiotDiary.bot.middlewares.config import MiddlewareData
-from idiotDiary.bot.utils import events as get_event
-from idiotDiary.bot.utils.exceptions import (UnknownEventTypeError,
-                                            PassEventException)
+from idiotDiary.bot.utils.exceptions import (
+    UnknownEventTypeError, PassEventException
+)
 from idiotDiary.core.db import dto
 
 logger = logging.getLogger(__name__)
@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 
 def _parse_event(event: t.TelegramObject) -> dto.LogEvent:
     if isinstance(event, t.Message):
-        return get_event.from_message(event)
+        return dto.LogEvent.from_message(event)
     elif isinstance(event, t.CallbackQuery):
-        return get_event.from_callback_query(event)
+        return dto.LogEvent.from_callback_query(event)
     elif isinstance(event, DialogUpdateEvent):
         raise PassEventException(event)
     raise UnknownEventTypeError(event)

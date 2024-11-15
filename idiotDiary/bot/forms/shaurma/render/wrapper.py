@@ -11,9 +11,9 @@ from taskiq import AsyncTaskiqTask, TaskiqResult
 from idiotDiary.bot.forms.shaurma.utils.types import RenderFunc
 from idiotDiary.bot.states.start import MainMenuSG
 from idiotDiary.bot.utils.dialog_factory import OnFinish
-from idiotDiary.bot.utils.exceptions import TaskiqTaskError
 from idiotDiary.core.config import Paths
 from idiotDiary.core.utils.dates import get_now_isoformat
+from idiotDiary.core.utils.exceptions.taskiq import TaskiqTaskError
 from idiotDiary.mq.tasks.draw_screenshot import draw_screenshot
 
 

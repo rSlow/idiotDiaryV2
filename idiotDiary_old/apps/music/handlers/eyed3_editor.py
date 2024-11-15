@@ -5,59 +5,57 @@ import eyed3
 from aiogram import types, Bot
 from aiogram.enums import ContentType
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
-from aiogram_dialog.widgets.input import MessageInput, TextInput, ManagedTextInput
+from aiogram_dialog.widgets.input import MessageInput, TextInput
 from aiogram_dialog.widgets.kbd import Select, Button, Row, Group
 from aiogram_dialog.widgets.text import Const, Format
-from eyed3.id3 import Tag
-
+from common.buttons import CANCEL_BUTTON, BACK_BUTTON
 from common.dialogs.types import JinjaTemplate
 from common.filters import regexp_factory
-from common.buttons import CANCEL_BUTTON, BACK_BUTTON
 from common.utils.decorators import to_async_thread
 from common.utils.functions import edit_dialog_message
+from dishka import FromDishka
+from dishka.integrations.aiogram_dialog import inject
+from eyed3.id3 import Tag
+
+from idiotDiary.core.config import Paths
 from .. import settings
-from ..states import EyeD3FSM
 from ..enums import EyeD3ActionsEnum, EyeD3MessagesEnum
+from ..states import EyeD3FSM
 from ..utils.audio import download_audio
 from ..utils.image import process_image, get_aiogram_thumbnail
 from ..utils.temp_dowlnoader import TempFileDownloader
 
 
-async def initialize_audio_file(message: types.Message,
-                                manager: DialogManager):
+async def initialize_audio_file(message: types.Message, manager: DialogManager):
     bot: Bot = manager.middleware_data["bot"]
 
     audio = message.audio
     file_id = audio.file_id
-    filename = audio.file_name or uuid.uuid4().hex + settings.AUDIO_FILE_EXT
+    filename = audio.file_name or f"{uuid.uuid4().hex}.mp3"
     file_path = settings.TEMP_DIR / filename
 
-    await edit_dialog_message(
-        manager=manager,
-        text="Обработка..."
-    )
+    await edit_dialog_message(manager=manager, text="Обработка...")
+
     async with TempFileDownloader(file_path=file_path,
                                   bot=bot,
                                   file_id=file_id):
-        eyed3_audio = await to_async_thread(eyed3.load)(file_path)
+        eyed3_audio = eyed3.load(file_path)
         if eyed3_audio is None:
             await message.answer(
-                text="Невозможно распознать файл. Попробуйте загрузить другой файл."
+                "Невозможно распознать файл. Попробуйте загрузить другой файл."
             )
             return await manager.done()
 
-        eyed3_tag: Tag = eyed3_audio.tag if eyed3_audio.tag is not None else Tag()
+        eyed3_tag = eyed3_audio.tag or Tag()
+        # eyed3_tag: Tag = eyed3_audio.tag if eyed3_audio.tag is not None else Tag()
 
-        album = eyed3_tag.album
-        title = audio.title
-        artist = audio.performer
         thumbnail = audio.thumbnail.file_id if audio.thumbnail else None
         manager.dialog_data.update({
             "filename": filename,
             "file_id": file_id,
-            "album": album,
-            "title": title,
-            "artist": artist,
+            "album": eyed3_tag.album,
+            "title": audio.title,
+            "artist": audio.performer,
             "thumbnail": thumbnail
         })
 
@@ -66,33 +64,21 @@ async def initialize_audio_file(message: types.Message,
 
 
 # ----- INITIALIZE FROM FILE ----- #
-async def audio_handler(message: types.Message,
-                        _: MessageInput,
-                        manager: DialogManager):
+async def audio_handler(message: types.Message, _, manager: DialogManager):
     await message.delete()
-    await initialize_audio_file(
-        message=message,
-        manager=manager
-    )
+    await initialize_audio_file(message, manager)
 
 
 # ----- INITIALIZE FROM URL ----- #
-async def url_handler(message: types.Message,
-                      __: ManagedTextInput,
-                      manager: DialogManager,
-                      url: str):
+async def url_handler(
+        message: types.Message, _, manager: DialogManager, url: str
+):
     await message.delete()
-    await edit_dialog_message(
-        manager=manager,
-        text="Скачиваю..."
-    )
-    result = await download_audio(
-        url=url,
-        root_temp_path=settings.TEMP_DIR
-    )
+    await edit_dialog_message(manager=manager, text="Скачиваю...")
+
+    result = await download_audio(url=url, root_temp_path=settings.TEMP_DIR)
     audio_file = types.BufferedInputFile(
-        file=result.data,
-        filename=result.filename
+        file=result.data, filename=result.filename
     )
     audio = await message.answer_document(document=audio_file)
     await initialize_audio_file(
@@ -130,31 +116,29 @@ async def edit_window_getter(dialog_manager: DialogManager, **__):
     return data
 
 
-async def category_button_click(_: types.CallbackQuery,
-                                __: Button,
-                                manager: DialogManager,
-                                category: str):
+async def category_button_click(_, __, manager: DialogManager, category: str):
     manager.dialog_data["active_category"] = category
     await manager.next()
 
 
 # ----- SAVE ----- #
-async def eyed3_export(callback: types.CallbackQuery,
-                       __: Button,
-                       manager: DialogManager):
-    bot: Bot = manager.middleware_data["bot"]
+@inject
+async def eyed3_export(
+        callback: types.CallbackQuery, _, manager: DialogManager,
+        bot: FromDishka[Bot], paths: FromDishka[Paths]
+):
     eyed3_data = manager.dialog_data
 
-    file_id = eyed3_data.get("file_id")
-    filename = eyed3_data.get("filename", uuid.uuid4().hex + settings.AUDIO_FILE_EXT)
-    file_path = settings.TEMP_DIR / filename
+    file_id = eyed3_data["file_id"]
+    filename = eyed3_data.get("filename", f"{uuid.uuid4().hex}.mp3")
+    file_path = paths.temp_folder_path / filename
 
     await callback.message.edit_text("Обработка...")
 
     async with TempFileDownloader(file_path=file_path,
                                   bot=bot,
                                   file_id=file_id):
-        eyed3_tag: Tag = Tag()
+        eyed3_tag = Tag()
         eyed3_tag.album = eyed3_data.get("album")
         eyed3_tag.title = eyed3_data.get("title")
         eyed3_tag.artist = eyed3_data.get("artist")
@@ -176,15 +160,13 @@ async def eyed3_export(callback: types.CallbackQuery,
         eyed3_tag.save(file_path.as_posix())
 
         if eyed3_tag.artist and eyed3_tag.title:
-            filename = f"{eyed3_tag.artist} - {eyed3_tag.title}{settings.AUDIO_FILE_EXT}"
+            filename = f"{eyed3_tag.artist} - {eyed3_tag.title}.mp3"
 
-        audio_file = types.FSInputFile(
-            path=file_path,
-            filename=filename
-        )
+        audio_file = types.FSInputFile(path=file_path, filename=filename)
         await callback.message.answer_document(
             document=audio_file,
-            thumbnail=await get_aiogram_thumbnail(processed_image_io) if thumbnail_id is not None else None
+            thumbnail=await get_aiogram_thumbnail(
+                processed_image_io) if thumbnail_id is not None else None
         )
 
     manager.show_mode = ShowMode.DELETE_AND_SEND
@@ -209,7 +191,7 @@ eyed3_main_window = Window(
     Button(
         Const("Сохранить 💾"),
         id="save",
-        on_click=eyed3_export
+        on_click=eyed3_export  # noqa
     ),
     CANCEL_BUTTON,
     getter=edit_window_getter,
@@ -224,10 +206,9 @@ async def edit_category_getter(dialog_manager: DialogManager, **__):
 
 
 # ----- EDITOR TEXT ----- #
-async def text_handler(message: types.Message,
-                       _: ManagedTextInput,
-                       manager: DialogManager,
-                       value: str):
+async def text_handler(
+        message: types.Message, _, manager: DialogManager, value: str
+):
     category = manager.dialog_data["active_category"]
     if category not in [
         EyeD3ActionsEnum.title.name,

@@ -11,6 +11,7 @@ from redis import Redis
 from idiotDiary.core.config.models.redis import RedisConfig
 from idiotDiary.core.db import dto
 from idiotDiary.core.scheduler.context import SchedulerInjectContext
+from idiotDiary.core.utils.dates import tz_local
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +34,6 @@ class Scheduler(Protocol):
 
 class ApScheduler(Scheduler):
     def __init__(self, dishka: AsyncContainer, redis_config: RedisConfig):
-        # TODO move to di
         SchedulerInjectContext.container = dishka
         self.job_store = RedisJobStore(
             host=redis_config.host,
@@ -53,11 +53,10 @@ class ApScheduler(Scheduler):
             jobstores={"default": self.job_store},
             job_defaults=job_defaults,
             executors={"default": self.executor},
+            timezone=tz_local
         )
 
     async def start(self):
-        # TODO scheduler не стартует (выдается только в middleware data,
-        #  нужно запускать самостоятельно)
         self.scheduler.start()
 
     async def close(self):
