@@ -11,7 +11,6 @@ from idiotDiary.core.utils.exceptions.user import UnknownUsernameFound, \
 
 
 class UserDao(BaseDao[db.User]):
-
     async def get_by_id(self, id_: int) -> dto.User:
         result = await self.session.scalars(
             select(self.model)
@@ -116,6 +115,14 @@ class UserDao(BaseDao[db.User]):
             .where(db.Role.id == role_id)
         )
         return res.one()
+
+    async def set_superusers(self, users_id: list[int]):
+        await self.session.execute(
+            update(self.model)
+            .where(self.model.tg_id.in_(users_id))
+            .values(is_superuser=True)
+        )
+        await self.commit()
 
 
 def user_options():

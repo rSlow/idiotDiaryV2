@@ -18,10 +18,10 @@ from idiotDiary.bot.config.parser.main import load_config as load_bot_config
 from idiotDiary.bot.di import get_bot_providers
 from idiotDiary.bot.di.dp import resolve_update_types
 from idiotDiary.bot.utils import ui
-from idiotDiary.core.config.models import WebConfig
 from idiotDiary.core.config.parser.config_logging import setup_logging
 from idiotDiary.core.config.parser.paths import get_paths
 from idiotDiary.core.config.parser.retort import get_base_retort
+from idiotDiary.core.db.dao.user import UserDao
 from idiotDiary.core.di import get_common_providers
 from idiotDiary.core.scheduler.scheduler import ApScheduler
 from idiotDiary.core.utils import di_visual
@@ -59,7 +59,7 @@ def main():
 
     startup_callback = partial(
         on_startup,
-        di_container, api_config.web, api_config.api, webhook_config
+        di_container, bot_config, api_config.api, webhook_config
     )
     shutdown_callback = partial(on_shutdown, di_container)
     api_app.add_event_handler("startup", startup_callback)
@@ -76,9 +76,10 @@ def main():
 
 async def on_startup(
         dishka: AsyncContainer,
-        web_config: WebConfig, api_config: ApiConfig,
+        bot_config: BotAppConfig, api_config: ApiConfig,
         webhook_config: WebhookConfig
 ):
+    web_config = bot_config.web
     webhook_url = (
             web_config.real_base_url +  # domain + proxy
             api_config.root_path + webhook_config.path
@@ -97,6 +98,10 @@ async def on_startup(
     await broker.startup()
 
     await dishka.get(ApScheduler)  # run scheduler
+
+    async with dishka() as request_dishka:
+        user_dao = await request_dishka.get(UserDao)
+        await user_dao.set_superusers(bot_config.bot.superusers)
 
 
 async def on_shutdown(dishka: AsyncContainer):
