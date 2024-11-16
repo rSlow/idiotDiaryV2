@@ -71,7 +71,7 @@ class UserNotificationDao(BaseDao[db.NotificationState]):
 
     async def clear_notifications(self, user_id: int):
         await self.session.execute(
-            delete(db.NotificationTime)  # TODO check
+            delete(db.NotificationTime)
             .where(db.NotificationState.user_id == user_id)
         )
         await self.commit()
