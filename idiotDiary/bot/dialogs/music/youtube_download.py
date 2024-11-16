@@ -84,7 +84,8 @@ async def download_and_send_file(
             timeout_message="Превышено время скачивания видео.",
     ) as context:
         audio_file_path: Path = await context.wait_result(
-            timeout=120, url=url, from_time=from_time, to_time=to_time
+            timeout=120, temp_path=context.temp_folder,
+            url=url, from_time=from_time, to_time=to_time
         )
         await edit_dialog_message(manager=manager, text="Отправляю файл...")
         audio_file = types.FSInputFile(path=audio_file_path)

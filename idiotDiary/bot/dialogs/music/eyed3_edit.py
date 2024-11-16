@@ -51,7 +51,9 @@ async def url_handler(
                                "Загрузка отменена.",
             timeout_message="Превышено время скачивания видео.",
     ) as context:
-        audio_file_path: Path = await context.wait_result(timeout=120, url=url)
+        audio_file_path: Path = await context.wait_result(
+            timeout=120, temp_path=context.temp_folder, url=url
+        )
         await edit_dialog_message(manager=manager, text="Отправляю файл...")
         audio_file = types.FSInputFile(path=audio_file_path)
         audio_message = await message.answer_document(document=audio_file)
