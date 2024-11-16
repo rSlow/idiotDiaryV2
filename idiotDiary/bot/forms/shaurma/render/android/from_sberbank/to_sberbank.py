@@ -13,7 +13,7 @@ X = 1080
 
 def render(temp_dir: Path, name: str, transfer_amount: float, **_kw) -> Path:
     with ImageContext(
-            template_path=paths.TEMPLATES_DIR / "iphone" / "from_sberbank" / "to_sberbank.png",
+            template_path=paths.TEMPLATES_DIR / "android" / "from_sberbank" / "to_sberbank.png",
             temp_dir=temp_dir
     ) as context:
         draw = context.draw
