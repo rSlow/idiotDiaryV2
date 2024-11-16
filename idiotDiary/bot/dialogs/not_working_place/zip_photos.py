@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from aiofiles import tempfile as atf
 from aiogram import types, Bot
 from aiogram.enums import ContentType
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
@@ -9,11 +8,10 @@ from aiogram_dialog.widgets.kbd import Button
 from aiogram_dialog.widgets.text import Const, Format
 from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
-from taskiq import AsyncTaskiqTask, TaskiqResult
 
 from idiotDiary.bot.states.not_working_place import ImagesZipSG
+from idiotDiary.bot.utils.taskiq_context import TaskiqContext
 from idiotDiary.bot.views import buttons as b
-from idiotDiary.core.config import Paths
 from idiotDiary.mq.tasks.zip import zip_files_in_folder
 
 DD_KEY = "photos"
@@ -32,20 +30,23 @@ async def photo_handler(message: types.Message, _, manager: DialogManager):
 @inject
 async def send_photos(
         callback: types.CallbackQuery, _, manager: DialogManager,
-        paths: FromDishka[Paths], bot: FromDishka[Bot]
+        bot: FromDishka[Bot]
 ):
     file_id_list = manager.dialog_data.get(DD_KEY)
     await callback.message.edit_text(
         f"Запаковывается {len(file_id_list)} фотографий..."
     )
-    async with atf.TemporaryDirectory(dir=paths.temp_folder_path) as temp_dir:
-        temp_path = Path(temp_dir)
+
+    async with TaskiqContext(
+            task=zip_files_in_folder, manager=manager,
+            error_log_message=f"Ошибка во время генерации архива",
+    ) as context:
         for i, file_id in enumerate(file_id_list, 1):
-            await bot.download(file_id, temp_path / f"{i}.jpg")
-        task: AsyncTaskiqTask = await zip_files_in_folder.kiq(temp_path)
-        zip_file_path: TaskiqResult = await task.wait_result(timeout=60)
-        print(zip_file_path.return_value)
-        zip_doc = types.FSInputFile(zip_file_path.return_value)
+            await bot.download(file_id, context.temp_folder / f"{i}.jpg")
+        zip_file_path: Path = await context.wait_result(
+            timeout=60, folder_path=context.temp_folder
+        )
+        zip_doc = types.FSInputFile(zip_file_path)
         await callback.message.edit_text("Архив отправляется...")
         await callback.message.answer_document(zip_doc)
 

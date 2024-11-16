@@ -1,17 +1,15 @@
 from datetime import datetime
 from pathlib import Path
 
-import aiofiles.tempfile as atf
 from aiogram import types
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import TextInput
 from aiogram_dialog.widgets.kbd import Button
 from aiogram_dialog.widgets.text import Const
-from taskiq import AsyncTaskiqTask, TaskiqResult
 
 from idiotDiary.bot.states.music import YTDownloadSG
-from idiotDiary.bot.utils.exceptions.music import DownloadAudioError
 from idiotDiary.bot.utils.message import edit_dialog_message
+from idiotDiary.bot.utils.taskiq_context import TaskiqContext
 from idiotDiary.bot.utils.type_factory import regexp_factory, HTTPS_REGEXP, \
     PAIR_TIMECODE_REGEXP
 from idiotDiary.bot.views import buttons as b
@@ -78,20 +76,22 @@ async def download_and_send_file(
     else:
         from_time, to_time = None, None
 
-    async with atf.TemporaryDirectory(dir=paths.temp_folder_path) as temp_dir:
-        task: AsyncTaskiqTask = await download_youtube_audio.kiq(
-            temp_path=Path(temp_dir), url=url,
-            from_time=from_time, to_time=to_time
+    async with TaskiqContext(
+            task=download_youtube_audio, manager=manager,
+            error_log_message="Ошибка скачивания аудио:",
+            error_user_message="Произошла ошибка скачивания файла. "
+                               "Загрузка отменена.",
+            timeout_message="Превышено время скачивания видео.",
+    ) as context:
+        audio_file_path: Path = await context.wait_result(
+            timeout=120, url=url, from_time=from_time, to_time=to_time
         )
-        task_res: TaskiqResult = await task.wait_result(timeout=120)
-        if task_res.is_err:
-            raise DownloadAudioError(task_res.error)
-
         await edit_dialog_message(manager=manager, text="Отправляю файл...")
-        audio_file = types.FSInputFile(path=task_res.return_value)
+        audio_file = types.FSInputFile(path=audio_file_path)
         await message.answer_document(document=audio_file)
-        manager.show_mode = ShowMode.DELETE_AND_SEND
-        await manager.done()
+
+    manager.show_mode = ShowMode.DELETE_AND_SEND
+    await manager.done()
 
 
 timecode_window = Window(

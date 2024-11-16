@@ -16,20 +16,19 @@ from aiogram_dialog.widgets.text import Format
 from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
 from eyed3.id3 import Tag
-from taskiq import AsyncTaskiqTask, TaskiqResult
+from taskiq import TaskiqResult
 
 from idiotDiary.bot.schemas.music import EyeD3ActionsEnum, EyeD3MessagesEnum
 from idiotDiary.bot.services.music import initialize_audio_file, set_thumbnail
 from idiotDiary.bot.states.music import Eyed3EditSG
-from idiotDiary.bot.utils.exceptions.music import DownloadAudioError
 from idiotDiary.bot.utils.message import edit_dialog_message
+from idiotDiary.bot.utils.taskiq_context import TaskiqContext
 from idiotDiary.bot.utils.type_factory import regexp_factory, HTTPS_REGEXP
 from idiotDiary.bot.views import buttons as b
 from idiotDiary.bot.views.alert import BotAlert
 from idiotDiary.bot.views.types import JinjaTemplate
 from idiotDiary.core.config import Paths
-from idiotDiary.mq.tasks.music import download_youtube_audio
-from idiotDiary.mq.tasks.music import process_thumbnail
+from idiotDiary.mq.tasks.music import download_youtube_audio, process_thumbnail
 
 
 # ----- INITIALIZE FROM FILE ----- #
@@ -39,25 +38,25 @@ async def audio_handler(message: types.Message, _, manager: DialogManager):
 
 
 # ----- INITIALIZE FROM URL ----- #
-@inject
 async def url_handler(
         message: types.Message, _, manager: DialogManager, url: str,
-        paths: FromDishka[Paths]
 ):
     await message.delete()
     await edit_dialog_message(manager=manager, text="Скачиваю...")
 
-    async with atf.TemporaryDirectory(dir=paths.temp_folder_path) as temp_dir:
-        task: AsyncTaskiqTask = await download_youtube_audio.kiq(
-            temp_path=Path(temp_dir), url=url
-        )
-        task_res: TaskiqResult = await task.wait_result(timeout=120)
-        if task_res.is_err:
-            raise DownloadAudioError(task_res.error)
-        audio_file = types.FSInputFile(path=task_res.return_value)
-        audio = await message.answer_document(document=audio_file)
+    async with TaskiqContext(
+            task=download_youtube_audio, manager=manager,
+            error_log_message="Ошибка скачивания аудио:",
+            error_user_message="Произошла ошибка скачивания файла. "
+                               "Загрузка отменена.",
+            timeout_message="Превышено время скачивания видео.",
+    ) as context:
+        audio_file_path: Path = await context.wait_result(timeout=120, url=url)
+        await edit_dialog_message(manager=manager, text="Отправляю файл...")
+        audio_file = types.FSInputFile(path=audio_file_path)
+        audio_message = await message.answer_document(document=audio_file)
 
-    await initialize_audio_file(message=audio, manager=manager)
+    await initialize_audio_file(message=audio_message, manager=manager)
 
 
 async def invalid_url(message: types.Message, *_):
@@ -73,7 +72,7 @@ eyed3_start_window = Window(
     ),
     TextInput(
         id="url",
-        on_success=url_handler,  # noqa
+        on_success=url_handler,
         on_error=invalid_url,
         type_factory=regexp_factory(HTTPS_REGEXP)
     ),

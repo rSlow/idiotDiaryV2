@@ -1,13 +1,13 @@
 import logging
-from typing import TypeVar, ParamSpec, Callable, Awaitable
+from typing import Callable, Awaitable
 
 from taskiq import TaskiqMiddleware, TaskiqMessage
 from taskiq.result.v2 import TaskiqResult
 
-_ReturnValue = TypeVar("_ReturnValue")
-_FuncParams = ParamSpec("_FuncParams")
-
-ExceptionHandler = Callable[[BaseException, _FuncParams], Awaitable[None]]
+ExceptionHandler = Callable[
+    [BaseException, TaskiqMessage, TaskiqResult],
+    Awaitable[None]
+]
 
 logger = logging.getLogger(__name__)
 
