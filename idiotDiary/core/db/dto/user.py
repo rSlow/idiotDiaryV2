@@ -15,7 +15,7 @@ class User:
     is_bot: bool | None = None
     is_superuser: bool | None = None
     is_active: bool | None = None
-    roles: list[UserRole] = field(default_factory=list)
+    roles: list[str] = field(default_factory=list)
 
     @property
     def fullname(self) -> str:

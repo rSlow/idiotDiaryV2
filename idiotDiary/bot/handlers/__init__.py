@@ -18,6 +18,6 @@ def setup_handlers(dp: Dispatcher, log_chat_id: int):
     handlers_router.include_routers(commands.setup())
     handlers_router.include_routers(birthdays.setup())
 
-    dp.include_routers(handlers_router)
+    dp.include_router(handlers_router)
 
     logger.debug("handlers configured successfully")

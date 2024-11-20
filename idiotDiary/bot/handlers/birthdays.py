@@ -5,7 +5,7 @@ from dishka import FromDishka
 from dishka.integrations.aiogram import inject
 
 from idiotDiary.bot.di.jinja import JinjaRenderer
-from idiotDiary.bot.filters.user import F_User_roles
+from idiotDiary.bot.filters.user import role_filter
 from idiotDiary.bot.views import commands
 from idiotDiary.bot.views.birthdays import get_birthdays_message
 from idiotDiary.core.db import dto
@@ -20,16 +20,16 @@ async def check_birthdays(
         dao: FromDishka[BirthdayDao], jinja: FromDishka[JinjaRenderer]
 ):
     user: dto.User = dialog_manager.middleware_data["user"]
-    message_text = await get_birthdays_message(dao, user.id_, jinja)
-    await message.answer(message_text, disable_notification=True)
+    if "birthdays" in user.roles:
+        message_text = await get_birthdays_message(dao, user.id_, jinja)
+        await message.answer(message_text, disable_notification=True)
     await dialog_manager.update({}, ShowMode.DELETE_AND_SEND)
 
 
 def setup():
     router = Router(name=__name__)
     router.message.register(
-        check_birthdays,
-        Command(commands.BIRTHDAYS),
-        F_User_roles.contains("birthdays")
+        check_birthdays, Command(commands.BIRTHDAYS),
+        role_filter("birthdays")
     )
     return router
