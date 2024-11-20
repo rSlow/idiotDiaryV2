@@ -28,8 +28,8 @@ async def check_birthdays(
 
 def setup():
     router = Router(name=__name__)
-    router.message.register(
-        check_birthdays, Command(commands.BIRTHDAYS),
-        role_filter("birthdays")
-    )
+    router.message.filter(role_filter("birthdays"))
+
+    router.message.register(check_birthdays, Command(commands.BIRTHDAYS))
+
     return router
