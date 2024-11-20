@@ -4,7 +4,7 @@ from aiogram_dialog.widgets.kbd import Column, Start
 from aiogram_dialog.widgets.text import Format, Const
 from dishka.integrations.aiogram_dialog import inject
 
-from idiotDiary.bot.filters.user import F_User
+from idiotDiary.bot.filters.user import F_User_roles, F_User
 from idiotDiary.bot.states.admin import AdminMainSG
 from idiotDiary.bot.states.birthdays import BirthdaysMenuSG
 from idiotDiary.bot.states.music import MusicMainSG
@@ -28,19 +28,19 @@ main_menu = Dialog(
                 Const("нерабочая площадка 😶‍🌫️"),
                 id="not_working_place",
                 state=NwpMainSG.state,
-                when=F_User.roles.contains("nwp")
+                when=F_User_roles.contains("nwp")
             ),
             Start(
                 Const("(бес)платная шаурма 🌯"),
                 id="free_shaurma",
                 state=FshPickFormSG.device,
-                when=F_User.roles.contains("shaurma")
+                when=F_User_roles.contains("shaurma")
             ),
             Start(
                 Const("напоминальщик ДР 🎂"),
                 id="birthdays",
                 state=BirthdaysMenuSG.state,
-                when=F_User.roles.contains("birthdays")
+                when=F_User_roles.contains("birthdays")
             ),
             Start(
                 Const("Музыка 🎧"),

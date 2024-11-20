@@ -1,13 +1,12 @@
-from typing import Callable
+from typing import cast
 
 from aiogram import types
-from aiogram_dialog import DialogManager
-from aiogram_dialog.widgets.common import Whenable
+from magic_filter import MagicFilter
 
 from idiotDiary.bot.filters.base import F_MD
-from idiotDiary.bot.middlewares.config import MiddlewareData
 
-F_User = F_MD["user"]
+F_User = cast(MagicFilter, F_MD["user"])
+F_User_roles = cast(MagicFilter, F_User.roles)
 
 
 def is_superuser(superusers: list[int]):
@@ -20,10 +19,3 @@ def is_superuser(superusers: list[int]):
         return user.id in superusers
 
     return _is_superuser
-
-
-def adg_is_superuser(data: dict, _: Whenable, __: DialogManager):
-    middleware_data: MiddlewareData = data["middleware_data"]
-    user = middleware_data["user"]
-    superusers = middleware_data["bot_config"].superusers
-    return user is not None and user.tg_id in superusers

@@ -5,6 +5,7 @@ from dishka import FromDishka
 from dishka.integrations.aiogram import inject
 
 from idiotDiary.bot.di.jinja import JinjaRenderer
+from idiotDiary.bot.filters.user import F_User_roles
 from idiotDiary.bot.views import commands
 from idiotDiary.bot.views.birthdays import get_birthdays_message
 from idiotDiary.core.db import dto
@@ -26,5 +27,9 @@ async def check_birthdays(
 
 def setup():
     router = Router(name=__name__)
-    router.message.register(check_birthdays, Command(commands.BIRTHDAYS))
+    router.message.register(
+        check_birthdays,
+        Command(commands.BIRTHDAYS),
+        F_User_roles.contains("birthdays")
+    )
     return router
