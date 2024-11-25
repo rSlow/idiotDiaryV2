@@ -1,8 +1,6 @@
-from aiogram.types import User
 from aiogram_dialog import Dialog, Window, LaunchMode
 from aiogram_dialog.widgets.kbd import Column, Start
 from aiogram_dialog.widgets.text import Format, Const
-from dishka.integrations.aiogram_dialog import inject
 
 from idiotDiary.bot.filters.user import F_User_roles, F_User
 from idiotDiary.bot.states.admin import AdminMainSG
@@ -12,17 +10,16 @@ from idiotDiary.bot.states.not_working_place import NwpMainSG
 from idiotDiary.bot.states.shaurma import FshPickFormSG
 from idiotDiary.bot.states.start import MainMenuSG
 from idiotDiary.bot.states.users import UserMainSG
+from idiotDiary.core.db import dto
 
 
-@inject
-async def main_menu_getter(event_from_user: User, **__):
-    username = event_from_user.username or event_from_user.full_name
-    return {"username": username}
+async def main_menu_getter(user: dto.User, **__):
+    return {"mention": user.name_mention}
 
 
 main_menu = Dialog(
     Window(
-        Format("{username}, куда надо?"),
+        Format("{mention}, куда надо?"),
         Column(
             Start(
                 Const("нерабочая площадка 😶‍🌫️"),
