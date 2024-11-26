@@ -14,14 +14,11 @@ from idiotDiary.core.config import Paths
 
 @inject
 async def get_logs(
-        callback: types.CallbackQuery, _, manager: DialogManager,
-        paths: FromDishka[Paths]
+        callback: types.CallbackQuery, _, manager: DialogManager, paths: FromDishka[Paths]
 ):
     files = [
-        types.FSInputFile(
-            path=filename,
-            filename=filename.name
-        ) for filename in paths.log_path.glob("*.log")
+        types.FSInputFile(path=filename, filename=filename.name)
+        for filename in paths.log_path.glob("*.log")
         if os.path.getsize(filename)  # check file is not empty
     ]
 

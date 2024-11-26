@@ -8,11 +8,11 @@ from aiogram_dialog.widgets.text import Const, Format
 from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
 
-from idiotDiary.bot.states.birthdays import AddNotificationTimeSG, \
-    ClearNotificationSG, BirthdaysNotificationSG
+from idiotDiary.bot.states.birthdays import (
+    AddNotificationTimeSG, ClearNotificationSG, BirthdaysNotificationSG
+)
 from idiotDiary.bot.utils.dialog_factory import choice_dialog_factory
-from idiotDiary.bot.utils.input_validation import error_dt_input_handler, \
-    time_from_text
+from idiotDiary.bot.utils.input_validation import error_dt_input_handler, time_from_text
 from idiotDiary.bot.views import buttons as b
 from idiotDiary.bot.views.types import JinjaTemplate
 from idiotDiary.core.db import dto
@@ -111,9 +111,7 @@ async def success_time_add_handler(
         dao: FromDishka[UserNotificationDao], scheduler: FromDishka[ApScheduler]
 ):
     user: dto.User = manager.middleware_data["user"]
-    notification = await dao.add_notification(
-        user_id=user.id_, notification_time=valid_time
-    )
+    notification = await dao.add_notification(user_id=user.id_, notification_time=valid_time)
     user_state = await dao.get_user_state(user.id_)
     scheduler.add_birthday_notification(notification, user_state)
 
@@ -122,10 +120,14 @@ async def success_time_add_handler(
     await manager.done()
 
 
+async def add_time_notification_getter(**__):
+    return {"now": get_now().strftime(dates.TIME_FORMAT)}
+
+
 add_time_notification_dialog = Dialog(
     Window(
         Const(f"Введите время в формате {dates.TIME_FORMAT_USER}"),
-        Const(f"Например: {get_now():{dates.TIME_FORMAT}}"),
+        Const("Например: {now}"),
         TextInput(
             id="time_to_add",
             type_factory=time_from_text,
@@ -133,6 +135,7 @@ add_time_notification_dialog = Dialog(
             on_error=error_dt_input_handler
         ),
         b.CANCEL,
+        getter=add_time_notification_getter,
         state=AddNotificationTimeSG.state,
     )
 )

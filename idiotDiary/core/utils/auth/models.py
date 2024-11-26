@@ -50,9 +50,7 @@ class UserTgAuth(BaseModel):
         )
 
     def to_tg_spec(self) -> str:
-        data = self.model_dump(
-            exclude={"hash"}, exclude_none=True, exclude_unset=True
-        )
+        data = self.model_dump(exclude={"hash"}, exclude_none=True, exclude_unset=True)
         data["auth_date"] = int(self.auth_date.timestamp())
         return "\n".join([
             f"{key}={data[key]}"

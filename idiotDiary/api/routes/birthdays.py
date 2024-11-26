@@ -52,7 +52,6 @@ def setup():
 
     router.add_api_route("/", update_birthdays, methods=["PUT"])
     router.add_api_route("/", delete_birthdays, methods=["DELETE"])
-    router.add_api_route("/{birthday_uuid}/", delete_birthday,
-                         methods=["DELETE"])
+    router.add_api_route("/{birthday_uuid}/", delete_birthday, methods=["DELETE"])
 
     return router

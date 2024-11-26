@@ -10,10 +10,8 @@ from aiogram_dialog.widgets.text import Const
 from idiotDiary.bot.states.music import YTDownloadSG
 from idiotDiary.bot.utils.message import edit_dialog_message
 from idiotDiary.bot.utils.taskiq_context import TaskiqContext
-from idiotDiary.bot.utils.type_factory import regexp_factory, HTTPS_REGEXP, \
-    PAIR_TIMECODE_REGEXP
+from idiotDiary.bot.utils.type_factory import regexp_factory, HTTPS_REGEXP, PAIR_TIMECODE_REGEXP
 from idiotDiary.bot.views import buttons as b
-from idiotDiary.core.config import Paths
 from idiotDiary.mq.tasks.music import download_youtube_audio
 
 
@@ -39,15 +37,11 @@ url_window = Window(
 )
 
 
-async def full_timecode(
-        callback: types.CallbackQuery, _, manager: DialogManager
-):
+async def full_timecode(callback: types.CallbackQuery, _, manager: DialogManager):
     await download_and_send_file(callback.message, manager)
 
 
-async def valid_timecode(
-        message: types.Message, _, manager: DialogManager, timecode: str
-):
+async def valid_timecode(message: types.Message, _, manager: DialogManager, timecode: str):
     await message.delete()
     manager.dialog_data.update({"timecode": timecode})
     await download_and_send_file(message, manager)
@@ -57,20 +51,16 @@ async def invalid_timecode(message: types.Message, *_):
     await message.answer("Неверный формат таймкода.")
 
 
-async def download_and_send_file(
-        message: types.Message, manager: DialogManager
-):
-    paths: Paths = manager.middleware_data["paths"]
-
+async def download_and_send_file(message: types.Message, manager: DialogManager):
     await edit_dialog_message(manager=manager, text="Начинаю скачивание...")
 
     url = manager.dialog_data.get("url")
     if url is None:
         raise RuntimeError("`url` is None")  # TODO
 
-    timecode = manager.dialog_data.get("timecode")
+    timecode: str | None = manager.dialog_data.get("timecode")
     if timecode is not None:
-        str_from_time, str_to_time = timecode.split("-")
+        str_from_time, str_to_time = timecode.split("-", maxsplit=1)
         from_time = datetime.strptime(str_from_time, r"%H:%M:%S")
         to_time = datetime.strptime(str_to_time, r"%H:%M:%S")
     else:
@@ -78,9 +68,8 @@ async def download_and_send_file(
 
     async with TaskiqContext(
             task=download_youtube_audio, manager=manager,
-            error_log_message="Ошибка скачивания аудио:",
-            error_user_message="Произошла ошибка скачивания файла. "
-                               "Загрузка отменена.",
+            error_log_message="Ошибка скачивания аудио",
+            error_user_message="Произошла ошибка скачивания файла. Загрузка отменена.",
             timeout_message="Превышено время скачивания видео.",
     ) as context:
         audio_file_path: Path = await context.wait_result(
@@ -96,8 +85,7 @@ async def download_and_send_file(
 
 
 timecode_window = Window(
-    Const(
-        "При необходимости отправьте таймкод в формате: ЧЧ:ММ:СС-ЧЧ:ММ:СС"),
+    Const("При необходимости отправьте таймкод в формате: ЧЧ:ММ:СС-ЧЧ:ММ:СС"),
     Const("или нажмите кнопку 'Полностью'"),
     Button(
         Const("Полностью"),

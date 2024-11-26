@@ -9,8 +9,7 @@ logger = logging.getLogger(__name__)
 
 
 async def edit_dialog_message(
-        manager: DialogManager, text: str,
-        reply_markup: InlineKeyboardMarkup | None = None
+        manager: DialogManager, text: str, reply_markup: InlineKeyboardMarkup | None = None
 ):
     dialog_message_id: int = manager.current_stack().last_message_id
     bot: Bot = manager.middleware_data["bot"]
@@ -23,15 +22,10 @@ async def edit_dialog_message(
     )
 
 
-async def delete_message(
-        bot: Bot, chat_id: int, message_id: int,
-        error_text: str | None = None
-) -> bool:
+async def delete_message(bot: Bot, chat_id: int, message_id: int, error_text: str | None = None):
     try:
-        return await bot.delete_message(
-            chat_id=chat_id,
-            message_id=message_id
-        )
+        return await bot.delete_message(chat_id=chat_id, message_id=message_id)
+
     except TelegramBadRequest as ex:
         logger.warning(
             error_text.format_map({

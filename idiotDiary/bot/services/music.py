@@ -27,9 +27,7 @@ async def initialize_audio_file(message: types.Message, manager: DialogManager):
         await bot.download(file=file_id, destination=file_path)
         eyed3_audio = eyed3.load(file_path)
         if eyed3_audio is None:
-            await message.answer(
-                "Невозможно распознать файл. Попробуйте загрузить другой файл."
-            )
+            await message.answer("Невозможно распознать файл. Попробуйте загрузить другой файл.")
             return await manager.done()
 
         eyed3_tag = eyed3_audio.tag or Tag()

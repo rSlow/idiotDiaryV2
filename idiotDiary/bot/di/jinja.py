@@ -44,16 +44,11 @@ class JinjaProvider(Provider):
             "date": lambda x: datetime_filter(x, dates.DATE_FORMAT),
             "timedelta": timedelta_filter,
         }
-        env = Environment(
-            loader=loader, trim_blocks=True,
-            lstrip_blocks=True, autoescape=True
-        )
+        env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True, autoescape=True)
         env.filters.update(filters)
         logger.info(f"Jinja init with loader <{loader.__class__.__name__}>")
         return env
 
     @provide
     def get_loader(self, paths: Paths) -> BaseLoader:
-        return FileSystemLoader(
-            searchpath=paths.bot_path / "views" / "jinja" / "templates"
-        )
+        return FileSystemLoader(searchpath=paths.bot_path / "views" / "jinja" / "templates")

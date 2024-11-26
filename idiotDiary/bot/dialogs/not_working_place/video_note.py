@@ -14,9 +14,7 @@ async def download_video_note(
         message: types.Message, _, manager: DialogManager
 ):
     await message.delete()
-    await edit_dialog_message(
-        manager=manager, text="Видеосообщение принято, обработка..."
-    )
+    await edit_dialog_message(manager=manager, text="Видеосообщение принято, обработка...")
 
     video_note_file_io = await message.bot.download(message.video_note.file_id)
     video_note = types.BufferedInputFile(

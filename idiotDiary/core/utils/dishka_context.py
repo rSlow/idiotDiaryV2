@@ -22,9 +22,8 @@ class BaseInjectContext(ABC):
     @classmethod
     def _check_container_init(cls) -> None:
         if cls.container is None:
-            raise RuntimeError(
-                "Inject context container has not been initialized"
-            )
+            raise RuntimeError("Inject context container has not been initialized")
+
         if not isinstance(cls.container, (AsyncContainer, Container)):
             raise TypeError(
                 f"{cls.container} is {cls.container.__class__.__name__}, "

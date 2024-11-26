@@ -1,6 +1,5 @@
 from idiotDiary.bot.forms.shaurma import FshBankForms
-from idiotDiary.bot.utils.dialog_factory import InputDialogFactory, \
-    WindowTemplate
+from idiotDiary.bot.utils.dialog_factory import InputDialogFactory, WindowTemplate
 from idiotDiary.bot.forms.shaurma.render.wrapper import as_render_callback
 
 

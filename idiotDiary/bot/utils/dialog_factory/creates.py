@@ -7,13 +7,10 @@ from aiogram_dialog.widgets.text import Const, Text
 
 
 def _create_cancel_button(
-        text: Text = Const("Назад ◀"),
-        result: Any | None = None, on_click: Optional[OnClick] = None,
-        when: WhenCondition = None
+        text: Text = Const("Назад ◀"), result: Any | None = None,
+        on_click: Optional[OnClick] = None, when: WhenCondition = None
 ):
-    return Cancel(
-        text=text, id="__cancel__", result=result, on_click=on_click, when=when
-    )
+    return Cancel(text=text, id="__cancel__", result=result, on_click=on_click, when=when)
 
 
 def _create_back_button(

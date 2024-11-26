@@ -11,8 +11,7 @@ import aiofiles.ospath as aiopath
 from aiogram import Bot
 from aiogram.types import User
 from aiogram_dialog import DialogManager
-from taskiq import TaskiqResultTimeoutError, \
-    TaskiqResult, AsyncTaskiqTask, AsyncTaskiqDecoratedTask
+from taskiq import TaskiqResultTimeoutError, TaskiqResult, AsyncTaskiqTask, AsyncTaskiqDecoratedTask
 
 from idiotDiary.core.config import Paths
 from idiotDiary.core.utils.exceptions import BaseError
@@ -20,8 +19,7 @@ from idiotDiary.core.utils.exceptions.taskiq import TaskiqTaskError
 
 
 class TempFolderIsExist(BaseError):
-    user_note_template = ("Ошибка файловой системы. "
-                          "Попробуйте выполнить действие ещё раз.")
+    user_note_template = "Ошибка файловой системы. Попробуйте выполнить действие ещё раз."
 
 
 class TaskiqContext:
@@ -33,7 +31,8 @@ class TaskiqContext:
             error_user_message: str | None = None,
             timeout_message: str | None = "Превышено время выполнения задачи.",
             error_callback: Callable[[], Awaitable[None]] | None = None,
-            timeout_callback: Callable[[], Awaitable[None]] | None = None
+            timeout_callback: Callable[[], Awaitable[None]] | None = None,
+            make_temp_folder:bool = True
     ):
         self._task = task
         self._manager = manager
@@ -42,6 +41,7 @@ class TaskiqContext:
         self._timeout_message = timeout_message
         self._error_callback = error_callback
         self._timeout_callback = timeout_callback
+        self._make_temp_folder = make_temp_folder
 
         self._temp_folder_path: Path | None = None
 
@@ -54,15 +54,14 @@ class TaskiqContext:
         return self._manager.middleware_data["paths"]
 
     async def __aenter__(self) -> Self:
-        temp_folder_name = ''.join(
-            random.choice(string.ascii_lowercase) for _ in range(10)
-        )
-        temp_folder_path = self._paths.temp_folder_path / temp_folder_name
-        if not await aiopath.exists(temp_folder_path):
-            await aios.mkdir(temp_folder_path)
-            self._temp_folder_path = temp_folder_path
-        else:
-            raise TempFolderIsExist
+        if self._make_temp_folder:
+            temp_folder_name = ''.join(random.choice(string.ascii_lowercase) for _ in range(10))
+            temp_folder_path = self._paths.temp_folder_path / temp_folder_name
+            if not await aiopath.exists(temp_folder_path):
+                await aios.mkdir(temp_folder_path)
+                self._temp_folder_path = temp_folder_path
+            else:
+                raise TempFolderIsExist
 
         return self
 
@@ -79,9 +78,7 @@ class TaskiqContext:
             if res.is_err:
                 if self._error_callback is not None:
                     await self._error_callback()
-                raise TaskiqTaskError(
-                    self._error_log_message, res.error, self._error_user_message
-                )
+                raise TaskiqTaskError(self._error_log_message, res.error, self._error_user_message)
 
             return res.return_value
 
@@ -91,6 +88,4 @@ class TaskiqContext:
             if self._timeout_message is not None:
                 user: User = self._manager.middleware_data["event_from_user"]
                 bot: Bot = self._manager.middleware_data["bot"]
-                await bot.send_message(
-                    chat_id=user.id, text=self._timeout_message
-                )
+                await bot.send_message(chat_id=user.id, text=self._timeout_message)

@@ -16,7 +16,7 @@ from idiotDiary.mq.di import get_taskiq_providers
 
 
 @broker.on_event(TaskiqEvents.WORKER_STARTUP)
-async def client_startup(*_):
+async def worker_startup(*_):
     paths = get_paths()
     retort = get_base_retort()
     taskiq_config = load_taskiq_config(paths, retort)
@@ -37,5 +37,5 @@ async def client_startup(*_):
 
 
 @broker.on_event(TaskiqEvents.WORKER_SHUTDOWN)
-async def worker_startup(*_):
+async def worker_shutdown(*_):
     pass

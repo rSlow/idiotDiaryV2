@@ -1,34 +1,28 @@
-from dataclasses import dataclass, field
 from functools import wraps
 from typing import Optional
 
 from aiogram import types
 from aiogram_dialog import Dialog, Window, LaunchMode, DialogManager
 from aiogram_dialog.dialog import OnResultEvent, OnDialogEvent
-from aiogram_dialog.widgets.input.text import (
-    OnSuccess, TextInput, ManagedTextInput
-)
+from aiogram_dialog.widgets.input.text import OnSuccess, TextInput, ManagedTextInput
 from aiogram_dialog.widgets.kbd import Row
 from aiogram_dialog.widgets.text import Format
 from aiogram_dialog.widgets.utils import GetterVariant
 
 from idiotDiary.bot.views import buttons as b
-from .creates import (
-    _create_cancel_button, _create_next_button, _create_back_button
-)
+from .creates import _create_cancel_button, _create_next_button, _create_back_button
 from .form import InputForm
 from .getters import DialogDataGetter
 from .types import OnFinish
 from .window import WindowTemplate
 
 
-@dataclass
 class InputDialogFactory:
     def __init__(
             self,
             input_form: type[InputForm],
             on_finish: OnFinish,
-            template: WindowTemplate = field(default_factory=WindowTemplate)
+            template: WindowTemplate = WindowTemplate
     ):
         self.input_form = input_form
         self.on_finish = on_finish
@@ -37,8 +31,8 @@ class InputDialogFactory:
     def _with_last_field_handler(self, on_success: OnSuccess) -> OnSuccess:
         @wraps(self.on_finish)
         async def _on_success(
-                message: types.Message, text_input: ManagedTextInput,
-                manager: DialogManager, text: str
+                message: types.Message, text_input: ManagedTextInput, manager: DialogManager,
+                text: str
         ):
             await on_success(message, text_input, manager, text)
             await self.on_finish(message, manager)
@@ -62,9 +56,7 @@ class InputDialogFactory:
             widgets = [*form_field.texts]
 
             if form_field == self.input_form.last():
-                _on_success = self._with_last_field_handler(
-                    form_field.on_success
-                )
+                _on_success = self._with_last_field_handler(form_field.on_success)
             else:
                 _on_success = form_field.on_success
 

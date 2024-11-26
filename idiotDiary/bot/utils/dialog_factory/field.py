@@ -70,9 +70,7 @@ class InputFormField(State):
         except IndexError:
             pass
 
-    async def _default_on_error(
-            self, message: types.Message, _, manager: DialogManager, __
-    ):
+    async def _default_on_error(self, message: types.Message, _, manager: DialogManager, __):
         manager.show_mode = ShowMode.DELETE_AND_SEND
         if self.error_message is not None:
             await message.answer(self.error_message)

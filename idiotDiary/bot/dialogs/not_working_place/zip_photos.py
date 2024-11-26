@@ -29,8 +29,7 @@ async def photo_handler(message: types.Message, _, manager: DialogManager):
 
 @inject
 async def send_photos(
-        callback: types.CallbackQuery, _, manager: DialogManager,
-        bot: FromDishka[Bot]
+        callback: types.CallbackQuery, _, manager: DialogManager, bot: FromDishka[Bot]
 ):
     file_id_list = manager.dialog_data.get(DD_KEY)
     await callback.message.edit_text(
@@ -39,13 +38,12 @@ async def send_photos(
 
     async with TaskiqContext(
             task=zip_files_in_folder, manager=manager,
-            error_log_message=f"Ошибка во время генерации архива",
+            error_log_message="Ошибка во время генерации архива",
+            error_user_message="Ошибка во время генерации архива",
     ) as context:
         for i, file_id in enumerate(file_id_list, 1):
             await bot.download(file_id, context.temp_folder / f"{i}.jpg")
-        zip_file_path: Path = await context.wait_result(
-            timeout=60, folder_path=context.temp_folder
-        )
+        zip_file_path: Path = await context.wait_result(timeout=60, folder_path=context.temp_folder)
         zip_doc = types.FSInputFile(zip_file_path)
         await callback.message.edit_text("Архив отправляется...")
         await callback.message.answer_document(zip_doc)

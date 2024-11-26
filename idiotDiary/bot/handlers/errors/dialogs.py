@@ -6,8 +6,7 @@ from aiogram import Bot, Dispatcher, types
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import ExceptionTypeFilter
 from aiogram_dialog import DialogManager, StartMode, ShowMode
-from aiogram_dialog.api.exceptions import UnknownIntent, NoContextError, \
-    OutdatedIntent
+from aiogram_dialog.api.exceptions import UnknownIntent, NoContextError, OutdatedIntent
 
 from idiotDiary.bot.states.start import MainMenuSG
 from idiotDiary.bot.views.alert import BotAlert

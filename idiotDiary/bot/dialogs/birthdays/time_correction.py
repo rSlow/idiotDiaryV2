@@ -7,8 +7,7 @@ from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
 
 from idiotDiary.bot.states.birthdays import TimeCorrectionSG
-from idiotDiary.bot.utils.input_validation import time_from_text, \
-    error_dt_input_handler
+from idiotDiary.bot.utils.input_validation import time_from_text, error_dt_input_handler
 from idiotDiary.bot.views import buttons as b
 from idiotDiary.bot.views.types import JinjaTemplate
 from idiotDiary.core.db import dto
@@ -29,9 +28,7 @@ async def success_handler(
     notifications = await dao.get_user_notifications(user.id_)
     scheduler.update_user_birthdays(user_state, notifications)
 
-    await message.answer(
-        f"Часовой пояс c временем {valid_time:{dates.TIME_FORMAT}} сохранен."
-    )
+    await message.answer(f"Часовой пояс c временем {valid_time:{dates.TIME_FORMAT}} сохранен.")
     manager.show_mode = ShowMode.DELETE_AND_SEND
     await manager.done()
 

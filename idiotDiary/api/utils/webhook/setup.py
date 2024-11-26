@@ -16,13 +16,9 @@ def setup_lifespan(app: FastAPI, dishka: AsyncContainer, /, **kwargs: Any):
     @asynccontextmanager
     async def lifespan(*_: Any, **__: Any):
         dispatcher = await dishka.get(Dispatcher)
-        await dispatcher.emit_startup(
-            **workflow_data, **dispatcher.workflow_data
-        )
+        await dispatcher.emit_startup(**workflow_data, **dispatcher.workflow_data)
         yield
-        await dispatcher.emit_shutdown(
-            **workflow_data, **dispatcher.workflow_data
-        )
+        await dispatcher.emit_shutdown(**workflow_data, **dispatcher.workflow_data)
 
     app.include_router(APIRouter(lifespan=lifespan))
     # lifespan replace events ahahahah fastapi nice work

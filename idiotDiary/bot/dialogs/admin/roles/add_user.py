@@ -18,7 +18,6 @@ from .getters import user_role_getter
 async def handle_user_input(
         message: types.Message, __, manager: DialogManager, input_: str,
         dao: FromDishka[UserDao],
-
 ):
     manager.show_mode = ShowMode.DELETE_AND_SEND
 

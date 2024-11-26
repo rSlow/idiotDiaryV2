@@ -2,8 +2,7 @@ import logging
 
 from sqlalchemy import Engine as SyncEngine, create_engine as create_sync_engine
 from sqlalchemy.engine import make_url
-from sqlalchemy.orm import sessionmaker as sync_sessionmaker, \
-    Session as SyncSession
+from sqlalchemy.orm import sessionmaker as sync_sessionmaker, Session as SyncSession
 
 from idiotDiary.core.config.models.db import DBConfig
 

@@ -18,5 +18,6 @@ async def get_birthdays_message(
             dates[fetch_date] = birthdays
 
     return jinja.render_template(
-        "birthdays/main_query.jinja2", dates=dates
+        "birthdays/main_query.jinja2",
+        dates=dates
     )

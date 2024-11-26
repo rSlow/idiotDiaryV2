@@ -47,8 +47,7 @@ async def url_handler(
     async with TaskiqContext(
             task=download_youtube_audio, manager=manager,
             error_log_message="Ошибка скачивания аудио:",
-            error_user_message="Произошла ошибка скачивания файла. "
-                               "Загрузка отменена.",
+            error_user_message="Произошла ошибка скачивания файла. Загрузка отменена.",
             timeout_message="Превышено время скачивания видео.",
     ) as context:
         audio_file_path: Path = await context.wait_result(

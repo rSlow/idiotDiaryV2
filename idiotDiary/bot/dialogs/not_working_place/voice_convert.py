@@ -12,9 +12,7 @@ from idiotDiary.core.utils.dates import get_now_isoformat
 DD_KEY = "voice_filename"
 
 
-async def convert_voice_message(
-        message: types.Message, _, manager: DialogManager
-):
+async def convert_voice_message(message: types.Message, _, manager: DialogManager):
     await message.delete()
     await edit_dialog_message(manager=manager, text="Конвертирую...")
     voice_filename = manager.dialog_data.get(DD_KEY)
@@ -29,9 +27,7 @@ async def convert_voice_message(
     manager.show_mode = ShowMode.DELETE_AND_SEND
 
 
-async def set_voice_file_text(
-        message: types.Message, _, manager: DialogManager, text: str
-):
+async def set_voice_file_text(message: types.Message, _, manager: DialogManager, text: str):
     await message.delete()
     manager.dialog_data[DD_KEY] = text + ".mp3"
 

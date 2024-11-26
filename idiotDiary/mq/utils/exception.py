@@ -25,14 +25,11 @@ class ExceptionMiddleware(TaskiqMiddleware):
 
         return wrapper
 
-    def add_error_handler(
-            self, exc_type: type[BaseException], handler: ExceptionHandler
-    ) -> None:
+    def add_error_handler(self, exc_type: type[BaseException], handler: ExceptionHandler):
         self._exc_handlers[exc_type] = handler
 
     async def on_error(
-            self, message: TaskiqMessage, result: TaskiqResult,
-            exception: BaseException,
+            self, message: TaskiqMessage, result: TaskiqResult, exception: BaseException,
     ) -> Awaitable[None] | None:
         exc_handler = self._exc_handlers.get(type(exception))
         if exc_handler is not None:

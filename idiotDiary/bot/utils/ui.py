@@ -16,8 +16,5 @@ async def setup(bot: Bot):
         commands.UPDATE,
         commands.BIRTHDAYS,
     ]
-    await bot.set_my_commands(
-        commands=_commands,
-        scope=BotCommandScopeAllPrivateChats()
-    )
+    await bot.set_my_commands(commands=_commands, scope=BotCommandScopeAllPrivateChats())
     logger.info("%s bot commands were installed.", len(_commands))

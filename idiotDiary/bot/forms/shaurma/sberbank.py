@@ -11,7 +11,7 @@ class BaseSberbankForm(InputForm):
         Const("Валерия Владимировна Д."),
         Const("Валерия Владимировна Демченко"),
         type_factory=tf.name_type_factory,
-        error_message=...
+        # error_message=... # TODO
     )
     transfer_amount = InputFormField(
         Const("Введите сумму перевода:"),

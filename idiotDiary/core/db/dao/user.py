@@ -6,8 +6,7 @@ from sqlalchemy.orm import selectinload
 from idiotDiary.core.db import dto
 from idiotDiary.core.db import models as db
 from idiotDiary.core.db.dao.base import BaseDao
-from idiotDiary.core.utils.exceptions.user import UnknownUsernameFound, \
-    MultipleUsernameFound
+from idiotDiary.core.utils.exceptions.user import UnknownUsernameFound, MultipleUsernameFound
 
 
 class UserDao(BaseDao[db.User]):

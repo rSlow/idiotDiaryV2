@@ -23,15 +23,12 @@ async def cmd_start(
         welcome_message = jinja.render_template("commands/start.jinja2")
         await message.answer(welcome_message)
 
-    await dialog_manager.start(
-        state=MainMenuSG.state, mode=StartMode.RESET_STACK,
-    )
+    await dialog_manager.start(state=MainMenuSG.state, mode=StartMode.RESET_STACK)
 
 
 @inject
 async def cmd_help(
-        message: types.Message, dialog_manager: DialogManager,
-        jinja: FromDishka[JinjaRenderer]
+        message: types.Message, dialog_manager: DialogManager, jinja: FromDishka[JinjaRenderer]
 ):
     help_message = jinja.render_template("commands/help.jinja2")
     await message.answer(help_message)

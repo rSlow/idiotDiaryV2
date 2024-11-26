@@ -1,6 +1,5 @@
 from aiogram_dialog.widgets.common import WhenCondition, Scroll
-from aiogram_dialog.widgets.kbd import Row, Keyboard, PrevPage, CurrentPage, \
-    NextPage
+from aiogram_dialog.widgets.kbd import Row, Keyboard, PrevPage, CurrentPage, NextPage
 from aiogram_dialog.widgets.text import Text, Const, Format
 
 

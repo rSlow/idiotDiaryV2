@@ -25,9 +25,7 @@ class SeleniumProvider(Provider):
         return config.selenium
 
     @provide(scope=Scope.REQUEST)
-    def get_selenium_driver(
-            self, config: SeleniumConfig, options: Options
-    ) -> Iterable[WebDriver]:
+    def get_selenium_driver(self, config: SeleniumConfig, options: Options) -> Iterable[WebDriver]:
         match config.type_:
             case SeleniumDriverType.REMOTE:
                 driver = remote.WebDriver(

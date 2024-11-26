@@ -45,9 +45,7 @@ role_window = Window(
 )
 
 
-async def accept_remove_user_from_role(
-        _, __, manager: DialogManager, user_id: str
-):
+async def accept_remove_user_from_role(_, __, manager: DialogManager, user_id: str):
     manager.dialog_data["user_id"] = int(user_id)
     await manager.switch_to(RoleSG.accept_delete_user)
 
@@ -101,8 +99,7 @@ role_user_delete_accept_window = choice_window_factory(
 
 @inject
 async def on_accept_delete(
-        callback: types.CallbackQuery, _, manager: DialogManager,
-        dao: FromDishka[RoleDao],
+        callback: types.CallbackQuery, _, manager: DialogManager, dao: FromDishka[RoleDao]
 ):
     role_id = manager.start_data["role_id"]
     role = await dao.get(role_id)

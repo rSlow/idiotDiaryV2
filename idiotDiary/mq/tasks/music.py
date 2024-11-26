@@ -52,7 +52,7 @@ async def download_youtube_audio(
     if duration > 600:
         raise BigDurationError
 
-    ffmpeg_options: list = ydl_opts["external_downloader_args"]["ffmpeg"]
+    ffmpeg_options: list[str] = ydl_opts["external_downloader_args"]["ffmpeg"]
     if from_time:
         ffmpeg_options.extend(["-ss", from_time.strftime(r"%H:%M:%S")])
     if to_time:

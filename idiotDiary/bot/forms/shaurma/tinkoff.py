@@ -35,10 +35,7 @@ class BaseTinkoffForm(InputForm):
     )
     start_amount = InputFormField(
         Const("Введите начальную сумму (до перевода):"),
-        Const(
-            "Либо нажми кнопку, чтобы подставить "
-            "любое случайное значение от 10 до 50 тысяч:"
-        ),
+        Const("Либо нажми кнопку, чтобы подставить любое случайное значение от 10 до 50 тысяч:"),
         type_factory=tf.amount_type_factory,
         keyboard=Button(
             Format("{random_amount}"),

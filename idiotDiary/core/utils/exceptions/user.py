@@ -19,5 +19,4 @@ class UnknownUserTgIdError(UnknownUserError):
 
 
 class MultipleUsernameFound(BaseError):
-    log_message = ("По имени пользователя {username} "
-                   "найдено несколько пользователей.")
+    log_message = "По имени пользователя {username} найдено несколько пользователей."

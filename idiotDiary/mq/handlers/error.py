@@ -17,9 +17,7 @@ logger = logging.getLogger(__name__)
 
 @exc_middleware.error_handler(TelegramForbiddenError)
 @error_inject
-async def tg_user_blocked(
-        exc: TelegramForbiddenError, _, __, dao: FromDishka[DaoHolder]
-):
+async def tg_user_blocked(exc: TelegramForbiddenError, _, __, dao: FromDishka[DaoHolder]):
     user_id: int = exc.method.chat_id
     await dao.user.deactivate(user_id)
     logger.info(f"Deactivated user with id {user_id}")
@@ -27,10 +25,7 @@ async def tg_user_blocked(
 
 @exc_middleware.error_handler(Exception)
 @error_inject
-async def base_error(
-        exc: Exception, message: TaskiqMessage, _,
-        alert: FromDishka[BotAlert]
-):
+async def base_error(exc: Exception, message: TaskiqMessage, _, alert: FromDishka[BotAlert]):
     exc_text = (
         f"Получено исключение в taskiq, задача {message.task_name}:\n"
         f"-----\n"

@@ -12,8 +12,7 @@ from idiotDiary.core.db.dao.birthday import BirthdayDao
 
 @inject
 async def clear_birthdays(
-        callback: types.CallbackQuery, _, manager: DialogManager,
-        dao: FromDishka[BirthdayDao]
+        callback: types.CallbackQuery, _, manager: DialogManager, dao: FromDishka[BirthdayDao]
 ):
     user: dto.User = manager.middleware_data["user"]
     await dao.delete_all_from_user(user.id_)

@@ -20,21 +20,17 @@ class SecurityProps:
         self.access_token_expire = config.token_expire
         self.encoding = config.encoding
 
-    def verify_password(
-            self, plain_password: str, hashed_password: str
-    ) -> bool:
+    def verify_password(self, plain_password: str, hashed_password: str) -> bool:
         return self.pwd_context.verify(plain_password, hashed_password)
 
     def get_password_hash(self, password: str) -> str:
         return self.pwd_context.hash(password)
 
     def create_bearer_token(self, data: dict) -> str:
-        to_encode = data.copy()
+        data_to_encode = data.copy()
         expire = datetime.now(tz=tz_utc) + self.access_token_expire
-        to_encode.update({"exp": expire})
-        encoded_jwt = jwt.encode(
-            to_encode, self.secret_key, algorithm=self.algorythm
-        )
+        data_to_encode.update({"exp": expire})
+        encoded_jwt = jwt.encode(data_to_encode, self.secret_key, algorithm=self.algorythm)
         return f"bearer {encoded_jwt}"
 
     def create_basic_auth(self, tg_id: int, hashed_password: str) -> str:

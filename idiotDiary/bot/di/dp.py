@@ -3,8 +3,7 @@ import logging
 from aiogram import Dispatcher
 from aiogram.fsm.storage.base import BaseEventIsolation, BaseStorage
 from aiogram.fsm.storage.memory import MemoryStorage
-from aiogram.fsm.storage.redis import RedisEventIsolation, RedisStorage, \
-    DefaultKeyBuilder
+from aiogram.fsm.storage.redis import RedisEventIsolation, RedisStorage, DefaultKeyBuilder
 from aiogram_dialog import BgManagerFactory
 from aiogram_dialog.manager.bg_manager import BgManagerFactoryImpl
 from dishka import Provider, Scope, provide, AsyncContainer
@@ -40,12 +39,12 @@ class DpProvider(Provider):
         setup_middlewares(dp)
 
         logger.info(
-            "Configured bot routers \n%s",
+            "Configured bot routers: \n%s",
             print_router_tree(dp) + "\n"
         )
         # TODO `Configured middlewares`
         # logger.info(
-        #     "Configured middlewares \n%s",
+        #     "Configured middlewares: \n%s",
         #     print_middleware_tree(dp) + "\n"
         # )
 

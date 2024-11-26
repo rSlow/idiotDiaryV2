@@ -22,9 +22,7 @@ class BaseRequestHandler(ABC):
 
     def register(self, app: FastAPI, /, path: str, **kwargs: Any) -> None:
         router = APIRouter()
-        router.add_api_route(
-            methods=["POST"], path=path, endpoint=self.handle, **kwargs
-        )
+        router.add_api_route(methods=["POST"], path=path, endpoint=self.handle, **kwargs)
         app.include_router(router)
 
     @staticmethod
@@ -35,18 +33,14 @@ class BaseRequestHandler(ABC):
         if result:
             await dispatcher.silent_call_request(bot, result)
 
-    async def _handle_request(
-            self, bot: Bot, dispatcher: Dispatcher, request: Request
-    ) -> Response:
+    async def _handle_request(self, bot: Bot, dispatcher: Dispatcher, request: Request) -> Response:
         result: TelegramMethod[Any] | None = \
             await dispatcher.feed_webhook_update(
                 bot,
                 await request.json(),
                 **self.data,
             )
-        content = await self._build_response_content(
-            bot=bot, dispatcher=dispatcher, result=result
-        )
+        content = await self._build_response_content(bot=bot, dispatcher=dispatcher, result=result)
         return Response(content=content)
 
     @inject
@@ -62,9 +56,7 @@ class BaseRequestHandler(ABC):
     ) -> Response:
         if not self.verify_secret(secret_token, bot):
             return Response(content="Unauthorized", status_code=401)
-        return await self._handle_request(
-            bot=bot, dispatcher=dispatcher, request=request
-        )
+        return await self._handle_request(bot=bot, dispatcher=dispatcher, request=request)
 
     __call__ = handle
 
@@ -85,7 +77,5 @@ class SimpleRequestHandler(BaseRequestHandler):
 
     def verify_secret(self, telegram_secret_token: str, bot: Bot) -> bool:
         if self.secret_token:
-            return secrets.compare_digest(
-                telegram_secret_token, self.secret_token
-            )
+            return secrets.compare_digest(telegram_secret_token, self.secret_token)
         return True

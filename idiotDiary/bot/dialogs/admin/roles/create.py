@@ -29,15 +29,11 @@ create_role_alias_window = Window(
 
 @inject
 async def save_role(
-        message: types.Message, _,
-        manager: DialogManager, role_name: str,
+        message: types.Message, _, manager: DialogManager, role_name: str,
         dao: FromDishka[RoleDao]
 ):
     role_alias = manager.dialog_data["role_alias"]
-    role = dto.UserRole(
-        name=role_name,
-        alias=role_alias
-    )
+    role = dto.UserRole(name=role_name, alias=role_alias)
     created_role = await dao.add(role)
     await message.answer(f"Роль '{created_role.alias}' создана.")
     await manager.done(show_mode=ShowMode.DELETE_AND_SEND)

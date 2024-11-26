@@ -39,9 +39,7 @@ class ContextDataMiddleware(BaseMiddleware):
             if isinstance(event, DialogUpdateEvent):
                 user = await dao_holder.user.get_by_tg_id(user_tg.id)
             else:
-                user = await dao_holder.user.upsert_user(
-                    dto.User.from_aiogram(user_tg)
-                )
+                user = await dao_holder.user.upsert_user(dto.User.from_aiogram(user_tg))
         data["user"] = user
 
         return await handler(event, data)

@@ -17,8 +17,7 @@ from idiotDiary.core.db import dto
 from idiotDiary.core.db.dao import DaoHolder
 from idiotDiary.core.utils.auth.security import SecurityProps
 from idiotDiary.core.utils.auth.token import Token
-from idiotDiary.core.utils.exceptions.user import UnknownUsernameFound, \
-    UnknownUserIdError
+from idiotDiary.core.utils.exceptions.user import UnknownUsernameFound, UnknownUserIdError
 
 logger = logging.getLogger(__name__)
 T = t.TypeVar("T")
@@ -49,9 +48,7 @@ class AuthService:
     def __init__(self, security: SecurityProps) -> None:
         self.security = security
 
-    async def authenticate_user(
-            self, tg_id: int, password: str, dao: DaoHolder
-    ) -> dto.User:
+    async def authenticate_user(self, tg_id: int, password: str, dao: DaoHolder) -> dto.User:
         http_status_401 = HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Incorrect TG ID or password",
@@ -69,9 +66,7 @@ class AuthService:
 
         return user.without_password()
 
-    async def update_user_password(
-            self, user: dto.User, password: str, dao: DaoHolder
-    ) -> None:
+    async def update_user_password(self, user: dto.User, password: str, dao: DaoHolder) -> None:
         hashed_password = self.security.get_password_hash(password)
         await dao.user.set_password(user, hashed_password)
 
@@ -83,9 +78,7 @@ class AuthService:
             tg_id=user.tg_id, hashed_password=user.hashed_password
         )
 
-    async def get_user_from_bearer(
-            self, token: Token, dao: DaoHolder,
-    ) -> dto.User:
+    async def get_user_from_bearer(self, token: Token, dao: DaoHolder) -> dto.User:
         logger.debug("try to check token %s", token)
         try:
             payload: dict = jwt.decode(
@@ -114,9 +107,7 @@ class AuthService:
 
         return user
 
-    async def get_user_from_basic(
-            self, request: Request, dao: DaoHolder
-    ) -> dto.User:
+    async def get_user_from_basic(self, request: Request, dao: DaoHolder) -> dto.User:
         if (header := request.headers.get("Authorization")) is None:
             raise AuthHeaderMissingError
         schema, token = header.split(" ", maxsplit=1)

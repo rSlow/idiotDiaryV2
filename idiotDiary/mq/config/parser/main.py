@@ -13,8 +13,6 @@ def load_config(paths: Paths, retort: Retort):
 
     return TaskiqAppConfig.from_base(
         base=load_base_config(config_dct, paths, retort),
-        result_backend=retort.load(
-            config_dct["mq"]["backend"], ResultBackendConfig
-        ),
+        result_backend=retort.load(config_dct["mq"]["backend"], ResultBackendConfig),
         selenium=retort.load(config_dct["selenium"], SeleniumConfig),
     )

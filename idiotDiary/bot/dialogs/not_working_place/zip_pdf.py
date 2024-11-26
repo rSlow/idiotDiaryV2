@@ -42,8 +42,7 @@ async def file_handler(message: types.Message, _, manager: DialogManager):
 
 @inject
 async def on_zip_ready(
-        callback: types.CallbackQuery, _, manager: DialogManager,
-        bot: FromDishka[Bot]
+        callback: types.CallbackQuery, _, manager: DialogManager, bot: FromDishka[Bot]
 ):
     message = callback.message
     files_data = manager.dialog_data.get(DD_KEY, [])
@@ -53,8 +52,7 @@ async def on_zip_ready(
     async with TaskiqContext(
             task=pack_pdf_file, manager=manager,
             error_log_message="Ошибка генерации PDF файла:",
-            error_user_message="Произошла ошибка генерации PDF. "
-                               "Задача отменена.",
+            error_user_message="Произошла ошибка генерации PDF. Задача отменена.",
             timeout_message="Тайм-аут запроса. Задача отменена.",
     ) as context:
         file_paths: list[Path] = []
@@ -63,9 +61,7 @@ async def on_zip_ready(
             file_paths.append(file_path)
             await bot.download(file=file.file_id, destination=file_path)
             await asyncio.sleep(0.1)  # flood control
-        pdf_file_path: Path = await context.wait_result(
-            timeout=120, file_paths=file_paths
-        )
+        pdf_file_path: Path = await context.wait_result(timeout=120, file_paths=file_paths)
         pdf_file = types.FSInputFile(pdf_file_path)
         await callback.message.answer_document(pdf_file)
 

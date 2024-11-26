@@ -8,8 +8,8 @@ from idiotDiary.core.db.dao.user import UserDao
 
 @inject
 async def role_getter(
-        dialog_manager: DialogManager, role_dao: FromDishka[RoleDao],
-        user_dao: FromDishka[UserDao], **__
+        dialog_manager: DialogManager, role_dao: FromDishka[RoleDao], user_dao: FromDishka[UserDao],
+        **__
 ):
     role_id = dialog_manager.start_data["role_id"]
     role = await role_dao.get(role_id)
@@ -22,8 +22,8 @@ async def role_getter(
 
 @inject
 async def user_role_getter(
-        dialog_manager: DialogManager, role_dao: FromDishka[RoleDao],
-        user_dao: FromDishka[UserDao], **__
+        dialog_manager: DialogManager, role_dao: FromDishka[RoleDao], user_dao: FromDishka[UserDao],
+        **__
 ):
     role = await role_dao.get(dialog_manager.start_data["role_id"])
     user = await user_dao.get_by_id(dialog_manager.dialog_data["user_id"])
@@ -33,8 +33,8 @@ async def user_role_getter(
 
 @inject
 async def users_role_getter(
-        dialog_manager: DialogManager, role_dao: FromDishka[RoleDao],
-        user_dao: FromDishka[UserDao], **__
+        dialog_manager: DialogManager, role_dao: FromDishka[RoleDao], user_dao: FromDishka[UserDao],
+        **__
 ):
     role_id = dialog_manager.start_data["role_id"]
     role = await role_dao.get(role_id)

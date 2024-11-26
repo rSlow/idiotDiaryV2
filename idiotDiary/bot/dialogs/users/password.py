@@ -13,9 +13,7 @@ from idiotDiary.core.utils.auth import SecurityProps
 
 
 @inject
-async def user_with_password_getter(
-        user: dto.User, user_dao: FromDishka[UserDao], **__
-):
+async def user_with_password_getter(user: dto.User, user_dao: FromDishka[UserDao], **__):
     user_with_creds = await user_dao.get_by_tg_id_with_password(user.tg_id)
     return {"has_password": user_with_creds.hashed_password is not None}
 

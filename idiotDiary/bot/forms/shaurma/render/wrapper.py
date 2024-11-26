@@ -17,8 +17,7 @@ def as_render_callback(render_func: RenderFunc) -> OnFinish:
 
         async with TaskiqContext(
                 task=draw_screenshot, manager=manager,
-                error_log_message=f"Рендер скриншота функции {module_func} "
-                                  f"завершился с ошибкой",
+                error_log_message=f"Рендер скриншота функции {module_func} завершился с ошибкой",
                 timeout_message="Превышено время генерации изображения.",
         ) as context:
             photo_path = await context.wait_result(

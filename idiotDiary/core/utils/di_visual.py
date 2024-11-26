@@ -27,19 +27,14 @@ class Component:
 def dep_key_to_render_dependency(provide: DependencyKey):
     hint = provide.type_hint
     name = getattr(hint, "__name__", str(hint))
-    return DependencyClass(
-        name=name,
-        provide=provide
-    )
+    return DependencyClass(name=name, provide=provide)
 
 
 def factory_to_component(factory: Factory):
     return Component(
         provide=dep_key_to_render_dependency(factory.provides),
         scope=factory.scope,
-        dependencies=[
-            dep_key_to_render_dependency(dep) for dep in factory.dependencies
-        ]
+        dependencies=[dep_key_to_render_dependency(dep) for dep in factory.dependencies]
     )
 
 
