@@ -50,6 +50,7 @@ role_list_window = Window(
             on_click=select_role,
         ),
         id="roles",
+        width=1,
         height=6,
         hide_on_single_page=True
     ),

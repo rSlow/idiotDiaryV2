@@ -14,7 +14,7 @@ from idiotDiary.core.db import dto
 
 
 async def main_menu_getter(user: dto.User, **__):
-    return {"mention": user.name_mention}
+    return {"mention": user.short_mention}
 
 
 main_menu = Dialog(

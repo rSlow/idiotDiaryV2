@@ -27,11 +27,21 @@ class User:
 
     @property
     def name_mention(self) -> str:
-        return (self.fullname
+        return (
+                self.fullname
                 or self.username
                 or str(self.tg_id)
                 or str(self.id_)
-                or "unknown")
+                or "unknown"
+        )
+
+    @property
+    def short_mention(self) -> str:
+        return (
+                self.first_name
+                or self.username
+                or self.name_mention
+        )
 
     @classmethod
     def from_aiogram(cls, user: tg.User) -> User:
