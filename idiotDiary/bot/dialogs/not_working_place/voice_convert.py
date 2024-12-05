@@ -1,5 +1,5 @@
 from aiogram import types, F
-from aiogram.enums import ContentType
+from aiogram.enums import ContentType, ChatAction
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import TextInput, MessageInput
 from aiogram_dialog.widgets.text import Const, Format
@@ -18,6 +18,7 @@ async def convert_voice_message(message: types.Message, _, manager: DialogManage
     voice_filename = manager.dialog_data.get(DD_KEY)
 
     voice_file_io = await message.bot.download(message.voice.file_id)
+    await message.bot.send_chat_action(chat_id=message.chat.id, action=ChatAction.UPLOAD_VIDEO_NOTE)
     voice_file = types.BufferedInputFile(
         file=voice_file_io.read(),
         filename=voice_filename or f"voice-message-{get_now_isoformat()}.mp3"

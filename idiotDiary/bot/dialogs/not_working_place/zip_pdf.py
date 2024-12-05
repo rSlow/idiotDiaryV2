@@ -4,7 +4,7 @@ from pathlib import Path
 
 from adaptix import Retort
 from aiogram import types, F, Bot
-from aiogram.enums import ContentType
+from aiogram.enums import ContentType, ChatAction
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button
@@ -61,6 +61,9 @@ async def on_zip_ready(
             file_paths.append(file_path)
             await bot.download(file=file.file_id, destination=file_path)
             await asyncio.sleep(0.1)  # flood control
+        await message.bot.send_chat_action(
+            chat_id=message.chat.id, action=ChatAction.UPLOAD_DOCUMENT
+        )
         pdf_file_path: Path = await context.wait_result(timeout=120, file_paths=file_paths)
         pdf_file = types.FSInputFile(pdf_file_path)
         await callback.message.answer_document(pdf_file)

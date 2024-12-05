@@ -42,7 +42,6 @@ set_password_dialog = Dialog(
         ),
         TextInput(
             id="password",
-            type_factory=str,
             on_success=set_password,  # noqa
         ),
         b.CANCEL,

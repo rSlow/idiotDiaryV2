@@ -5,7 +5,7 @@ from pathlib import Path
 import aiofiles.tempfile as atf
 from aiogram import Bot
 from aiogram import types
-from aiogram.enums import ContentType
+from aiogram.enums import ContentType, ChatAction
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.input import TextInput
@@ -50,6 +50,9 @@ async def url_handler(
             error_user_message="Произошла ошибка скачивания файла. Загрузка отменена.",
             timeout_message="Превышено время скачивания видео.",
     ) as context:
+        await message.bot.send_chat_action(
+            chat_id=message.chat.id, action=ChatAction.UPLOAD_DOCUMENT
+        )
         audio_file_path: Path = await context.wait_result(
             timeout=120, temp_path=context.temp_folder, url=url
         )
@@ -141,9 +144,10 @@ async def eyed3_export(
         else:
             aiogram_thumbnail = None
 
-        await callback.message.answer_document(
-            document=audio_file, thumbnail=aiogram_thumbnail
+        await callback.bot.send_chat_action(
+            chat_id=callback.message.chat.id, action=ChatAction.UPLOAD_DOCUMENT
         )
+        await callback.message.answer_document(document=audio_file, thumbnail=aiogram_thumbnail)
 
     manager.show_mode = ShowMode.DELETE_AND_SEND
     await manager.done()

@@ -1,5 +1,5 @@
 from aiogram import types
-from aiogram.enums import ContentType
+from aiogram.enums import ContentType, ChatAction
 from aiogram_dialog import Dialog, Window, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.text import Const
@@ -15,7 +15,7 @@ async def download_video_note(
 ):
     await message.delete()
     await edit_dialog_message(manager=manager, text="Видеосообщение принято, обработка...")
-
+    await message.bot.send_chat_action(chat_id=message.chat.id, action=ChatAction.UPLOAD_VOICE)
     video_note_file_io = await message.bot.download(message.video_note.file_id)
     video_note = types.BufferedInputFile(
         file=video_note_file_io.read(),

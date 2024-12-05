@@ -87,6 +87,7 @@ async def on_startup(
 
     bot = await dishka.get(Bot)
     dp: Dispatcher = await dishka.get(Dispatcher)
+    await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(
         url=webhook_url,
         secret_token=webhook_config.secret,

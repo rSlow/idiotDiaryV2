@@ -27,9 +27,7 @@ async def send_token(
     user_with_creds = await dao.get_by_tg_id_with_password(user.tg_id)
     basic = auth.create_user_basic_token(user_with_creds)
     token = basic.split(" ", maxsplit=1)[1]
-    await callback.message.answer(
-        f"Токен внешней авторизации:\n<pre>{token}</pre>"
-    )
+    await callback.message.answer(f"Токен внешней авторизации:\n<pre>{token}</pre>")
     manager.show_mode = ShowMode.DELETE_AND_SEND
 
 

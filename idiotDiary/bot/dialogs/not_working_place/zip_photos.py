@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from aiogram import types, Bot
-from aiogram.enums import ContentType
+from aiogram.enums import ContentType, ChatAction
 from aiogram_dialog import Window, Dialog, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import MessageInput
 from aiogram_dialog.widgets.kbd import Button
@@ -43,6 +43,9 @@ async def send_photos(
     ) as context:
         for i, file_id in enumerate(file_id_list, 1):
             await bot.download(file_id, context.temp_folder / f"{i}.jpg")
+        await callback.bot.send_chat_action(
+            chat_id=callback.message.chat.id, action=ChatAction.UPLOAD_DOCUMENT
+        )
         zip_file_path: Path = await context.wait_result(timeout=60, folder_path=context.temp_folder)
         zip_doc = types.FSInputFile(zip_file_path)
         await callback.message.edit_text("Архив отправляется...")

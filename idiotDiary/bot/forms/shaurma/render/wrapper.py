@@ -1,6 +1,7 @@
 from typing import cast
 
 from aiogram import types
+from aiogram.enums import ChatAction
 from aiogram_dialog import DialogManager, StartMode
 
 from idiotDiary.bot.forms.shaurma.utils.types import RenderFunc
@@ -20,6 +21,9 @@ def as_render_callback(render_func: RenderFunc) -> OnFinish:
                 error_log_message=f"Рендер скриншота функции {module_func} завершился с ошибкой",
                 timeout_message="Превышено время генерации изображения.",
         ) as context:
+            await message.bot.send_chat_action(
+                chat_id=message.chat.id, action=ChatAction.UPLOAD_PHOTO
+            )
             photo_path = await context.wait_result(
                 timeout=120,
                 module_func=module_func, temp_dir=context.temp_folder,

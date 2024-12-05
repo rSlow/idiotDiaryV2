@@ -14,9 +14,8 @@ from idiotDiary.core.db.dao import DaoHolder
 
 @inject
 async def cmd_start(
-        message: types.Message, dialog_manager: DialogManager,
-        user: dto.User, dao: FromDishka[DaoHolder],
-        jinja: FromDishka[JinjaRenderer]
+        message: types.Message, dialog_manager: DialogManager, user: dto.User,
+        dao: FromDishka[DaoHolder], jinja: FromDishka[JinjaRenderer]
 ):
     start_event = await dao.log.get_last_by_user(user.tg_id, "/start")
     if start_event is None:
@@ -28,7 +27,8 @@ async def cmd_start(
 
 @inject
 async def cmd_help(
-        message: types.Message, dialog_manager: DialogManager, jinja: FromDishka[JinjaRenderer]
+        message: types.Message, dialog_manager: DialogManager,
+        jinja: FromDishka[JinjaRenderer]
 ):
     help_message = jinja.render_template("commands/help.jinja2")
     await message.answer(help_message)

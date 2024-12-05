@@ -66,7 +66,6 @@ async def to_banks_getter(dialog_manager: DialogManager, **__):
     to_banks = [
         to_bank.name
         for to_bank in FshBankForms[device][from_bank].to_banks
-
     ]
     return {"to_banks": to_banks}
 
