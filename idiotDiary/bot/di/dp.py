@@ -4,6 +4,7 @@ from aiogram import Dispatcher
 from aiogram.fsm.storage.base import BaseEventIsolation, BaseStorage
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.fsm.storage.redis import RedisEventIsolation, RedisStorage, DefaultKeyBuilder
+from aiogram.fsm.strategy import FSMStrategy
 from aiogram_dialog import BgManagerFactory
 from aiogram_dialog.manager.bg_manager import BgManagerFactoryImpl
 from dishka import Provider, Scope, provide, AsyncContainer
@@ -32,7 +33,9 @@ class DpProvider(Provider):
             storage: BaseStorage,
             bot_config: BotConfig
     ) -> Dispatcher:
-        dp = Dispatcher(storage=storage, events_isolation=event_isolation)
+        dp = Dispatcher(
+            storage=storage, events_isolation=event_isolation, fsm_strategy=FSMStrategy.CHAT
+        )
         setup_aiogram_dishka(container=dishka, router=dp)
         setup_handlers(dp, bot_config.log_chat)
         setup_dialogs(dp)

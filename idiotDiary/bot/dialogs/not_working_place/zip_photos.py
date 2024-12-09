@@ -32,9 +32,7 @@ async def send_photos(
         callback: types.CallbackQuery, _, manager: DialogManager, bot: FromDishka[Bot]
 ):
     file_id_list = manager.dialog_data.get(DD_KEY)
-    await callback.message.edit_text(
-        f"Запаковывается {len(file_id_list)} фотографий..."
-    )
+    await callback.message.edit_text(f"Запаковывается {len(file_id_list)} фотографий...")
 
     async with TaskiqContext(
             task=zip_files_in_folder, manager=manager,

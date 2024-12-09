@@ -17,9 +17,7 @@ class UserNotificationDao(BaseDao[db.NotificationState]):
         if user is not None:
             return user.to_dto()
 
-    async def add_or_update_user_state(
-            self, user_id: int, timeshift: time | None = None
-    ):
+    async def add_or_update_user_state(self, user_id: int, timeshift: time | None = None):
         kwargs = {
             "user_id": user_id,
             "timeshift": timeshift or time(hour=0, minute=0),
@@ -61,9 +59,7 @@ class UserNotificationDao(BaseDao[db.NotificationState]):
 
     async def add_notification(self, user_id: int, notification_time: time):
         user_state = await self.add_or_update_user_state(user_id)
-        notification = db.NotificationTime(
-            time=notification_time, user_state_id=user_state.id_
-        )
+        notification = db.NotificationTime(time=notification_time, user_state_id=user_state.id_)
         self.session.add(notification)
         await self.commit()
         await self.session.refresh(notification)

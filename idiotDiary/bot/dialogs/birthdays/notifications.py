@@ -91,7 +91,7 @@ async def clear_notifications(
     notifications = await dao.get_user_notifications(user_id=user.id_)
     await dao.clear_notifications(user_id=user.id_)
     for notification in notifications:
-        scheduler.remove_birthday_notification(notification)
+        scheduler.remove_birthday_notification(notification.id_)
 
     await callback.message.answer("Все настройки оповещений удалены.")
     manager.show_mode = ShowMode.DELETE_AND_SEND

@@ -13,7 +13,7 @@ from idiotDiary.core.utils.dates import get_now
 
 
 @SchedulerInjectContext.inject
-async def send_birthdays(
+async def check_birthdays(
         user_id: int,
         birthdays_dao: FromDishka[BirthdayDao],
         notification_dao: FromDishka[UserNotificationDao],

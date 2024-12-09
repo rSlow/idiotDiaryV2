@@ -32,7 +32,7 @@ class TaskiqContext:
             timeout_message: str | None = "Превышено время выполнения задачи.",
             error_callback: Callable[[], Awaitable[None]] | None = None,
             timeout_callback: Callable[[], Awaitable[None]] | None = None,
-            make_temp_folder:bool = True
+            make_temp_folder: bool = True
     ):
         self._task = task
         self._manager = manager

@@ -50,6 +50,11 @@ main_menu = Dialog(
                 state=UserMainSG.state,
             ),
             Start(
+                Const("Подписки FarPost "),
+                id="user_profile",
+                state=UserMainSG.state,
+            ),
+            Start(
                 Const("Админка ⚙️"),
                 id="admin",
                 state=AdminMainSG.state,

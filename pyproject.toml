@@ -36,6 +36,8 @@ pillow = "^11.0.0"
 aiogram-dialog = "^2.2.0"
 yt-dlp = "^2024.11.4"
 eyed3 = "^0.9.7"
+fake-useragent = "^2.0.1"
+bs4 = "^0.0.2"
 
 
 [build-system]

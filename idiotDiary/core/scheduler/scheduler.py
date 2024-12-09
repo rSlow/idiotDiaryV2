@@ -64,44 +64,74 @@ class ApScheduler(Scheduler):
         self.executor.shutdown()
         self.job_store.shutdown()
 
-    # ----- TASKS -----#
-    def remove_birthday_notification(
-            self, notification: dto.NotificationTime
-    ):
-        job_id = _prepare_notification_key(notification)
-        try:
-            self.scheduler.remove_job(job_id=job_id)
-        except JobLookupError as e:
-            logger.error(
-                "can't remove job %s for preparing game %s",
-                job_id,
-                notification.id_,
-                exc_info=e,
-            )
+    # ----- TASKS ----- #
 
+    # ----- BIRTHDAYS ----- #
     def add_birthday_notification(
-            self, notification: dto.NotificationTime,
-            state: dto.NotificationState
+            self, notification: dto.NotificationTime, state: dto.NotificationState
     ):
 
         self.scheduler.add_job(
-            func="idiotDiary.core.scheduler.tasks:"
-                 "send_birthdays",
-            id=_prepare_notification_key(notification),
+            func="idiotDiary.core.scheduler.task_wrappers.birthdays:"
+                 "check_birthdays",
+            id=_prepare_notification_key(notification.id_),
             trigger="cron",
             hour=(notification.time.hour + state.timeshift.hour) % 24,
             minute=(notification.time.minute + state.timeshift.minute) % 60,
             kwargs={"user_id": state.user_id}
         )
 
+    def remove_birthday_notification(self, notification_id: int):
+        job_id = _prepare_notification_key(notification_id)
+        try:
+            self.scheduler.remove_job(job_id=job_id)
+        except JobLookupError as e:
+            logger.error(
+                "can't remove job %s for birthday notification %s",
+                job_id,
+                notification_id,
+                exc_info=e,
+            )
+
     def update_user_birthdays(
             self, state: dto.NotificationState,
             notifications: list[dto.NotificationTime]
     ):
         for notification in notifications:
-            self.remove_birthday_notification(notification)
+            self.remove_birthday_notification(notification.id_)
             self.add_birthday_notification(notification, state)
 
+    # ----- SUBSCRIPTIONS ----- #
+    def add_ad_subscription(self, subscription: dto.Subscription):
+        self.scheduler.add_job(
+            func="idiotDiary.core.scheduler.task_wrappers.subs:"
+                 "check_subscription",
+            id=_prepare_subscription_key(subscription.id_),
+            trigger="interval",
+            seconds=subscription.frequency,
+            kwargs={"subscription_id": subscription.id_}
+        )
 
-def _prepare_notification_key(notification: dto.NotificationTime) -> str:
-    return f"notification-{notification.id_}"
+    def remove_ad_subscription(self, subscription_id: int):
+        job_id = _prepare_subscription_key(subscription_id)
+        try:
+            self.scheduler.remove_job(job_id=job_id)
+        except JobLookupError as e:
+            logger.error(
+                "can't remove job %s for ad subscription %s",
+                job_id,
+                subscription_id,
+                exc_info=e,
+            )
+
+    def update_user_ad_subscriptions(self, *subscriptions: dto.Subscription):
+        for subscription in subscriptions:
+            ...
+
+
+def _prepare_notification_key(notification_id: int) -> str:
+    return f"notification-{notification_id}"
+
+
+def _prepare_subscription_key(subscription_id: int) -> str:
+    return f"subscription-{subscription_id}"

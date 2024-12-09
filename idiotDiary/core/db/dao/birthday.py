@@ -12,9 +12,7 @@ class BirthdayDao(BaseDao[db.Birthday]):
     async def update(self, birthdays: list[dto.Birthday], user_id: int):
         await self.session.execute(
             delete(self.model)
-            .filter(
-                self.model.uuid.in_([birthday.uuid for birthday in birthdays]),
-            )
+            .filter(self.model.uuid.in_([birthday.uuid for birthday in birthdays]))
         )
         models = [
             self.model(
