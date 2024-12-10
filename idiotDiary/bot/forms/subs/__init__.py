@@ -16,6 +16,7 @@ class SubCreateForm(InputForm):
     url = InputFormField(
         Const("Ожидаю ссылку подписки в формате:"),
         Const("https://www.farpost.ru/..."),
+        Const("https://www.baza.drom.ru/..."),
         Const("Введенный запрос будет проверен на правильность автоматически."),
         type_factory=tf.url_validator,
         on_success=on_url_success,

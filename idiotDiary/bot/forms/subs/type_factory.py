@@ -13,5 +13,12 @@ def frequency_validator(data: str):
     return frequency
 
 
-URLPattern = re.compile(r"https?://(www\.)?farpost\.ru/.+")
+URLPattern = re.compile(
+    r"https?://(www\.)?"
+    r"("
+    r"farpost|"
+    r"baza\.drom"
+    r")"
+    r"\.ru/.+"
+)
 url_validator = regexp_factory(URLPattern)

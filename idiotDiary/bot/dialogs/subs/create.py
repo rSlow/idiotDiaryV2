@@ -4,7 +4,7 @@ from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
 
 from idiotDiary.bot.forms.subs import SubCreateForm
-from idiotDiary.bot.utils.dialog_factory import InputDialogFactory
+from idiotDiary.bot.utils.dialog_factory import InputDialogFactory, WindowTemplate
 from idiotDiary.bot.utils.message import edit_dialog_message
 from idiotDiary.core.db import dto
 from idiotDiary.core.db.dao.subscription import SubscriptionDao
@@ -36,5 +36,6 @@ async def create_subscription(
 
 create_sub_dialog = InputDialogFactory(
     input_form=SubCreateForm,
-    on_finish=create_subscription  # noqa
-)
+    on_finish=create_subscription,  # noqa
+    template=WindowTemplate(disable_web_page_preview=True)
+).dialog()

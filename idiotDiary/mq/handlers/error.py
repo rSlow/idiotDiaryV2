@@ -3,7 +3,6 @@ import logging
 from aiogram.exceptions import TelegramForbiddenError
 from aiogram.utils.markdown import html_decoration as hd
 from dishka import FromDishka
-from selenium.common import WebDriverException
 from taskiq import TaskiqMessage, TaskiqResult
 
 from idiotDiary.bot.views.alert import BotAlert
@@ -11,7 +10,8 @@ from idiotDiary.core.db.dao.subscription import SubscriptionDao
 from idiotDiary.core.db.dao.user import UserDao
 from idiotDiary.core.scheduler.scheduler import ApScheduler
 from idiotDiary.mq.di.inject import error_inject
-from idiotDiary.mq.utils.exception import ExceptionMiddleware
+from idiotDiary.mq.utils.exception_middleware import ExceptionMiddleware
+from idiotDiary.mq.utils.exceptions import InvalidSubPageError
 
 exc_middleware = ExceptionMiddleware()
 
@@ -35,14 +35,6 @@ async def tg_user_blocked(
     await subs_dao.deactivate_user_subscriptions(user_id)
 
 
-@exc_middleware.error_handler(WebDriverException)
-@error_inject
-async def selenium_webdriver_error(
-        _exc: WebDriverException, _message: TaskiqMessage, _result: TaskiqResult
-):
-    logger.error(f"WebDriverException error")
-
-
 @exc_middleware.error_handler(Exception)
 @error_inject
 async def base_error(exc: Exception, message: TaskiqMessage, _, alert: FromDishka[BotAlert]):
@@ -53,3 +45,13 @@ async def base_error(exc: Exception, message: TaskiqMessage, _, alert: FromDishk
     )
     logger.exception(exc_text, exc_info=exc)
     await alert(exc_text % hd.quote(str(exc)))
+
+
+@exc_middleware.error_handler(InvalidSubPageError)
+@error_inject
+async def selenium_webdriver_error(
+        exc: InvalidSubPageError, _message: TaskiqMessage, _result: TaskiqResult,
+        alert: FromDishka[BotAlert]
+):
+    logger.error(repr(exc))
+    await alert(hd.quote(repr(exc)))
