@@ -8,7 +8,7 @@ from dishka.integrations.aiogram_dialog import inject
 from idiotDiary.bot.di.jinja import JinjaRenderer
 from idiotDiary.bot.states.birthdays import CalendarSG
 from idiotDiary.bot.views import buttons as b
-from idiotDiary.bot.views.types.localized_calendar import LocalizedCalendar
+from idiotDiary.bot.views.types import LocalizedCalendar
 from idiotDiary.core.db import dto
 from idiotDiary.core.db.dao.birthday import BirthdayDao
 

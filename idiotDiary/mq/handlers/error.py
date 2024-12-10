@@ -3,7 +3,8 @@ import logging
 from aiogram.exceptions import TelegramForbiddenError
 from aiogram.utils.markdown import html_decoration as hd
 from dishka import FromDishka
-from taskiq import TaskiqMessage
+from selenium.common import WebDriverException
+from taskiq import TaskiqMessage, TaskiqResult
 
 from idiotDiary.bot.views.alert import BotAlert
 from idiotDiary.core.db.dao.subscription import SubscriptionDao
@@ -32,6 +33,14 @@ async def tg_user_blocked(
     for sub in user_subs:
         scheduler.remove_ad_subscription(sub.id_)
     await subs_dao.deactivate_user_subscriptions(user_id)
+
+
+@exc_middleware.error_handler(WebDriverException)
+@error_inject
+async def selenium_webdriver_error(
+        _exc: WebDriverException, _message: TaskiqMessage, _result: TaskiqResult
+):
+    logger.error(f"WebDriverException error")
 
 
 @exc_middleware.error_handler(Exception)

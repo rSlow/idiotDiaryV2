@@ -1,7 +1,7 @@
 from aiogram import types, F
 from aiogram_dialog import Dialog, Window, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import TextInput
-from aiogram_dialog.widgets.kbd import SwitchTo, Group
+from aiogram_dialog.widgets.kbd import SwitchTo, Group, ManagedCheckbox, Row
 from aiogram_dialog.widgets.text import Const, Format, Case
 from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
@@ -21,21 +21,19 @@ async def sub_main_getter(
 ):
     sub_id = dialog_manager.start_data["sub_id"]
     subscription = await sub_dao.get(sub_id)
-    return {
-        "subscription": subscription,
-        "sub_is_active": subscription.is_active
-    }
+    dialog_manager.dialog_data["sub_is_active"] = subscription.is_active
+    return {"subscription": subscription}
 
 
 @inject
 async def toggle_is_active(
-        _, checkbox: DataCheckbox, manager: DialogManager,
+        _, checkbox: ManagedCheckbox, manager: DialogManager,
         dao: FromDishka[SubscriptionDao], scheduler: FromDishka[ApScheduler]
 ):
     sub_id: int = manager.start_data["sub_id"]
-    is_active: bool = checkbox.is_checked(manager)
-    sub = await dao.set_is_active(sub_id, is_active)
-    if is_active:
+    updated_sub_is_active: bool = checkbox.is_checked()
+    sub = await dao.set_is_active(sub_id, updated_sub_is_active)
+    if updated_sub_is_active:
         scheduler.add_ad_subscription(sub)
     else:
         scheduler.remove_ad_subscription(sub.id_)
@@ -87,8 +85,9 @@ async def set_name(
         dao: FromDishka[SubscriptionDao]
 ):
     await message.delete()
-    if name != manager.dialog_data["name"]:
-        sub_id: int = manager.start_data["sub_id"]
+    sub_id: int = manager.start_data["sub_id"]
+    sub = await dao.get(sub_id)
+    if name != sub.name:
         await dao.set_name(sub_id, name)
     manager.show_mode = ShowMode.EDIT
     await manager.switch_to(SubMenu.main)
@@ -101,7 +100,10 @@ sub_name_window = Window(
         id="name",
         on_success=set_name  # noqa
     ),
-    buttons.MAIN_MENU,
+    Row(
+        buttons.BACK,
+        buttons.MAIN_MENU,
+    ),
     state=SubMenu.name,
     getter=sub_main_getter,
 )
@@ -116,9 +118,8 @@ async def set_frequency(
     sub_id: int = manager.start_data["sub_id"]
     sub = await dao.get(sub_id)
     if frequency != sub.frequency:
-        await dao.set_frequency(sub_id, frequency)
-        sub = await dao.get(sub_id)
-        scheduler.update_user_ad_subscriptions(sub)
+        updated_sub = await dao.set_frequency(sub_id, frequency)
+        scheduler.update_user_ad_subscriptions(updated_sub)
 
     await manager.switch_to(SubMenu.main)
 
@@ -139,7 +140,10 @@ sub_frequency_window = Window(
         on_success=set_frequency,  # noqa
         on_error=on_error_frequency
     ),
-    buttons.MAIN_MENU,
+    Row(
+        buttons.BACK,
+        buttons.MAIN_MENU,
+    ),
     state=SubMenu.frequency,
     getter=sub_main_getter
 )

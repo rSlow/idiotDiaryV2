@@ -10,7 +10,7 @@ import aiofiles.os as aios
 import aiofiles.ospath as aiopath
 from aiogram import Bot
 from aiogram.types import User
-from aiogram_dialog import DialogManager
+from aiogram_dialog import DialogManager, ShowMode
 from taskiq import TaskiqResultTimeoutError, TaskiqResult, AsyncTaskiqTask, AsyncTaskiqDecoratedTask
 
 from idiotDiary.core.config import Paths
@@ -66,7 +66,7 @@ class TaskiqContext:
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
-        if await aiopath.exists(self._temp_folder_path):
+        if await aiopath.exists(self._temp_folder_path or ""):
             loop = asyncio.get_running_loop()
             p_func = partial(shutil.rmtree, self._temp_folder_path)
             return await loop.run_in_executor(None, p_func)
@@ -89,3 +89,4 @@ class TaskiqContext:
                 user: User = self._manager.middleware_data["event_from_user"]
                 bot: Bot = self._manager.middleware_data["bot"]
                 await bot.send_message(chat_id=user.id, text=self._timeout_message)
+                self._manager.show_mode = ShowMode.DELETE_AND_SEND

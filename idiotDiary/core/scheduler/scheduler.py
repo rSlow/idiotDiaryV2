@@ -126,7 +126,9 @@ class ApScheduler(Scheduler):
 
     def update_user_ad_subscriptions(self, *subscriptions: dto.Subscription):
         for subscription in subscriptions:
-            ...
+            if subscription.is_active:
+                self.remove_ad_subscription(subscription.id_)
+                self.add_ad_subscription(subscription)
 
 
 def _prepare_notification_key(notification_id: int) -> str:

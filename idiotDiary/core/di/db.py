@@ -16,9 +16,7 @@ class DbProvider(Provider):
         return base_config.db
 
     @provide
-    async def get_engine(
-            self, db_config: DBConfig
-    ) -> AsyncIterable[AsyncEngine]:
+    async def get_engine(self, db_config: DBConfig) -> AsyncIterable[AsyncEngine]:
         engine = create_engine(db_config)
         yield engine
         await engine.dispose(True)

@@ -7,7 +7,7 @@ from idiotDiary.mq.broker import broker
 
 
 @broker.task
-def draw_screenshot(module_func: str, temp_dir: Path, **data) -> Path:
+async def draw_screenshot(module_func: str, temp_dir: Path, **data) -> Path:
     module_str, func_str = module_func.rsplit(":", maxsplit=1)
     module = importlib.import_module(module_str)
     func = cast(RenderFunc, getattr(module, func_str))

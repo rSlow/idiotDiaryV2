@@ -26,9 +26,7 @@ def create_engine(db_config: DBConfig) -> AsyncEngine:
     )
 
 
-def create_session_maker(
-        engine: AsyncEngine
-) -> async_sessionmaker[AsyncSession]:
+def create_session_maker(engine: AsyncEngine) -> async_sessionmaker[AsyncSession]:
     pool: async_sessionmaker[AsyncSession] = async_sessionmaker(
         bind=engine,
         expire_on_commit=False,

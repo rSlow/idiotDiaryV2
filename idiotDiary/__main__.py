@@ -57,10 +57,7 @@ def main():
 
     setup_fastapi_dishka(di_container, api_app)
 
-    startup_callback = partial(
-        on_startup,
-        di_container, bot_config, api_config.api, webhook_config
-    )
+    startup_callback = partial(on_startup, di_container, bot_config, api_config.api, webhook_config)
     shutdown_callback = partial(on_shutdown, di_container)
     api_app.add_event_handler("startup", startup_callback)
     api_app.add_event_handler("shutdown", shutdown_callback)

@@ -19,7 +19,7 @@ class DataCheckbox(Checkbox):
         self._data_getter = data_getter
 
     def is_checked(self, manager: DialogManager) -> bool:
-        if value := manager.dialog_data.get(self._data_getter) is not None:
+        if (value := manager.dialog_data.get(self._data_getter)) is not None:
             return bool(value)
         return super().is_checked(manager)
 

@@ -9,6 +9,7 @@ from idiotDiary.bot.states.music import MusicMainSG
 from idiotDiary.bot.states.not_working_place import NwpMainSG
 from idiotDiary.bot.states.shaurma import FshPickFormSG
 from idiotDiary.bot.states.start import MainMenuSG
+from idiotDiary.bot.states.subs import SubsMainFSM
 from idiotDiary.bot.states.users import UserMainSG
 from idiotDiary.core.db import dto
 
@@ -51,8 +52,8 @@ main_menu = Dialog(
             ),
             Start(
                 Const("Подписки FarPost "),
-                id="user_profile",
-                state=UserMainSG.state,
+                id="subs",
+                state=SubsMainFSM.state,
             ),
             Start(
                 Const("Админка ⚙️"),

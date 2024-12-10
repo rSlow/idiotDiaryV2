@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "idiotDiary"
-version = "3.0.0"
+version = "3.0.1"
 description = ""
 authors = ["rSlow <redmaxx4@gmail.com>"]
 readme = "README.md"
@@ -38,6 +38,7 @@ yt-dlp = "^2024.11.4"
 eyed3 = "^0.9.7"
 fake-useragent = "^2.0.1"
 bs4 = "^0.0.2"
+python-dateutil = "^2.9.0.post0"
 
 
 [build-system]

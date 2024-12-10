@@ -38,9 +38,7 @@ async def audio_handler(message: types.Message, _, manager: DialogManager):
 
 
 # ----- INITIALIZE FROM URL ----- #
-async def url_handler(
-        message: types.Message, _, manager: DialogManager, url: str,
-):
+async def url_handler(message: types.Message, _, manager: DialogManager, url: str):
     await message.delete()
     await edit_dialog_message(manager=manager, text="Скачиваю...")
 
@@ -100,20 +98,20 @@ async def category_button_click(_, __, manager: DialogManager, category: str):
 @inject
 async def eyed3_export(
         callback: types.CallbackQuery, _, manager: DialogManager,
-        bot: FromDishka[Bot], paths: FromDishka[Paths],
-        alert: FromDishka[BotAlert]
+        bot: FromDishka[Bot], paths: FromDishka[Paths], alert: FromDishka[BotAlert]
 ):
     await callback.message.edit_text("Обработка...")
 
     dialog_data = manager.dialog_data
 
     file_id = dialog_data["file_id"]
-    filename = dialog_data.get("filename", f"{uuid.uuid4().hex}.mp3")
+    download_filename = f"{uuid.uuid4().hex}.mp3"
+    filename = dialog_data.get("filename")
 
     async with atf.TemporaryDirectory(dir=paths.temp_folder_path) as temp_dir:
         temp_path = Path(temp_dir)
-        file_path = temp_path / filename
-        await bot.download(file=file_id, destination=file_path)
+        download_file_path = temp_path / download_filename
+        await bot.download(file=file_id, destination=download_file_path)
 
         eyed3_tag = Tag()
         eyed3_tag.album = dialog_data.get("album")
@@ -127,20 +125,23 @@ async def eyed3_export(
             task = await process_thumbnail.kiq(image_path=thumbnail_path)
             res: TaskiqResult = await task.wait_result(timeout=15)
             if res.is_err:
-                await alert("Ошибка генерации обложки: ", repr(res.error))
+                await alert(f"Ошибка генерации обложки: {repr(res.error)}")
             else:
-                manager.dialog_data["real_thumbnail_path"] = res.return_value
+                manager.dialog_data["thumbnail_path"] = res.return_value
                 await set_thumbnail(eyed3_tag, res.return_value)
 
-        eyed3_tag.save(file_path.as_posix())
+        eyed3_tag.save(download_file_path.as_posix())
 
         if eyed3_tag.artist and eyed3_tag.title:
             filename = f"{eyed3_tag.artist} - {eyed3_tag.title}.mp3"
 
-        audio_file = types.FSInputFile(path=file_path, filename=filename)
-
-        if thumbnail_path := manager.dialog_data.get("real_thumbnail_path"):
-            aiogram_thumbnail = types.FSInputFile(thumbnail_path)
+        audio_file = types.FSInputFile(
+            path=download_file_path,
+            filename=filename or download_filename
+        )
+        thumbnail_path = manager.dialog_data.get("thumbnail_path")
+        if thumbnail_path:
+            aiogram_thumbnail = types.FSInputFile(path=thumbnail_path)
         else:
             aiogram_thumbnail = None
 
@@ -221,6 +222,7 @@ async def photo_handler(message: types.Message, _, manager: DialogManager):
 
 
 # ----- CLEANER ----- #
+
 async def clear_category(_, __, manager: DialogManager):
     category = manager.dialog_data["active_category"]
     manager.dialog_data.update({category: None})

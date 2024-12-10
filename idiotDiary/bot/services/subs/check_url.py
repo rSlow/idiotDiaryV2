@@ -16,13 +16,13 @@ async def on_url_success(message: types.Message, _, manager: DialogManager, data
             error_user_message="Во время проверки ссылки возникла неизвестная ошибка. "
                                "Пожалуйста, попробуйте добавить ссылку через некоторое время."
     ) as context:
-        real_url: str | None = await context.wait_result(timeout=30, url=data)
-        if real_url is not None:
-            parsed_url = urlparse(real_url)
-            manager.dialog_data["url"] = str(parsed_url.parent) + "?" + parsed_url.query_string
+        request_url: str | None = await context.wait_result(timeout=30, url=data)
+        if request_url is not None:
+            manager.dialog_data["url"] = request_url
             await manager.next()
         else:
             await message.answer(
                 f"<a href='{data}'>Ссылка</a> ведет на сайт FarPost, но при этом страница "
-                f"не содержит списка элементов. Проверьте правильность введенной ссылки."
+                f"не содержит списка элементов. Проверьте правильность введенной ссылки.",
+                disable_web_page_preview=True
             )

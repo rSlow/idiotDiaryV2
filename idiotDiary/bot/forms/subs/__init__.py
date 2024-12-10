@@ -9,6 +9,7 @@ from . import type_factory as tf
 
 async def on_default_frequency(_, __, manager: DialogManager):
     manager.dialog_data["frequency"] = 60
+    await manager.next()
 
 
 class SubCreateForm(InputForm):
@@ -18,7 +19,7 @@ class SubCreateForm(InputForm):
         Const("Введенный запрос будет проверен на правильность автоматически."),
         type_factory=tf.url_validator,
         on_success=on_url_success,
-        error_message="Неверная ссылка: {message}"
+        error_message="Неверная ссылка: {message.text}"
     )
     frequency = InputFormField(
         Const("Ссылка прошла проверку!"),

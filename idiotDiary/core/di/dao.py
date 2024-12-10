@@ -1,19 +1,19 @@
-from dishka import Scope, provide, Provider
+from dishka import Scope, provide, Provider, provide_all
 
 from idiotDiary.core.db.dao import DaoHolder
 from idiotDiary.core.db.dao.birthday import BirthdayDao
 from idiotDiary.core.db.dao.log import EventLogDao
 from idiotDiary.core.db.dao.notification import UserNotificationDao
 from idiotDiary.core.db.dao.role import RoleDao
+from idiotDiary.core.db.dao.subscription import SubscriptionDao
 from idiotDiary.core.db.dao.user import UserDao
 
 
 class DaoProvider(Provider):
     scope = Scope.REQUEST
 
-    dao = provide(DaoHolder)
-    user_dao = provide(UserDao)
-    log_dao = provide(EventLogDao)
-    birthday_dao = provide(BirthdayDao)
-    notifications_dao = provide(UserNotificationDao)
-    role_dao = provide(RoleDao)
+    holder = provide(DaoHolder)
+
+    dao = provide_all(
+        UserDao, EventLogDao, BirthdayDao, UserNotificationDao, RoleDao, SubscriptionDao
+    )

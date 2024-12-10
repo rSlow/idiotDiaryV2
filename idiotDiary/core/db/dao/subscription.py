@@ -9,7 +9,7 @@ from idiotDiary.core.db.dao.base import BaseDao
 class SubscriptionDao(BaseDao[db.Subscription]):
     async def add(self, subscription: dto.Subscription):
         exists = await self.session.scalars(
-            select(func.count(self.model))
+            select(func.count(self.model.id))
             .filter(self.model.user_id == subscription.user_id)
             .filter(self.model.url == subscription.url)
         )
@@ -62,6 +62,7 @@ class SubscriptionDao(BaseDao[db.Subscription]):
             update(self.model)
             .where(self.model.id == id_)
             .values(**kwargs)
+            .returning(self.model)
         )
         await self.commit()
         await self.session.flush()

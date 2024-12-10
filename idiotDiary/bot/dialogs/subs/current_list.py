@@ -17,7 +17,7 @@ from idiotDiary.core.db.dao.subscription import SubscriptionDao
 @inject
 async def current_subs_getter(user: dto.User, sub_dao: FromDishka[SubscriptionDao], **__):
     subs = await sub_dao.get_all_user_subscriptions(user.id_)
-    subs_buttons = [(sub.id, sub.name, sub.is_active) for sub in subs]
+    subs_buttons = [(sub.id_, sub.name, sub.is_active) for sub in subs]
     return {
         "subs": subs_buttons,
         "subs_count": len(subs),

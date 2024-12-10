@@ -12,7 +12,7 @@ def setup():
     router.include_routers(
         subs_main_dialog,
         current_subs_dialog,
-        create_sub_dialog,
+        create_sub_dialog.dialog(),
         sub_edit_dialog,
     )
 

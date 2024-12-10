@@ -1,3 +1,4 @@
+from aiogram import types
 from aiogram_dialog import DialogManager, ShowMode
 from dishka import FromDishka
 from dishka.integrations.aiogram_dialog import inject
@@ -12,9 +13,10 @@ from idiotDiary.core.scheduler.scheduler import ApScheduler
 
 @inject
 async def create_subscription(
-        _, manager: DialogManager,
+        message: types.Message, manager: DialogManager,
         dao: FromDishka[SubscriptionDao], scheduler: FromDishka[ApScheduler]
 ):
+    await message.delete()
     await edit_dialog_message(manager=manager, text="Обработка...")
 
     user: dto.User = manager.middleware_data["user"]

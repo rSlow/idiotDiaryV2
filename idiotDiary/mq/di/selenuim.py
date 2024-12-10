@@ -40,7 +40,6 @@ class SeleniumProvider(Provider):
 
             case _ as driver_type:
                 raise TypeError(f"{driver_type} is not supported.")
-
         yield driver
         driver.close()
         driver.quit()

@@ -65,7 +65,7 @@ async def download_youtube_audio(
 
 
 @broker.task
-def process_thumbnail(image_path: Path) -> Path:
+async def process_thumbnail(image_path: Path) -> Path:
     quality = 1024
     with Image.open(image_path) as image:
         new_image = ImageOps.fit(
