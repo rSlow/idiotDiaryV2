@@ -130,6 +130,10 @@ services:
         source: "./alembic.ini"
         target: "/app/alembic.ini"
         read_only: true
+      - type: "bind"
+        source: "./config/"
+        target: "/app/config/"
+        read_only: true
     entrypoint: [ "poetry", "run", "alembic", "upgrade", "heads" ]
     depends_on:
       - postgres
