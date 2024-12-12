@@ -13,7 +13,7 @@ async def on_url_success(message: types.Message, _, manager: DialogManager, data
     await edit_dialog_message(manager, "Проверка...")
     async with TaskiqContext(
             task=subs.is_url_valid, manager=manager,
-            error_user_message="Во время проверки ссылки возникла неизвестная ошибка. "
+            error_user_message="Во время проверки ссылки возникла ошибка. "
                                "Пожалуйста, попробуйте добавить ссылку через некоторое время.",
             timeout_message="Превышено время проверки. Попробуйте повторить чуть позже."
     ) as context:

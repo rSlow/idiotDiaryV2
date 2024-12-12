@@ -41,6 +41,10 @@ class Paths:
         return self.app_dir / "temp"
 
     @property
+    def cookies_folder_path(self) -> Path:
+        return self.app_dir / "cookies"
+
+    @property
     def core_path(self) -> Path:
         return self.src_path / "core"
 

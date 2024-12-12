@@ -10,8 +10,8 @@ from idiotDiary.core.db.dao.subscription import SubscriptionDao
 from idiotDiary.core.db.dao.user import UserDao
 from idiotDiary.core.scheduler.scheduler import ApScheduler
 from idiotDiary.mq.di.inject import error_inject
-from idiotDiary.mq.utils.exception_middleware import ExceptionMiddleware
-from idiotDiary.mq.utils.exceptions import InvalidSubPageError
+from idiotDiary.mq.middlewares.exception_middleware import ExceptionMiddleware
+from idiotDiary.mq.utils.exceptions import InvalidSubPageError, PageError
 
 exc_middleware = ExceptionMiddleware()
 
@@ -47,7 +47,7 @@ async def base_error(exc: Exception, message: TaskiqMessage, _, alert: FromDishk
     await alert(exc_text % hd.quote(str(exc)))
 
 
-@exc_middleware.error_handler(InvalidSubPageError)
+@exc_middleware.error_handler(PageError)
 @error_inject
 async def selenium_webdriver_error(
         exc: InvalidSubPageError, _message: TaskiqMessage, _result: TaskiqResult,

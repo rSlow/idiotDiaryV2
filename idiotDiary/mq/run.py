@@ -1,3 +1,6 @@
+import logging
+import subprocess
+
 from dishka import make_async_container
 from dishka.integrations.taskiq import setup_dishka as setup_taskiq_dishka
 from taskiq import TaskiqEvents
@@ -13,6 +16,8 @@ from idiotDiary.mq.broker import broker
 from idiotDiary.mq.config.models.main import TaskiqAppConfig
 from idiotDiary.mq.config.parser.main import load_config as load_taskiq_config
 from idiotDiary.mq.di import get_taskiq_providers
+
+logger = logging.getLogger("taskiq")
 
 
 @broker.on_event(TaskiqEvents.WORKER_STARTUP)
@@ -38,4 +43,10 @@ async def worker_startup(*_):
 
 @broker.on_event(TaskiqEvents.WORKER_SHUTDOWN)
 async def worker_shutdown(*_):
-    pass
+    logger.info("Shutting down")
+
+
+if __name__ == '__main__':
+    subprocess.call(
+        ["taskiq", "worker", "--tasks-pattern", "['**/tasks']", "idiotDiary.mq.run:broker"],
+    )

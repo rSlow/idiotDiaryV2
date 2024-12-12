@@ -30,8 +30,9 @@ class TaskiqContext:
             error_log_message: str = "Ошибка выполнения задачи.",
             error_user_message: str | None = None,
             timeout_message: str | None = "Превышено время выполнения задачи.",
-            error_callback: Callable[[], Awaitable[None]] | None = None,
-            timeout_callback: Callable[[], Awaitable[None]] | None = None,
+            error_callback: Callable[[TaskiqResult, DialogManager], Awaitable[None]] | None = None,
+            raise_error: bool = True,
+            timeout_callback: Callable[[DialogManager], Awaitable[None]] | None = None,
             make_temp_folder: bool = True
     ):
         self._task = task
@@ -40,6 +41,7 @@ class TaskiqContext:
         self._error_user_message = error_user_message
         self._timeout_message = timeout_message
         self._error_callback = error_callback
+        self._raise_error = raise_error
         self._timeout_callback = timeout_callback
         self._make_temp_folder = make_temp_folder
 
@@ -77,16 +79,20 @@ class TaskiqContext:
             res: TaskiqResult = await task.wait_result(timeout=timeout)
             if res.is_err:
                 if self._error_callback is not None:
-                    await self._error_callback()
-                raise TaskiqTaskError(self._error_log_message, res.error, self._error_user_message)
+                    await self._error_callback(res, self._manager)
+                if self._raise_error:
+                    self._manager.show_mode = ShowMode.DELETE_AND_SEND
+                    raise TaskiqTaskError(
+                        self._error_log_message, res.error, self._error_user_message
+                    )
 
             return res.return_value
 
         except TaskiqResultTimeoutError:
+            self._manager.show_mode = ShowMode.DELETE_AND_SEND
             if self._timeout_callback is not None:
-                await self._timeout_callback()
+                await self._timeout_callback(self._manager)
             if self._timeout_message is not None:
                 user: User = self._manager.middleware_data["event_from_user"]
                 bot: Bot = self._manager.middleware_data["bot"]
                 await bot.send_message(chat_id=user.id, text=self._timeout_message)
-                self._manager.show_mode = ShowMode.DELETE_AND_SEND

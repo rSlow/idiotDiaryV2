@@ -65,9 +65,7 @@ async def handle_notify_exception(
 
 
 @inject
-async def handle_base_error(
-        error: ErrorEvent, bot: Bot, alert: FromDishka[BotAlert]
-):
+async def handle_base_error(error: ErrorEvent, bot: Bot, alert: FromDishka[BotAlert]):
     exception = t.cast(BaseError, error.exception)
     chat_id = exception.chat_id or exception.user_id
     if chat_id is None:
