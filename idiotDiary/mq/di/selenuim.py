@@ -43,24 +43,23 @@ class SeleniumProvider(Provider):
             case SeleniumDriverType.CHROME:
                 service = chrome.Service(executable_path=config.path)
                 driver = webdriver.Chrome(options=options, service=service)
+                cdc_options = [
+                    "cdc_adoQpoasnfa76pfcZLmcfl_Array",
+                    "cdc_adoQpoasnfa76pfcZLmcfl_JSON",
+                    "cdc_adoQpoasnfa76pfcZLmcfl_Object",
+                    "cdc_adoQpoasnfa76pfcZLmcfl_Promise",
+                    "cdc_adoQpoasnfa76pfcZLmcfl_Proxy",
+                    "cdc_adoQpoasnfa76pfcZLmcfl_Symbol",
+                    "cdc_adoQpoasnfa76pfcZLmcfl_Window",
+                ]
+                driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
+                    "source": ";".join([f"delete window.{value}" for value in cdc_options])
+                })
 
             case _ as driver_type:
                 raise TypeError(f"{driver_type} is not supported.")
 
         driver.request_interceptor = _driver_interceptor
-
-        cdc_options = [
-            "cdc_adoQpoasnfa76pfcZLmcfl_Array",
-            "cdc_adoQpoasnfa76pfcZLmcfl_JSON",
-            "cdc_adoQpoasnfa76pfcZLmcfl_Object",
-            "cdc_adoQpoasnfa76pfcZLmcfl_Promise",
-            "cdc_adoQpoasnfa76pfcZLmcfl_Proxy",
-            "cdc_adoQpoasnfa76pfcZLmcfl_Symbol",
-            "cdc_adoQpoasnfa76pfcZLmcfl_Window",
-        ]
-        driver.execute_cdp_cmd("Page.addScriptToEvaluateOnNewDocument", {
-            "source": ";".join([f"delete window.{value}" for value in cdc_options])
-        })
 
         yield driver
 
