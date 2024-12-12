@@ -11,7 +11,7 @@ from dishka.integrations.taskiq import inject as taskiq_inject, CONTAINER_NAME
 from taskiq import TaskiqMessage
 from taskiq.result.v2 import TaskiqResult
 
-from idiotDiary.mq.utils.exception_middleware import ExceptionHandler
+from idiotDiary.mq.utils.types.di import ExceptionHandler
 
 T = TypeVar("T")
 P = ParamSpec("P")

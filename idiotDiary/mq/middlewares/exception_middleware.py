@@ -1,13 +1,10 @@
 import logging
-from typing import Callable, Awaitable
+from typing import Awaitable
 
 from taskiq import TaskiqMiddleware, TaskiqMessage
 from taskiq.result.v2 import TaskiqResult
 
-ExceptionHandler = Callable[
-    [BaseException, TaskiqMessage, TaskiqResult],
-    Awaitable[None]
-]
+from idiotDiary.mq.utils.types.di import ExceptionHandler
 
 logger = logging.getLogger(__name__)
 
