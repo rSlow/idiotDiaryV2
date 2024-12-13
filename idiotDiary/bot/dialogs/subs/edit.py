@@ -14,6 +14,12 @@ from idiotDiary.bot.views.types.data_checkbox import DataCheckbox
 from idiotDiary.core.db.dao.subscription import SubscriptionDao
 from idiotDiary.core.scheduler.scheduler import ApScheduler
 
+EDIT_MENU = SwitchTo(
+    text=Const("Назад ◀"),
+    id="__back__",
+    state=SubMenu.main
+)
+
 
 @inject
 async def sub_main_getter(
@@ -85,11 +91,11 @@ async def set_name(
         dao: FromDishka[SubscriptionDao]
 ):
     await message.delete()
+    manager.show_mode = ShowMode.EDIT
     sub_id: int = manager.start_data["sub_id"]
     sub = await dao.get(sub_id)
     if name != sub.name:
         await dao.set_name(sub_id, name)
-    manager.show_mode = ShowMode.EDIT
     await manager.switch_to(SubMenu.main)
 
 
@@ -101,7 +107,7 @@ sub_name_window = Window(
         on_success=set_name  # noqa
     ),
     Row(
-        buttons.BACK,
+        EDIT_MENU,
         buttons.MAIN_MENU,
     ),
     state=SubMenu.name,
@@ -115,6 +121,7 @@ async def set_frequency(
         dao: FromDishka[SubscriptionDao], scheduler: FromDishka[ApScheduler]
 ):
     await message.delete()
+    manager.show_mode = ShowMode.EDIT
     sub_id: int = manager.start_data["sub_id"]
     sub = await dao.get(sub_id)
     if frequency != sub.frequency:
@@ -141,7 +148,7 @@ sub_frequency_window = Window(
         on_error=on_error_frequency
     ),
     Row(
-        buttons.BACK,
+        EDIT_MENU,
         buttons.MAIN_MENU,
     ),
     state=SubMenu.frequency,

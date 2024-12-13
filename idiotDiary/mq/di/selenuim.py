@@ -41,8 +41,17 @@ class SeleniumProvider(Provider):
                 )
 
             case SeleniumDriverType.CHROME:
+                seleniumwire_options = {}
+                if config.proxy is not None:
+                    seleniumwire_options['proxy'] = {
+                        "http": config.proxy.uri,
+                        "https": config.proxy.uri,
+                        'no_proxy': 'localhost,127.0.0.1'
+                    }
                 service = chrome.Service(executable_path=config.path)
-                driver = webdriver.Chrome(options=options, service=service)
+                driver = webdriver.Chrome(
+                    options=options, service=service, seleniumwire_options=seleniumwire_options
+                )
                 cdc_options = [
                     "cdc_adoQpoasnfa76pfcZLmcfl_Array",
                     "cdc_adoQpoasnfa76pfcZLmcfl_JSON",

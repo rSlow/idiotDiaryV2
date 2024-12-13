@@ -44,7 +44,7 @@ async def base_error(exc: Exception, message: TaskiqMessage, _, alert: FromDishk
         f"{str(exc)}"
     )
     logger.exception(exc_text, exc_info=exc)
-    await alert(exc_text % hd.quote(str(exc)))
+    await alert(hd.quote(str(exc)))
 
 
 @exc_middleware.error_handler(PageError)
@@ -53,5 +53,11 @@ async def selenium_webdriver_error(
         exc: InvalidSubPageError, _message: TaskiqMessage, _result: TaskiqResult,
         alert: FromDishka[BotAlert]
 ):
-    logger.error(repr(exc))
-    await alert(hd.quote(repr(exc)))
+    exc_text = (
+        f"Ошибка парсера страниц:\n"
+        f"-----\n"
+        f"{str(exc)}"
+    )
+
+    logger.exception(exc_text, exc_info=exc)
+    await alert(hd.quote(exc_text))

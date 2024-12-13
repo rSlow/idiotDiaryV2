@@ -1,3 +1,4 @@
+import logging
 import pickle
 from pathlib import Path
 from typing import TypedDict, Literal
@@ -6,6 +7,8 @@ from urllib.parse import urlparse
 from selenium.webdriver.remote.webdriver import WebDriver
 
 from idiotDiary.mq.utils.exceptions import PageError
+
+logger = logging.getLogger(__name__)
 
 
 class Cookie(TypedDict):
@@ -38,7 +41,9 @@ class RequestContext:
                         try:
                             self._driver.add_cookie(cookie)
                         except Exception as ex:
-                            print("error on load cookies: " + repr(ex) + f": {cookie.get('name')}")
+                            logger.warning(
+                                "error on load cookies: " + repr(ex) + f": {cookie.get('name')}"
+                            )
         except FileNotFoundError:
             pass
 
