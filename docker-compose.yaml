@@ -117,7 +117,7 @@ services:
     restart: always
     shm_size: 500m
     ports:
-      - "127.0.0.1:${EXPOSE_SELENIUM:-4444}:4444"
+      - "${EXPOSE_SELENIUM:-4444}:4444"
     privileged: true
     env_file:
       - ${DOCKER_ENV_FILE:-.env}
