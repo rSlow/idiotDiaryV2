@@ -2,7 +2,7 @@ import logging
 import typing as t
 from functools import partial
 
-from aiogram import Bot
+from aiogram import Bot, Dispatcher
 from aiogram.exceptions import AiogramError
 from aiogram.exceptions import TelegramForbiddenError
 from aiogram.filters import ExceptionTypeFilter
@@ -111,7 +111,7 @@ async def handle(error: ErrorEvent, bot: Bot, log_chat_id: int):
     )
 
 
-def setup(dp, log_chat_id):
+def setup(dp: Dispatcher, log_chat_id: int):
     dp.errors.register(
         bot_blocked,
         ExceptionTypeFilter(TelegramForbiddenError)

@@ -44,7 +44,7 @@ async def base_error(exc: Exception, message: TaskiqMessage, _, alert: FromDishk
         f"{str(exc)}"
     )
     logger.exception(exc_text, exc_info=exc)
-    await alert(hd.quote(str(exc)))
+    await alert(hd.quote(exc_text))
 
 
 @exc_middleware.error_handler(PageError)

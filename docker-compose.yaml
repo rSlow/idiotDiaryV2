@@ -20,7 +20,6 @@ services:
     depends_on:
       - postgres
       - redis
-      - selenium
       - rabbitmq
       - migrations
     restart: always
@@ -45,6 +44,10 @@ services:
         target: "/app/cookies/"
     depends_on:
       - rabbitmq
+      - selenium
+      - postgres
+      - redis
+      - migrations
     entrypoint:
       [ "poetry", "run", "taskiq", "worker", "--tasks-pattern", "['**/tasks']", "idiotDiary.mq.run:broker" ]
     profiles:
