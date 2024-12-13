@@ -31,23 +31,23 @@ class SeleniumProvider(Provider):
 
     @provide(scope=Scope.REQUEST)
     def get_selenium_driver(self, config: SeleniumConfig, options: Options) -> Iterable[WebDriver]:
+        seleniumwire_options = {"auto_config": False}
+        if config.proxy is not None:
+            seleniumwire_options['proxy'] = {
+                "http": config.proxy.uri,
+                "https": config.proxy.uri,
+                'no_proxy': 'localhost,127.0.0.1'
+            }
+
         match config.type_:
             case SeleniumDriverType.REMOTE:
                 driver = webdriver.Remote(
                     config.uri,
                     DesiredCapabilities.CHROME,
-                    seleniumwire_options={"auto_config": False},
-                    options=options
+                    options=options, seleniumwire_options=seleniumwire_options
                 )
 
             case SeleniumDriverType.CHROME:
-                seleniumwire_options = {}
-                if config.proxy is not None:
-                    seleniumwire_options['proxy'] = {
-                        "http": config.proxy.uri,
-                        "https": config.proxy.uri,
-                        'no_proxy': 'localhost,127.0.0.1'
-                    }
                 service = chrome.Service(executable_path=config.path)
                 driver = webdriver.Chrome(
                     options=options, service=service, seleniumwire_options=seleniumwire_options

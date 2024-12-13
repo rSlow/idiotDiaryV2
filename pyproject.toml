@@ -41,6 +41,7 @@ bs4 = "^0.0.2"
 python-dateutil = "^2.9.0.post0"
 selenium-wire = "^5.1.0"
 blinker = "1.7.0"
+setuptools = "^75.6.0"
 
 
 [build-system]

@@ -100,7 +100,7 @@ services:
     restart: always
     ports:
       - "127.0.0.1:${EXPOSE_RABBITMQ}:5672"
-      - "127.0.0.1:${EXPOSE_RABBITMQ_HTTP}:15672"
+      - "${EXPOSE_RABBITMQ_HTTP}:15672"
     volumes:
       - type: "volume"
         source: "rabbitmq"

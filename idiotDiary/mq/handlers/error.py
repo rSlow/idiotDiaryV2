@@ -49,8 +49,8 @@ async def base_error(exc: Exception, message: TaskiqMessage, _, alert: FromDishk
 
 @exc_middleware.error_handler(PageError)
 @error_inject
-async def selenium_webdriver_error(
-        exc: InvalidSubPageError, _message: TaskiqMessage, _result: TaskiqResult,
+async def selenium_page_parser_error(
+        exc: PageError, _message: TaskiqMessage, _result: TaskiqResult,
         alert: FromDishka[BotAlert]
 ):
     exc_text = (
