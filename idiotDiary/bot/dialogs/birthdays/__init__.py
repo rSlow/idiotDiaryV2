@@ -1,5 +1,7 @@
 from aiogram import Router
 
+from idiotDiary.bot.filters.base import set_filter_on_router
+from idiotDiary.bot.filters.user import role_filter
 from .calendar import calendar_dialog
 from .clear import clear_dialog
 from .main import main_birthday_dialog
@@ -12,6 +14,7 @@ from .time_correction import time_correction_dialog
 
 def setup():
     router = Router(name=__name__)
+    set_filter_on_router(router, role_filter("birthdays"))
 
     router.include_routers(
         clear_dialog,

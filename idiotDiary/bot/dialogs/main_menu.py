@@ -2,7 +2,7 @@ from aiogram_dialog import Dialog, Window, LaunchMode
 from aiogram_dialog.widgets.kbd import Column, Start
 from aiogram_dialog.widgets.text import Format, Const
 
-from idiotDiary.bot.filters.user import F_User_roles, F_User
+from idiotDiary.bot.filters.user import F_User, adg_role_filter
 from idiotDiary.bot.states.admin import AdminMainSG
 from idiotDiary.bot.states.birthdays import BirthdaysMenuSG
 from idiotDiary.bot.states.music import MusicMainSG
@@ -26,24 +26,25 @@ main_menu = Dialog(
                 Const("нерабочая площадка 😶‍🌫️"),
                 id="not_working_place",
                 state=NwpMainSG.state,
-                when=F_User_roles.contains("nwp")
+                when=adg_role_filter("nwp")
             ),
             Start(
                 Const("(бес)платная шаурма 🌯"),
                 id="free_shaurma",
                 state=FshPickFormSG.device,
-                when=F_User_roles.contains("shaurma")
+                when=adg_role_filter("shaurma")
             ),
             Start(
                 Const("напоминальщик ДР 🎂"),
                 id="birthdays",
                 state=BirthdaysMenuSG.state,
-                when=F_User_roles.contains("birthdays")
+                when=adg_role_filter("birthdays")
             ),
             Start(
                 Const("Музыка 🎧"),
                 id="music",
-                state=MusicMainSG.state
+                state=MusicMainSG.state,
+                when=adg_role_filter("music")
             ),
             Start(
                 Const("Профиль 👤"),
@@ -54,6 +55,7 @@ main_menu = Dialog(
                 Const("Подписки FarPost "),
                 id="subs",
                 state=SubsMainFSM.state,
+                when=adg_role_filter("subs")
             ),
             Start(
                 Const("Админка ⚙️"),
