@@ -42,7 +42,7 @@ COOKIE_FILE = "farpost.pkl"
 @broker.task
 @inject
 async def is_url_valid(url: str, driver: FromDishka[WebDriver], paths: FromDishka[Paths]):
-    driver.implicitly_wait(5)
+    # driver.implicitly_wait(5)
     parsed_url = urlparse(url)
     driver.get(f"{parsed_url.scheme}://{parsed_url.netloc}")  # get session data
     with RequestContext(driver, paths.cookies_folder_path / COOKIE_FILE):
@@ -60,7 +60,7 @@ async def check_ads(
         user_dao: FromDishka[UserDao], sub_dao: FromDishka[SubscriptionDao],
         paths: FromDishka[Paths]
 ):
-    driver.implicitly_wait(5)
+    # driver.implicitly_wait(5)
     parsed_url = urlparse(url)
     driver.get(f"{parsed_url.scheme}://{parsed_url.netloc}")  # get session data
     with RequestContext(driver, paths.cookies_folder_path / COOKIE_FILE):
