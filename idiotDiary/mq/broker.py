@@ -16,7 +16,7 @@ def main():
 
     result_backend = RedisAsyncResultBackend(mq_config.result_backend.uri)
     _broker = (
-        AioPikaBroker(url=mq_config.mq.uri, qos=1)
+        AioPikaBroker(url=mq_config.mq.uri, qos=1, max_priority=5)
         .with_result_backend(result_backend)
         .with_middlewares()
     )

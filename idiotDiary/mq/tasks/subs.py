@@ -39,7 +39,7 @@ def _is_captcha_window(driver: WebDriver):
 COOKIE_FILE = "farpost.pkl"
 
 
-@broker.task
+@broker.task(priority=5)
 @inject
 async def is_url_valid(url: str, driver: FromDishka[WebDriver], paths: FromDishka[Paths]):
     # driver.implicitly_wait(5)
