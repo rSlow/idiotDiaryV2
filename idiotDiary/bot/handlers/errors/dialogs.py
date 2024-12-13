@@ -7,6 +7,7 @@ from aiogram.exceptions import TelegramBadRequest
 from aiogram.filters import ExceptionTypeFilter
 from aiogram_dialog import DialogManager, StartMode, ShowMode
 from aiogram_dialog.api.exceptions import UnknownIntent, NoContextError, OutdatedIntent
+from dishka import AsyncContainer
 
 from idiotDiary.bot.states.start import MainMenuSG
 from idiotDiary.bot.views.alert import BotAlert
@@ -58,7 +59,8 @@ async def outdated_intent(
     dialog_message_id: int = dialog_manager.current_stack().last_message_id
     if dialog_message_id != message.message_id:
         message_to_del = random.choice([dialog_message_id, message.message_id])
-        alert: BotAlert = dialog_manager.middleware_data["alert"]
+        dishka: AsyncContainer = dialog_manager.middleware_data["dishka_container"]
+        alert = await dishka.get(BotAlert)
         await alert(
             f"outdated intent: {dialog_message_id = }, {message.message_id = }"
             f"deleted message: {message_to_del}"
