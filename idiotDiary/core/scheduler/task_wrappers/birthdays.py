@@ -1,7 +1,6 @@
 from datetime import timedelta
 
 from aiogram import Bot
-from aiogram_dialog import BgManagerFactory, ShowMode
 from dishka import FromDishka
 
 from idiotDiary.bot.di.jinja import JinjaRenderer
@@ -20,7 +19,6 @@ async def check_birthdays(
         user_dao: FromDishka[UserDao],
         jinja: FromDishka[JinjaRenderer],
         bot: FromDishka[Bot],
-        bg: FromDishka[BgManagerFactory]
 ):
     user_state = await notification_dao.get_user_state(user_id)
     user = await user_dao.get_by_id(user_id)
@@ -38,4 +36,3 @@ async def check_birthdays(
             tomorrow_birthdays=tomorrow_birthdays
         )
         await bot.send_message(chat_id=user.tg_id, text=message_text)
-        await bg.bg(bot, user.tg_id, user.tg_id).update({}, show_mode=ShowMode.DELETE_AND_SEND)

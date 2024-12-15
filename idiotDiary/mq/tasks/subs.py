@@ -3,7 +3,6 @@ from urllib.parse import urlparse
 
 from aiogram import Bot
 from aiogram.utils.text_decorations import html_decoration as hd
-from aiogram_dialog import BgManagerFactory, ShowMode
 from dishka import FromDishka
 from selenium.common import NoSuchElementException
 from selenium.webdriver.common.by import By
@@ -42,7 +41,6 @@ COOKIE_FILE = "farpost.pkl"
 @broker.task(priority=5)
 @inject
 async def is_url_valid(url: str, driver: FromDishka[WebDriver], paths: FromDishka[Paths]):
-    # driver.implicitly_wait(5)
     parsed_url = urlparse(url)
     driver.get(f"{parsed_url.scheme}://{parsed_url.netloc}")  # get session data
     with RequestContext(driver, paths.cookies_folder_path / COOKIE_FILE):
@@ -56,11 +54,9 @@ async def is_url_valid(url: str, driver: FromDishka[WebDriver], paths: FromDishk
 @inject
 async def check_ads(
         url: str, user_id: int, sub_id: int,
-        driver: FromDishka[WebDriver], bot: FromDishka[Bot], bg: FromDishka[BgManagerFactory],
-        user_dao: FromDishka[UserDao], sub_dao: FromDishka[SubscriptionDao],
-        paths: FromDishka[Paths]
+        driver: FromDishka[WebDriver], bot: FromDishka[Bot], user_dao: FromDishka[UserDao],
+        sub_dao: FromDishka[SubscriptionDao], paths: FromDishka[Paths]
 ):
-    # driver.implicitly_wait(5)
     parsed_url = urlparse(url)
     driver.get(f"{parsed_url.scheme}://{parsed_url.netloc}")  # get session data
     with RequestContext(driver, paths.cookies_folder_path / COOKIE_FILE):
@@ -77,4 +73,3 @@ async def check_ads(
         quoted_name = hd.quote(sub.name)
         text = f"Для подписки <a href='{url}'>{quoted_name}</a> появились новые предложения!"
         await bot.send_message(chat_id=user.tg_id, text=text, disable_web_page_preview=True)
-        await bg.bg(bot, user.tg_id, user.tg_id).update({}, show_mode=ShowMode.DELETE_AND_SEND)
