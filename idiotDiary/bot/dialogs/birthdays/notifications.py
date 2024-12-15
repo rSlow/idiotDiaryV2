@@ -46,7 +46,7 @@ async def delete_notification(
     notification_id = int(notification_id)
     notification = await dao.get_notification(notification_id)
     await dao.delete_notification(notification_id)
-    scheduler.remove_birthday_notification(notification)
+    scheduler.remove_birthday_notification(notification_id)
     await callback.message.answer(
         f"Время оповещения {notification.time:{dates.TIME_FORMAT}} удалено."
     )
