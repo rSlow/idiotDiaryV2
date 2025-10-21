@@ -4,7 +4,7 @@ from dishka import Provider, provide, Scope
 from jinja2 import Environment, FileSystemLoader, BaseLoader, Template
 
 from idiotDiary.bot.views import jinja
-from idiotDiary.bot.views.jinja.filters import datetime_filter, timedelta_filter
+from idiotDiary.bot.views.jinja.filters import datetime_filter, timedelta_filter, declension_filter
 from idiotDiary.core.config import Paths
 from idiotDiary.core.utils import dates
 from idiotDiary.core.utils.dates import get_now
@@ -43,6 +43,7 @@ class JinjaProvider(Provider):
             "time": lambda x: datetime_filter(x, dates.TIME_FORMAT),
             "date": lambda x: datetime_filter(x, dates.DATE_FORMAT),
             "timedelta": timedelta_filter,
+            "declension": declension_filter,
         }
         env = Environment(loader=loader, trim_blocks=True, lstrip_blocks=True, autoescape=True)
         env.filters.update(filters)

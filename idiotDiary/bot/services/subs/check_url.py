@@ -1,3 +1,4 @@
+import html
 from urllib.parse import urlparse
 
 from aiogram import types
@@ -18,10 +19,10 @@ async def on_url_success(message: types.Message, _, manager: DialogManager, data
             timeout_message="Превышено время проверки. Попробуйте повторить чуть позже."
     ) as context:
         parsed_url = urlparse(data)
-        request_url = (f"{parsed_url.scheme}://"
-                       f"{parsed_url.netloc}"
-                       f"{parsed_url.path}"
-                       f"?{parsed_url.query}")
+        request_url = html.escape(f"{parsed_url.scheme}://"
+                                  f"{parsed_url.netloc}"
+                                  f"{parsed_url.path}"
+                                  f"?{parsed_url.query}")
         is_url_valid: bool = await context.wait_result(timeout=60, url=request_url)
         if is_url_valid:
             manager.dialog_data["url"] = request_url

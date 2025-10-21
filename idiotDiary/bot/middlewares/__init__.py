@@ -3,10 +3,12 @@ from aiogram_dialog.api.entities import DIALOG_EVENT_NAME
 
 from .context_data import ContextDataMiddleware
 from .logging import EventLoggingMiddleware
+from .user import UserMiddleware
 
 
 def setup_middlewares(dp: Dispatcher):
-    _base_setup_middleware(dp, ContextDataMiddleware(), outer=True)
+    _base_setup_middleware(dp, UserMiddleware(), outer=True)
+    _base_setup_middleware(dp, ContextDataMiddleware())
     _base_setup_middleware(dp, EventLoggingMiddleware())
 
 

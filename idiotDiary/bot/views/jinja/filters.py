@@ -14,3 +14,11 @@ def datetime_filter(
 def timedelta_filter(value: timedelta) -> str:
     minutes = value.seconds // 60
     return f"{minutes} мин."
+
+
+def declension_filter(value: int) -> str:
+    if value % 10 == 1 and value != 11:
+        return "год"
+    elif value % 10 in [2, 3, 4] and (value < 10 or value > 20):
+        return "года"
+    return "лет"

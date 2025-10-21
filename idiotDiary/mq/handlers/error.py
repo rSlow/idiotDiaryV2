@@ -11,7 +11,7 @@ from idiotDiary.core.db.dao.user import UserDao
 from idiotDiary.core.scheduler.scheduler import ApScheduler
 from idiotDiary.mq.di.inject import error_inject
 from idiotDiary.mq.middlewares.exception_middleware import ExceptionMiddleware
-from idiotDiary.mq.utils.exceptions import InvalidSubPageError, PageError
+from idiotDiary.mq.utils.exceptions import PageError
 
 exc_middleware = ExceptionMiddleware()
 

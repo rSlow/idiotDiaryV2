@@ -8,7 +8,7 @@ from idiotDiary.mq.broker import broker
 
 
 @broker.task
-async def pack_pdf_file(file_paths: list[Path]) -> Path:
+def pack_pdf_file(file_paths: list[Path]) -> Path:
     page_lists: list[list[PageObject]] = []
     for file_path in file_paths:
         page_lists.append(PdfReader(file_path).pages)

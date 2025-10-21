@@ -11,3 +11,7 @@ class InvalidSubPageError(PageError):
 
 class CaptchaPageError(PageError):
     log_message = "Вылезло окно капчи. Возможно, требуется обновление куков."
+
+
+class NoReelDownloadedError(BaseError):
+    log_message = "Не найден скачанный файл"

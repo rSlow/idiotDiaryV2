@@ -1,7 +1,3 @@
-__all__ = [
-    "DaoHolder"
-]
-
 from redis.asyncio import Redis
 from sqlalchemy.ext.asyncio import AsyncSession
 

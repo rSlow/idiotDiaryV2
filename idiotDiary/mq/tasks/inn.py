@@ -7,13 +7,13 @@ from selenium.webdriver.remote.webdriver import WebDriver
 
 from idiotDiary.bot.schemas.inn import INNSchema
 from idiotDiary.mq.broker import broker
-from idiotDiary.mq.di.inject import inject
+from idiotDiary.mq.di.inject import inject, sync_inject
 from idiotDiary.mq.utils.types.selenium import PartialFind
 
 
 @broker.task
-@inject
-async def get_inn(data: dict, driver: FromDishka[WebDriver]):
+@sync_inject
+def get_inn(data: dict, driver: FromDishka[WebDriver]):
     inn_schema = INNSchema.model_validate(data)
     # short function names
     wait = driver.implicitly_wait

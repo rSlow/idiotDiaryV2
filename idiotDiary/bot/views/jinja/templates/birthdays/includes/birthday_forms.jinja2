@@ -7,7 +7,7 @@
             {{ birthday.rank }}
         {% endif %}
 
-        {{ birthday.fio }} - {{ birthday.age }} {{ birthday.declension }}
+        {{ birthday.fio }} - {{ birthday.age }} {{ birthday.age|declension }}
         <br>
     {% endfor %}
 

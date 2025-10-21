@@ -20,3 +20,7 @@ BIRTHDAYS = BotCommand(
     command="birthdays",
     description="check дни рождений"
 )
+REEL_DOWNLOAD = BotCommand(
+    command="reel",
+    description="скачать reels"
+)

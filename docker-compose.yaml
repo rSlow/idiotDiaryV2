@@ -49,7 +49,12 @@ services:
       - redis
       - migrations
     entrypoint:
-      [ "poetry", "run", "taskiq", "worker", "--tasks-pattern", "['**/tasks']", "idiotDiary.mq.run:broker" ]
+      [
+        "poetry", "run", "taskiq", "worker",
+        "--tasks-pattern", "['**/tasks']",
+        "--max-threadpool-threads", "1",
+        "idiotDiary.mq.run:broker"
+      ]
     profiles:
       - services
 

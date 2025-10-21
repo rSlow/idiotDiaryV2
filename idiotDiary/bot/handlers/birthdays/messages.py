@@ -11,7 +11,6 @@ from idiotDiary.bot.views.birthdays import get_birthdays_message
 from idiotDiary.core.db import dto
 from idiotDiary.core.db.dao.birthday import BirthdayDao
 
-birthdays_router = Router(name="birthdays")
 
 
 @inject

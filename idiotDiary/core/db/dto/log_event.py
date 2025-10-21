@@ -5,8 +5,6 @@ import pytz
 from aiogram import types as t
 from aiogram_dialog.utils import CB_SEP
 
-from idiotDiary.core.db import dto
-
 
 @dataclass
 class LogEvent:
@@ -33,7 +31,7 @@ class LogEvent:
         dt = datetime.now(tz=pytz.UTC)
         chat_id = callback.message.chat.id
         if isinstance(callback.message, t.InaccessibleMessage):
-            return dto.LogEvent(
+            return LogEvent(
                 type_="inaccessible_callback_query",
                 chat_id=chat_id,
                 dt=dt

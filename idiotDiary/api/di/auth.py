@@ -31,7 +31,7 @@ class AuthProvider(Provider):
             dao: DaoHolder,
     ) -> dto.User:
         try:
-            token = await cookie_auth.get_token(request)
+            token = cookie_auth.get_token(request)
             return await auth_service.get_user_from_bearer(token, dao)
         except (PyJWTError, AuthError, HTTPException):
             try:

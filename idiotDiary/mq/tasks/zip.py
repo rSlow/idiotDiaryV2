@@ -6,7 +6,7 @@ from idiotDiary.mq.broker import broker
 
 
 @broker.task
-async def zip_files_in_folder(folder_path: Path):
+def zip_files_in_folder(folder_path: Path):
     zip_filename = get_now().isoformat() + ".zip"
     files_to_zip: list[Path] = [*folder_path.glob("*.*")]
     # to prevent trying to zip self zip file (glob is lazy generator)

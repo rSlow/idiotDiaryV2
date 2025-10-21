@@ -11,7 +11,7 @@ from idiotDiary.mq.broker import broker
 
 
 @broker.task
-async def download_youtube_audio(
+def download_youtube_audio(
         temp_path: Path, url: str,
         from_time: Optional[str] = None, to_time: Optional[str] = None
 ) -> Path:

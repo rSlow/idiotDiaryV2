@@ -1,3 +1,5 @@
+import html
+
 from aiogram import types, F
 from aiogram_dialog import Dialog, Window, DialogManager, ShowMode
 from aiogram_dialog.widgets.input import TextInput
@@ -28,6 +30,7 @@ async def sub_main_getter(
     sub_id = dialog_manager.start_data["sub_id"]
     subscription = await sub_dao.get(sub_id)
     dialog_manager.dialog_data["sub_is_active"] = subscription.is_active
+    subscription.url = html.unescape(subscription.url)
     return {"subscription": subscription}
 
 

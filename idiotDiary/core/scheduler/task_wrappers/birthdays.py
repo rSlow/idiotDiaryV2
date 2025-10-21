@@ -1,6 +1,8 @@
 from datetime import timedelta
 
 from aiogram import Bot
+from aiogram.types import InlineKeyboardButton
+from aiogram.utils.keyboard import InlineKeyboardBuilder
 from dishka import FromDishka
 
 from idiotDiary.bot.di.jinja import JinjaRenderer
@@ -35,4 +37,16 @@ async def check_birthdays(
             today_birthdays=today_birthdays,
             tomorrow_birthdays=tomorrow_birthdays
         )
-        await bot.send_message(chat_id=user.tg_id, text=message_text)
+
+        kb = InlineKeyboardBuilder()
+        kb.add(
+            InlineKeyboardButton(
+                text="Напомнить ...",
+                callback_data="remind"
+            ),
+        )
+
+        await bot.send_message(
+            chat_id=user.tg_id, text=message_text,
+            reply_markup=kb.as_markup()
+        )

@@ -23,7 +23,7 @@ class OAuth2PasswordBearerWithCookie(OAuth2):
         super().__init__(flows=flows, scheme_name=scheme_name, auto_error=auto_error)
 
     @staticmethod
-    async def get_token(request: Request) -> Token:
+    def get_token(request: Request) -> Token:
         authorization = request.cookies.get("Authorization", "")
         scheme, param = get_authorization_scheme_param(authorization)
         if not authorization or scheme.lower() != "bearer":

@@ -12,7 +12,7 @@ from idiotDiary.core.config import Paths
 from idiotDiary.core.db.dao.subscription import SubscriptionDao
 from idiotDiary.core.db.dao.user import UserDao
 from idiotDiary.mq.broker import broker
-from idiotDiary.mq.di.inject import inject
+from idiotDiary.mq.di.inject import inject, sync_inject
 from idiotDiary.mq.utils.exceptions import InvalidSubPageError, CaptchaPageError
 from idiotDiary.mq.utils.request_context import RequestContext
 
@@ -39,7 +39,7 @@ COOKIE_FILE = "farpost.pkl"
 
 
 @broker.task(priority=5)
-@inject
+@sync_inject
 async def is_url_valid(url: str, driver: FromDishka[WebDriver], paths: FromDishka[Paths]):
     parsed_url = urlparse(url)
     driver.get(f"{parsed_url.scheme}://{parsed_url.netloc}")  # get session data
@@ -51,7 +51,7 @@ async def is_url_valid(url: str, driver: FromDishka[WebDriver], paths: FromDishk
 
 
 @broker.task
-@inject
+@sync_inject
 async def check_ads(
         url: str, user_id: int, sub_id: int,
         driver: FromDishka[WebDriver], bot: FromDishka[Bot], user_dao: FromDishka[UserDao],
