@@ -52,7 +52,7 @@ main_menu = Dialog(
                 state=UserMainSG.state,
             ),
             Start(
-                Const("Подписки FarPost "),
+                Const("Подписки FarPost 📈"),
                 id="subs",
                 state=SubsMainFSM.state,
                 when=adg_role_filter("subs")
