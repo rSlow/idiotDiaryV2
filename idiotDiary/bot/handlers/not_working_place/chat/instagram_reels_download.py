@@ -34,13 +34,13 @@ async def download_reel_in_chat(
         command_args = command.args.split()
         url = command_args[0]
         parsed_url = urlparse(url)
-        reel_id_match = re.match(r"/reel/\w+", parsed_url.path)
+        reel_id_match = re.match(r"/reel/(\w+-)", parsed_url.path)
         if any((
                 "instagram.com" not in parsed_url.netloc,
                 not reel_id_match,
         )):
             no_url_msg = await message.answer(
-                text=f"Введена невалидная ссылка. Ссылка должна быть вида"
+                text=f"Введена невалидная ссылка. Ссылка должна быть вида \n"
                      f"<code>https://www.instagram.com/reel/DOGmdDojBZ1</code>",
                 disable_web_page_preview=True,
             )
