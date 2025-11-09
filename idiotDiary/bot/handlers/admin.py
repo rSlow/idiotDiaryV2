@@ -11,7 +11,7 @@ async def get_message_info(message: types.Message):
     if forward_origin.type != "hidden_user":
         text += f"User ID: {forward_origin.sender_user.id}\n"
     text += f"Chat ID: {message.chat.id}\nFrom User ID: {message.from_user.id}\n"
-    await message.answer(text)
+    await message.reply(text)
 
 
 def setup():
